@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+    <project>
+        <path>$WS_DIR$\Secure\GPIO_IOToggle_TrustZone_S.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\NonSecure\GPIO_IOToggle_TrustZone_NS.ewp</path>
+    </project>
+    <batchBuild>
+        <batchDefinition>
+            <name>All</name>
+            <member>
+                <project>GPIO_IOToggle_TrustZone_S</project>
+                <configuration>GPIO_IOToggle_TrustZone_S</configuration>
+            </member>
+            <member>
+                <project>GPIO_IOToggle_TrustZone_NS</project>
+                <configuration>GPIO_IOToggle_TrustZone_NS</configuration>
+            </member>
+        </batchDefinition>
+    </batchBuild>
+</workspace>
