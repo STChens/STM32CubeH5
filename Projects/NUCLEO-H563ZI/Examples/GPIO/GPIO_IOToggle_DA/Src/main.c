@@ -40,7 +40,21 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define RESET_n_INIT_COUNTER()  \
+  {     \
+      DWT->CYCCNT = 0;  \
+      DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;\
+  }
+#define STOP_n_GET_COUNTER(val)  \
+  {     \
+    DWT->CTRL &= (~DWT_CTRL_CYCCNTENA_Msk); \
+    (val) = DWT->CYCCNT; \
+  }
+#define ENABLE_DWT_COUNTER()    \
+  {\
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;\
+    DWT->CYCCNT = 0;\
+  }
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -65,6 +79,24 @@ static void read_SBS_reg(void);
 static void SetProductState(uint32_t prodState);
 static void GetProductState(void);
 
+/**
+  * @brief  Print clock counter number and convert to ms/us
+  * @param  cnt clock counter
+  * @param  str string to be printed at the beginning
+  * @param  keylen length of cipher key
+  * @retval None.
+  */
+static void DemoPrintCounter(uint32_t cnt, char *str)
+{
+  printf("\r\n------------------------------------------------------\r\n");
+  if((str)!=NULL)
+    printf("\t %s:\r\n", str);
+  printf("Clock cycle: %d\r\n", cnt);
+  cnt=cnt/250;
+  printf("Time: %d(ms) %d(us)\r\n", cnt/1000, cnt);
+  printf("------------------------------------------------------\r\n");
+}
+
 static void read_SBS_reg(void)
 {
   __HAL_RCC_SBS_CLK_ENABLE();
@@ -86,10 +118,32 @@ static void open_debug(void)
   printf("==> Read SBS DBG CR register [%08x]\r\n", SBS->DBGCR);
   printf("==> Enable AP and DBG from SBS\r\n");
   SBS->DBGCR = 0xb451b4b4;
-  SBS->DBGLOCKR = 0x0000006a;
+  SBS->DBGLOCKR = 0x0000006a;  
   DBGMCU->CR |= 0x00010000; /* set bit16 as 1 to reset SBS under power reset instead of system reset*/
+  
+  __DSB();
+  __ISB();
   read_SBS_reg();
   while(1){}
+}
+
+static void open_debug_partial(int unlock_ap, int unlock_dbg, int auth_hdpl)
+{
+  uint32_t unlockAp = (unlock_ap == 1) ? 0xB4 : 0;
+  uint32_t unlockDBG = (unlock_dbg == 1) ? 0xB400 : 0;
+  uint32_t authHDPL = (auth_hdpl == 1) ? 0x510000 : ((auth_hdpl == 2) ? 0x8A0000 : ((auth_hdpl == 3) ? 0x6F0000 : 0));
+  __HAL_RCC_SBS_CLK_ENABLE();
+
+  printf("Test SBS DBG \r\n");
+  printf("==> Read SBS DBG CR register [%08x]\r\n", SBS->DBGCR);
+  printf("==> Enable AP and DBG from SBS\r\n");
+  SBS->DBGCR = unlockAp | unlockDBG | authHDPL;
+  //SBS->DBGLOCKR = 0x0000006a;
+  DBGMCU->CR |= 0x00000000; /* set bit16 as 0 to reset SBS under system reset*/
+  __DSB();
+  __ISB();
+  
+  read_SBS_reg();  
 }
 
 static void GetProductState(void)
@@ -292,6 +346,10 @@ int main(void)
       printf("Set state to provisioning  ---------- 1\n");
       printf("Set state to provisioned   ---------- 2\n");
       printf("Set state to closed        ---------- 3\n");
+      printf("Test DWT                   ---------- w\n");
+      printf("Partial debug (no AP)      ---------- 4\n");
+      printf("Partial debug (no DBG)     ---------- 5\n");
+      printf("Partial debug (HDPL3)      ---------- 6\n");
       printf("Exit                       ---------- x\n");
       //while (HAL_UART_Receive(&hcom_uart[COM1], &response, 1, 1000) == HAL_TIMEOUT);
       COM_Flush();
@@ -299,6 +357,38 @@ int main(void)
       printf("Your input is : %c\r\n", response);
       switch (response)
       {
+      case '4':
+        open_debug_partial(0, 1, 1);
+        break;
+      case '5':
+        open_debug_partial(1, 0, 1);
+        break;
+      case '6':
+        open_debug_partial(1, 1, 3);
+        break;        
+      case 'w':
+        {
+          uint32_t cnt = 0;          
+          
+          ENABLE_DWT_COUNTER();
+          printf("Test DWT counter with debug enabled but AP disabled.\r\n");
+          open_debug_partial(0, 1, 1);
+          
+          RESET_n_INIT_COUNTER();
+          read_SBS_reg();
+          STOP_n_GET_COUNTER(cnt);
+          DemoPrintCounter(cnt, "Clock cycle for DWT test");
+          
+          ENABLE_DWT_COUNTER();
+          printf("Test DWT counter with debug and AP disabled.\r\n");
+          SBS->DBGCR = 0;
+          
+          RESET_n_INIT_COUNTER();
+          read_SBS_reg();
+          STOP_n_GET_COUNTER(cnt);
+          DemoPrintCounter(cnt, "Clock cycle for DWT test");          
+        }
+        break;
       case 'i':
         __HAL_RCC_SBS_CLK_ENABLE();
         printf("Current HDPL level is %02X\r\n", SBS->HDPLSR);
