@@ -107,6 +107,23 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+
+  COM_InitTypeDef Com;
+  Com.BaudRate = 115200;
+  Com.HwFlowCtl = COM_HWCONTROL_NONE;
+  Com.Parity = COM_PARITY_NONE;
+  Com.StopBits = COM_STOPBITS_1;
+  Com.WordLength = COM_WORDLENGTH_8B;
+  BSP_COM_Init(COM1, &Com);
+  printf("\r\n======================================================================");
+  printf("\r\n=              (C) COPYRIGHT 2026 STMicroelectronics                 =");
+  printf("\r\n=                                                                    =");
+  printf("\r\n=                     HASH TEST                                      =");
+  printf("\r\n======================================================================");
+  printf("\r\n** Build on %s, %s\r\n", __DATE__, __TIME__);
+
+  hash_test();
+
   MX_HASH_Init();
   MX_ICACHE_Init();
   /* USER CODE BEGIN 2 */
