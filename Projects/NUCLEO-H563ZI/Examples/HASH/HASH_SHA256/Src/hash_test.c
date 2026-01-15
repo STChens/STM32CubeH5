@@ -40,6 +40,13 @@
 #define Size_64K     (0x10000)
 #define Size_63K     (0x10000 - 0x400)
 #define Size_65K     (0x10000 + 0x400)
+#define Size_80K     (0x14000)
+
+#ifdef HASH_DMA_DEBUG
+#define HASH_DMA_DBGIF(x) x
+#else
+#define HASH_DMA_DBGIF(x) 
+#endif
 
 /* USER CODE END PM */
 
@@ -50,24 +57,39 @@ DMA_HandleTypeDef handle_GPDMA1_Channel0;
 
 /* USER CODE BEGIN PV */
 static __ALIGN_BEGIN const __IO uint8_t aInput[] __ALIGN_END = "The hash processor is a fully compliant implementation of the secure hash algorithm (SHA-1, SHA-2 family) and the HMAC (keyed-hash message authentication code) algorithm.";
-__ALIGN_BEGIN static uint8_t aSHA224Digest[28] __ALIGN_END;
+__ALIGN_BEGIN static uint8_t aSHADigest[64] __ALIGN_END;
 __ALIGN_BEGIN static uint8_t aExpectSHA224Digest[28] __ALIGN_END = { 0x61, 0x30, 0x9d, 0x5f, 0xa1, 0xe7, 0x82, 0x88,
                                                                      0x98, 0x20, 0xfc, 0xff, 0xc4, 0x62, 0x46, 0x72,
                                                                      0x63, 0xd4, 0xe1, 0x9c, 0xa4, 0x6d, 0xac, 0x17,
                                                                      0x7b, 0x8f, 0x05, 0x0a
                                                                     };
-__ALIGN_BEGIN static uint8_t aSHA256Digest[32] __ALIGN_END;
 __ALIGN_BEGIN static uint8_t aExpectSHA256Digest[32] __ALIGN_END = { 0x6d, 0x57, 0xa0, 0x56, 0xac, 0xa1, 0x3b, 0xcc,
                                                                      0x9f, 0x6a, 0x9a, 0xb4, 0xce, 0x90, 0x0a, 0x28,
                                                                      0xbe, 0xb5, 0xd8, 0x60, 0x70, 0x14, 0xb3, 0xe3,
                                                                      0xc0, 0xb3, 0xb3, 0xd7, 0xbd, 0x2e, 0x62, 0xf4
-							            };
+			
+				            };
+
+__ALIGN_BEGIN static uint8_t expected_sha256_65532_digest[32] = {
+  0x8e, 0x06, 0xbd, 0x2c, 0x78, 0x6a, 0xf9, 0xf5, 
+  0x25, 0x6b, 0x3e, 0x41, 0x07, 0xb1, 0x8d, 0x79,
+  0x9b, 0xd0, 0xee, 0x56, 0xd8, 0xbe, 0x30, 0x12, 
+  0x06, 0x4d, 0x81, 0x5d, 0xe7, 0xe7, 0x92, 0xbb
+};
+
+__ALIGN_BEGIN static uint8_t expected_sha256_65536_digest[32] = {
+  0x6e, 0xd4, 0x00, 0x7a, 0x9f, 0x8f, 0x86, 0xb7,  
+  0x90, 0xfe, 0x2c, 0xf0, 0xc8, 0x7d, 0x15, 0xbf,
+  0x60, 0x5b, 0xc6, 0x09, 0x00, 0x37, 0x8c, 0xc1,  
+  0x54, 0x9a, 0x96, 0xf6, 0x96, 0x65, 0x08, 0xc7
+};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 static void GPDMA1_Init(void);
 static void GPDMA1_Init_LinkList(uint32_t start_addr, int size);
-static void HASH_Init(int is_224);
+static void HASH_Init(int shasize);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -75,7 +97,7 @@ static void HASH_Init(int is_224);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 static void DemoPrintCounter(uint32_t cnt, char *str, int mode, int buf_size);
-void print_buf(const char * str, const uint8_t *buf, const size_t size, int showstring);
+void print_buf(const char * str, const uint8_t *buf, const size_t size, int hash_data_len);
 
 /**
   * @brief  Print clock counter number and convert to ms/us
@@ -105,105 +127,123 @@ static void DemoPrintCounter(uint32_t cnt, char *str, int mode, int buf_size)
   * @param  size size of the data in buffer in bytes
   * @retval None.
   */
-void print_buf(const char * str, const uint8_t *buf, const size_t size, int showstring)
+void print_buf(const char * str, const uint8_t *buf, const size_t size, int hash_data_len)
 {
   int i;
+#if 0
   if(str!=NULL)
   {
     printf("%s", str);
     printf("\r\n------------------------------------\r\n");
   }
+#endif
+  printf("%d: ", hash_data_len);
   for (i = 0; i< size; i++)
-  {
-    if(i%16 == 0)
-      printf("%08x:  ", i);
-
-    printf("%02x ",buf[i]);
-    if((i+1)%8 == 0) printf(" ");
-    if((i+1)%16 == 0) {
-      if ( showstring != 0 )
-      {
-        int j;
-        printf("| ");
-        for ( j = i-16; j<i; j++)
-        {
-          printf("%c", ((buf[j]>=0x20) && (buf[j]<127))?buf[j]:' ');
-        }
-      }
-      printf("\r\n");
-    }
+  {    
+    printf("%02x",buf[i]);
+    //if((i+1)%8 == 0) printf(" ");    
   }
+  printf("\r\n");
+#if 0
   if(str!=NULL)
     printf("\r\n------------------------------------\r\n");
+#endif
 }
 /* USER CODE END 0 */
+
+//#define HASH_DMA_BLOCK_SIZE 0xFFF0 // max is 0xFFFC
+#define HASH_DMA_BLOCK_SIZE 0xFFF0
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-static void hash_test_dma_224_256(int is_224, uint8_t * buf, int buf_size, uint8_t * ref, int ref_size, uint8_t *outbuf)
+static void hash_test_dma_sha2(int shasize, uint8_t * buf, int buf_size, uint8_t * ref, int ref_size, uint8_t *outbuf)
 {
   uint32_t cnt = 0;
+  int tmpsize = buf_size;
+  uint32_t pbuf = (uint32_t)buf;
+  uint32_t err;
 
   memset(outbuf, 0, ref_size);
 
-	printf("\r\n ===> Test HASH DMA mode %s\r\n", is_224 == 1?"SHA224":"SHA256");
-	/* Initialize all configured peripherals */
-        if ( buf_size < Size_64K )
-        {
-          GPDMA1_Init();
-        }
-        else
-        {
-          printf("Size must be < 64KB when using DMA mode\r\n");
-          return ;
-          // GPDMA1_Init_LinkList((uint32_t)buf, buf_size);	  
-        }
-        HASH_Init(is_224);
+	HASH_DMA_DBGIF(printf("\r\n ===> Test HASH DMA mode sha%d\r\n", shasize);)
+        GPDMA1_Init();
 
-	  printf("%s:%d\r\n", __FUNCTION__, __LINE__);
+        HASH_Init(shasize);
+
+	  HASH_DMA_DBGIF(printf("%s:%d\r\n", __FUNCTION__, __LINE__);)
 	  RESET_n_INIT_COUNTER();
 
+        __HAL_HASH_SET_MDMAT();
+        
+        while( tmpsize > HASH_DMA_BLOCK_SIZE )
+        {
+          //printf("Transfer data through DMA, size: %d, buffer pointer %x\r\n", HASH_DMA_BLOCK_SIZE, pbuf);
 	  /* Start HASH computation using DMA transfer */
-	  if (HAL_HASH_Start_DMA(&hhash, (uint8_t*)buf, buf_size, outbuf) != HAL_OK)
+	  if (HAL_HASH_Start_DMA(&hhash, (uint8_t*)pbuf, HASH_DMA_BLOCK_SIZE, outbuf) != HAL_OK)
 	  {
-		  printf("Call HAL_HASH_Start_DMA failed!\r\n");
+		  HASH_DMA_DBGIF(printf("Call HAL_HASH_Start_DMA failed!\r\n");)
 
 	    Error_Handler();
 	  }
 	  /* Wait for DMA transfer to complete */
 	  while (HAL_HASH_GetState(&hhash) == HAL_HASH_STATE_BUSY);
-	  STOP_n_GET_COUNTER(cnt);
-	  DemoPrintCounter(cnt, "HASH computation", is_224 == 1 ? 224 : 256, buf_size);
-
-	  printf("%s:%d HASH computation with DMA finished\r\n", __FUNCTION__, __LINE__);
-	  print_buf("Computed hash: ", outbuf, ref_size, 0);
-	  if ( ref != NULL )
+          tmpsize -= HASH_DMA_BLOCK_SIZE;
+          pbuf += HASH_DMA_BLOCK_SIZE;
+          
+          hhash.State = HAL_HASH_STATE_READY;
+        }        
+        
+        /* deal with the last block of data */
+        __HAL_HASH_RESET_MDMAT();
+        //printf("Transfer data through DMA last block, size: %d, buffer pointer %x\r\n", tmpsize, pbuf);
+        /* Start HASH computation using DMA transfer */
+	  if (HAL_HASH_Start_DMA(&hhash, (uint8_t*)pbuf, tmpsize, outbuf) != HAL_OK)
 	  {
-		  print_buf("Expected hash: ", ref, ref_size, 0);
+            HASH_DMA_DBGIF(printf("Call HAL_HASH_Start_DMA failed!\r\n");)
+
+	    Error_Handler();
+	  }
+	  /* Wait for DMA transfer to complete */
+	  while (HAL_HASH_GetState(&hhash) == HAL_HASH_STATE_BUSY);
+          
+          STOP_n_GET_COUNTER(cnt);
+	  err = HAL_HASH_GetError(&hhash);
+          
+          if ( err != HAL_HASH_ERROR_NONE )
+          {
+            printf("Hash computation error!\r\n");
+          }
+          
+	  HASH_DMA_DBGIF(printf("%s:%d HASH computation with DMA finished\r\n", __FUNCTION__, __LINE__);)
+	  print_buf("Computed hash: ", outbuf, ref_size, buf_size);
+	  HASH_DMA_DBGIF(DemoPrintCounter(cnt, "HASH computation", is_224 == 1 ? 224 : 256, buf_size);)
+          if ( ref != NULL )
+	  {
+		  HASH_DMA_DBGIF(print_buf("Expected hash: ", ref, ref_size, buf_size);)
 
 		 /* Compare computed digest with expected one */
 		  if( memcmp(outbuf, ref, ref_size) != 0)
 		  {
-			  printf("HASH computation result not as expected!\r\n");
+			  HASH_DMA_DBGIF(printf("HASH computation result not as expected!\r\n");)
 
 			BSP_LED_On(LED2);
 		  }
 		  else
 		  {
-			  printf("HASH computation result is OK!\r\n");
+			  HASH_DMA_DBGIF(printf("HASH computation result is OK!\r\n");)
 			BSP_LED_On(LED1);
 		  }
 	  }
-	  printf("%s:%d\r\n", __FUNCTION__, __LINE__);
+	  HASH_DMA_DBGIF(printf("%s:%d\r\n", __FUNCTION__, __LINE__);)
 
 	  if(HAL_HASH_DeInit(&hhash) != HAL_OK)
 	  {
 	    Error_Handler();
 	  }
 	  HAL_DMA_DeInit(hhash.hdmain);
-	  printf("<=== Deinit and return\r\n\r\n");
+	  HASH_DMA_DBGIF(printf("<=== Deinit and return\r\n\r\n");)
 }
 
 void hash_test(void)
@@ -212,7 +252,7 @@ void hash_test(void)
   /****************************************************************************/
   /****************************** SHA224 **************************************/
   /****************************************************************************/
-	hash_test_dma_224_256(1,
+	hash_test_dma_sha2(224,
 			(uint8_t*)aInput, strlen((char const*)aInput),
 			aExpectSHA224Digest, sizeof(aExpectSHA224Digest)/sizeof(aExpectSHA224Digest[0]),
 			aSHA224Digest);
@@ -221,41 +261,66 @@ void hash_test(void)
   /***************************** SHA256 ***************************************/
   /****************************************************************************/
 
-	hash_test_dma_224_256(0,
+	hash_test_dma_sha2(256,
 			(uint8_t*)aInput, strlen((char const*)aInput),
 			aExpectSHA256Digest, sizeof(aExpectSHA256Digest)/sizeof(aExpectSHA256Digest[0]),
-			aSHA256Digest);
+			aSHADigest);
 #endif
   /****************************************************************************/
   /****************************** SHA224 **************************************/
   /****************************************************************************/
-	hash_test_dma_224_256(1,
+#if 0
+	
+        hash_test_dma_sha2(224,
+			(uint8_t*)Input_64K, Size_64K-4,
+			NULL, sizeof(aExpectSHA224Digest)/sizeof(aExpectSHA224Digest[0]),
+			aSHADigest);
+	hash_test_dma_sha2(224,
 			(uint8_t*)Input_64K, Size_64K,
 			NULL, sizeof(aExpectSHA224Digest)/sizeof(aExpectSHA224Digest[0]),
-			aSHA224Digest);
-	hash_test_dma_224_256(1,
-			(uint8_t*)Input_64K, Size_64K,
-			NULL, sizeof(aExpectSHA224Digest)/sizeof(aExpectSHA224Digest[0]),
-			aSHA224Digest);
-	hash_test_dma_224_256(1,
+			aSHADigest);
+
+	hash_test_dma_sha2(224,
 			(uint8_t*)Input_64K, Size_65K,
 			NULL, sizeof(aExpectSHA224Digest)/sizeof(aExpectSHA224Digest[0]),
-			aSHA224Digest);
+			aSHADigest);
+
   /****************************************************************************/
   /***************************** SHA256 ***************************************/
   /****************************************************************************/
-	hash_test_dma_224_256(0,
-			(uint8_t*)Input_64K, Size_63K,
-			NULL, sizeof(aExpectSHA256Digest)/sizeof(aExpectSHA256Digest[0]),
-			aSHA256Digest);
-	hash_test_dma_224_256(0,
+
+	hash_test_dma_sha2(256,
+			(uint8_t*)Input_64K, Size_64K-4,
+			expected_sha256_65532_digest, sizeof(aExpectSHA256Digest)/sizeof(aExpectSHA256Digest[0]),
+			aSHADigest);
+	hash_test_dma_sha2(256,
 			(uint8_t*)Input_64K, Size_64K,
-			NULL, sizeof(aExpectSHA256Digest)/sizeof(aExpectSHA256Digest[0]),
-			aSHA256Digest);
-	hash_test_dma_224_256(0,
-			(uint8_t*)Input_64K, Size_65K,
-			NULL, sizeof(aExpectSHA256Digest)/sizeof(aExpectSHA256Digest[0]),
-			aSHA256Digest);
+			expected_sha256_65536_digest, sizeof(aExpectSHA256Digest)/sizeof(aExpectSHA256Digest[0]),
+			aSHADigest);
+        hash_test_dma_sha2(256,
+                (uint8_t*)Input_64K, Size_65K,
+                NULL, sizeof(aExpectSHA256Digest)/sizeof(aExpectSHA256Digest[0]),
+                aSHADigest);
+#endif
+
+#if 1
+        int shasize[] = {224, 256, 384, 512};
+        int i, j;
+        for (j = 0; j < 4; j++)
+        {
+          printf("\r\n=====> SHA2 Test %d\r\n", shasize[j]);
+          for ( i = 0 ; i <= 128; i++)
+          {
+            hash_test_dma_sha2(shasize[j], (uint8_t*)Input_64K, 65536+i, 
+                          NULL, shasize[j]/8, aSHADigest);
+          }
+          
+          hash_test_dma_sha2(shasize[j], (uint8_t*)Input_64K, Size_65K, 
+                          NULL, shasize[j]/8, aSHADigest);
+          hash_test_dma_sha2(shasize[j], (uint8_t*)Input_64K, Size_64K+Size_64K, 
+                          NULL, shasize[j]/8, aSHADigest);
+        }
+#endif
 }
 
 /**
@@ -403,7 +468,7 @@ static void GPDMA1_Init_LinkList(uint32_t start_addr, int size)
   * @param None
   * @retval None
   */
-static void HASH_Init(int is_224)
+static void HASH_Init(int shasize)
 {
 
   /* USER CODE BEGIN HASH_Init 0 */
@@ -415,10 +480,16 @@ static void HASH_Init(int is_224)
   /* USER CODE END HASH_Init 1 */
   hhash.Instance = HASH;
   hhash.Init.DataType = HASH_BYTE_SWAP;
-  if ( is_224 == 1 )
+  if ( shasize == 224 )
 	  hhash.Init.Algorithm = HASH_ALGOSELECTION_SHA224;
-  else
+  else if ( shasize == 256 )
 	  hhash.Init.Algorithm = HASH_ALGOSELECTION_SHA256;
+  else if ( shasize == 384 )
+	  hhash.Init.Algorithm = HASH_ALGOSELECTION_SHA384;
+  else if ( shasize == 512 )
+	  hhash.Init.Algorithm = HASH_ALGOSELECTION_SHA512;
+  else
+    Error_Handler();
   if (HAL_HASH_Init(&hhash) != HAL_OK)
   {
     Error_Handler();
