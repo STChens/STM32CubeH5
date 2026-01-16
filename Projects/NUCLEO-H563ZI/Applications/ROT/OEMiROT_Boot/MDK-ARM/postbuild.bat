@@ -95,9 +95,8 @@ IF !errorlevel! NEQ 0 goto :error
 call %img_config%
 
 IF "%app_full_secure%" == "1" (
-set s_sct_file="%appli_dir%\MDK-ARM\Secure\stm32h563xx_s.sct"
+set s_sct_file="%appli_dir%\MDK-ARM\stm32h563xx.sct"
 set s_main="%appli_dir%\Inc\main.h"
-echo s_main=%s_main%
 ) else (
 set s_sct_file="%appli_dir%\MDK-ARM\Secure\stm32h563xx_s.sct"
 set ns_sct_file="%appli_dir%\MDK-ARM\NonSecure\stm32h563xx_ns.sct"
@@ -285,7 +284,7 @@ IF !errorlevel! NEQ 0 goto :error
 set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_IMAGE_NON_SECURE_IMAGE_SIZE -n NS_CODE_SIZE %ns_sct_file% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
-:bypass_secure_icf_file_update
+:bypass_secure_sct_file_update
 
 :: ============================================================= Update %s_code_init_xml% =============================================================
 set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %s_code_init_xml% --vb >> %current_log_file% 2>&1"
@@ -331,6 +330,7 @@ IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% xmlval -xml %s_code_xml% -nxml %code_size% -nxml %scratch_sector_number% --decimal -e (((val1+1)/val2)+1) -cond val2 -c M %s_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
+echo %command%
 IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================ Update %ns_code_init_xml% =============================================================

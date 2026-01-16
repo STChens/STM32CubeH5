@@ -136,6 +136,8 @@
 #error "(FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) not aligned on FLASH_AREA_WRP_GROUP_SIZE"
 #endif /* ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_WRP_GROUP_SIZE) != 0 */
 
+#define SECURE_ONLY_APP 1
+#if (SECURE_ONLY_APP == 1) && (MCUBOOT_APP_IMAGE_NUMBER == 1)
 /* BL2 partitions size */
 #define FLASH_S_PARTITION_SIZE          (0xC6000) // test secure only (0x06000) /* 24 KB for S partition */
 #if defined(DEVICE_1M_FLASH_ENABLE)
@@ -143,6 +145,18 @@
 #else
 #define FLASH_NS_PARTITION_SIZE         (0) // test secure only (0xA0000) /* 640 KB for NS partition */
 #endif /* DEVICE_1M_FLASH_ENABLE */
+#else /* SECURE_ONLY_APP */
+
+/* BL2 partitions size */
+#define FLASH_S_PARTITION_SIZE          (0x06000) /* 24 KB for S partition */
+#if defined(DEVICE_1M_FLASH_ENABLE)
+#define FLASH_NS_PARTITION_SIZE         (0x40000) /* 256 KB for NS partition */
+#else
+#define FLASH_NS_PARTITION_SIZE         (0xA0000) /* 640 KB for NS partition */
+#endif /* DEVICE_1M_FLASH_ENABLE */
+
+#endif /* SECURE_ONLY_APP */
+
 #define FLASH_PARTITION_SIZE            (FLASH_S_PARTITION_SIZE+FLASH_NS_PARTITION_SIZE)
 
 #if (MCUBOOT_APP_IMAGE_NUMBER == 2)
