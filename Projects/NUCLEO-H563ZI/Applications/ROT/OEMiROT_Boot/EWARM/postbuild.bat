@@ -49,7 +49,7 @@ set appli_postbuild="%appli_dir%\EWARM\postbuild.bat"
 
 set "img_config=%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\img_config.bat"
 set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
-echo "bootpath = %bootpath%"
+
 ::======================================================================================
 ::image xml configuration files
 ::======================================================================================
@@ -94,8 +94,9 @@ IF !errorlevel! NEQ 0 goto :error
 call %img_config%
 
 IF "%app_full_secure%" == "1" (
-set s_icf_file=%appli_dir%\EWARM\stm32h573xx_flash.icf
+set s_icf_file=%appli_dir%\EWARM\stm32h563xx_flash.icf
 set s_main="%appli_dir%\Inc\main.h"
+echo s_main=%s_main%
 ) else (
 set s_icf_file="%appli_dir%\EWARM\Secure\stm32h563xx_flash_s.icf"
 set ns_icf_file="%appli_dir%\EWARM\NonSecure\stm32h563xx_flash_ns.icf"
