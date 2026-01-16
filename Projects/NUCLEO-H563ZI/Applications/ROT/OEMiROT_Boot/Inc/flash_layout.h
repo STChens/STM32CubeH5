@@ -25,14 +25,14 @@
  */
 
 /* Flash layout configuration : begin ****************************************/
-#define MCUBOOT_OVERWRITE_ONLY     /* Defined: the FW installation uses overwrite method.
+/*#define MCUBOOT_OVERWRITE_ONLY  */   /* Defined: the FW installation uses overwrite method.
                                       UnDefined: The FW installation uses swap mode. */
 
 #define MCUBOOT_EXT_LOADER         /* Defined: Use system bootloader (in system flash).
                                                To enter it, press user button at reset.
                                       Undefined: Do not use system bootloader. */
 
-#define MCUBOOT_APP_IMAGE_NUMBER 2      /* 1: S application only if FLASH_NS_PARTITION_SIZE = 0 ,
+#define MCUBOOT_APP_IMAGE_NUMBER 1      /* 1: S application only if FLASH_NS_PARTITION_SIZE = 0 ,
                                               else S and NS application binaries assembled in one single image.
                                            2: Two separated images for S and NS application binaries. */
 
@@ -137,11 +137,11 @@
 #endif /* ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_WRP_GROUP_SIZE) != 0 */
 
 /* BL2 partitions size */
-#define FLASH_S_PARTITION_SIZE          (0x06000) /* 24 KB for S partition */
+#define FLASH_S_PARTITION_SIZE          (0xC6000) // test secure only (0x06000) /* 24 KB for S partition */
 #if defined(DEVICE_1M_FLASH_ENABLE)
-#define FLASH_NS_PARTITION_SIZE         (0x40000) // test secure only (0x40000) /* 256 KB for NS partition */
+#define FLASH_NS_PARTITION_SIZE         (0) // test secure only (0x40000) /* 256 KB for NS partition */
 #else
-#define FLASH_NS_PARTITION_SIZE         (0xA0000) // test secure only (0xA0000) /* 640 KB for NS partition */
+#define FLASH_NS_PARTITION_SIZE         (0) // test secure only (0xA0000) /* 640 KB for NS partition */
 #endif /* DEVICE_1M_FLASH_ENABLE */
 #define FLASH_PARTITION_SIZE            (FLASH_S_PARTITION_SIZE+FLASH_NS_PARTITION_SIZE)
 
