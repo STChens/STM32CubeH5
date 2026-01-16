@@ -5,6 +5,7 @@ images.
 
 The core function of this application relies on the mcuboot middleware and the mbed-crypto middleware.
 
+It relies on cryptography hardware peripherals for optimal performances (PKA, SAE, HASH, RNG).
 This project is full secure.
 
 This project shows how to implement an OEMiROT.
@@ -15,6 +16,8 @@ The postbuild command is in charge of preparing the provisioning scripts and the
 (firmware application managed by OEMiROT) configuration files in ROT_Provisioning/OEMiROT folder,
 according to the flash layout and OEMiROT configuration.
 
+This project can also be configured as OEMuROT for STiROT_OEMuROT boot path.
+This is automatically performed when running the provisioning script of STiROT_OEMuROT boot path (ROT_Provisioning/STiROT_OEMuROT folder)
 
 The maximum system clock frequency at 250Mhz is configured.
 
@@ -25,12 +28,14 @@ TrustZone, OEMiROT, boot path, Root Of Trust, Security, mcuboot
 ### <b>Directory contents</b>
 
   - OEMiROT_Boot/Inc/mcuboot_config/mcuboot_config.h Mcuboot configuration file
+  - OEMiROT_Boot/Inc/aes_alt.h                       Header file for aes_alt.c
   - OEMiROT_Boot/Inc/boot_hal_cfg.h                  Platform configuration file for OEMiROT_Boot
   - OEMiROT_Boot/Inc/boot_hal_flowcontrol.h          Header file for flow control code in boot_hal.c
   - OEMiROT_Boot/Inc/boot_hal_hash_ref.h             Header file for hash reference code in boot_hal.c
   - OEMiROT_Boot/Inc/boot_hal_imagevalid.h           Header file for image validation code in boot_hal.c
   - OEMiROT_Boot/Inc/cmsis.h                         Header file for CMSIS
   - OEMiROT_Boot/Inc/mbedtls_config.h                Mbed-crypto configuration file
+  - OEMiROT_Boot/Inc/ecp_alt.h                       Header file for ecp_alt.c
   - OEMiROT_Boot/Inc/flash_layout.h                  Flash mapping
   - OEMiROT_Boot/Inc/low_level_flash.h               Header file for low_level_flash.c
   - OEMiROT_Boot/Inc/low_level_obkeys.h              Header file for low_level_obkeys.c
@@ -41,8 +46,12 @@ TrustZone, OEMiROT, boot path, Root Of Trust, Security, mcuboot
   - OEMiROT_Boot/Inc/sha256_alt.h                    Header file for sha256_alt.c
   - OEMiROT_Boot/Inc/stm32h5xx_hal_conf.h            HAL driver configuration file
   - OEMiROT_Boot/Inc/target_cfg.h                    Header file for target start up
+  - OEMiROT_Boot/Src/aes_alt.c                       AES HW crypto interface
   - OEMiROT_Boot/Src/bl2_nv_services.c               Non Volatile services for OEMiROT_Boot
   - OEMiROT_Boot/Src/boot_hal.c                      Platform initialization
+  - OEMiROT_Boot/Src/ecdsa_alt.c                     ECDSA HW crypto interface
+  - OEMiROT_Boot/Src/ecp_alt.c                       ECP HW crypto interface
+  - OEMiROT_Boot/Src/ecp_curves_alt.c                ECP curves HW crypto interface
   - OEMiROT_Boot/Src/image_macros_to_preprocess_bl2.cImages definitions to preprocess for bl2
   - OEMiROT_Boot/Src/keys_map.c                      keys indirection to access keys in OBKeys area
   - OEMiROT_Boot/Src/low_level_com.c                 UART low level interface
@@ -61,9 +70,9 @@ TrustZone, OEMiROT, boot path, Root Of Trust, Security, mcuboot
 
 ### <b>Hardware and Software environment</b>
 
-  - This example runs on STM32H563xx (2MBytes) devices with security enabled (TZEN=B4).
-  - It can be configured for STM32H563xx 1M device by uncommenting DEVICE_1M_FLASH_ENABLE (flash_layout.h).
-  - This example has been tested with STMicroelectronics NUCLEO-H563ZI (MB1404)
+  - This example runs on STM32H573xx devices with security enabled (TZEN=B4).
+  - It can be configured as OEMuRoT by uncommenting OEMUROT_ENABLE (flash_layout.h).
+  - This example has been tested with STMicroelectronics STM32H573I-DK (MB1677)
     board and can be easily tailored to any other supported device
     and development board.
   - To get debug print in your UART console you have to configure it using these parameters:
@@ -78,3 +87,18 @@ In order to build the OEMiROT_Boot project, you must do the following:
 
 Then refer to OEMiROT_Appli readme for example of application booted through OEMiROT boot path.
 
+### <b>Notes</b>
+
+By default the anti-tamper is enabled for internal tamper events only. It is possible to change this configuration with
+OEMIROT_TAMPER_ENABLE define in Inc\\boot_hal_cfg.h.
+
+```
+#define NO_TAMPER            (0)                   /*!< No tamper activated */
+#define INTERNAL_TAMPER_ONLY (1)                   /*!< Only Internal tamper activated */
+#define ALL_TAMPER           (2)                   /*!< Internal and External tamper activated */
+#define OEMIROT_TAMPER_ENABLE INTERNAL_TAMPER_ONLY /*!< TAMPER configuration flag  */
+```
+
+If OEMIROT_TAMPER_ENABLE is changed to ALL_TAMPER, the anti-tamper protection is enabled with active tamper pins usage.
+It is needed to connect TAMP_IN8 (PE5 on CN18 pin 18) and TAMP_OUT8 (PE4 on CN2 pin 5) on the STM32H573I-DK board,
+to allow the application to run. In case the tamper pins are opened or shorted, then the application is reset and blocked.
