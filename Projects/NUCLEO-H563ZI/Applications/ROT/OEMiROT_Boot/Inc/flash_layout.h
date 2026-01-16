@@ -32,8 +32,9 @@
                                                To enter it, press user button at reset.
                                       Undefined: Do not use system bootloader. */
 
-#define MCUBOOT_APP_IMAGE_NUMBER 2 /* 1: S and NS application binaries are assembled in one single image.
-                                      2: Two separated images for S and NS application binaries. */
+#define MCUBOOT_APP_IMAGE_NUMBER 2      /* 1: S application only if FLASH_NS_PARTITION_SIZE = 0 ,
+                                              else S and NS application binaries assembled in one single image.
+                                           2: Two separated images for S and NS application binaries. */
 
 #define MCUBOOT_S_DATA_IMAGE_NUMBER 0   /* 1: S data image for S application.
                                            0: No S data image. */
@@ -138,9 +139,9 @@
 /* BL2 partitions size */
 #define FLASH_S_PARTITION_SIZE          (0x06000) /* 24 KB for S partition */
 #if defined(DEVICE_1M_FLASH_ENABLE)
-#define FLASH_NS_PARTITION_SIZE         (0x40000) /* 256 KB for NS partition */
+#define FLASH_NS_PARTITION_SIZE         (0) // test secure only (0x40000) /* 256 KB for NS partition */
 #else
-#define FLASH_NS_PARTITION_SIZE         (0xA0000) /* 640 KB for NS partition */
+#define FLASH_NS_PARTITION_SIZE         (0) // test secure only (0xA0000) /* 640 KB for NS partition */
 #endif /* DEVICE_1M_FLASH_ENABLE */
 #define FLASH_PARTITION_SIZE            (FLASH_S_PARTITION_SIZE+FLASH_NS_PARTITION_SIZE)
 
@@ -168,9 +169,15 @@
                                          FLASH_S_DATA_PARTITION_SIZE : \
                                          FLASH_NS_DATA_PARTITION_SIZE)
 #define FLASH_MAX_PARTITION_SIZE        ((FLASH_MAX_APP_PARTITION_SIZE >   \
-                                         FLASH_MAX_DATA_PARTITION_SIZE) ? \
-                                         FLASH_MAX_APP_PARTITION_SIZE : \
-                                         FLASH_MAX_DATA_PARTITION_SIZE)
+                                         FLASH_MAX_DATA_PARTITION_SIZE) ?  \
+                                         ((FLASH_MAX_APP_PARTITION_SIZE >  \
+                                           FLASH_AREA_SCRATCH_SIZE) ?      \
+                                           FLASH_MAX_APP_PARTITION_SIZE :  \
+                                           FLASH_AREA_SCRATCH_SIZE) :      \
+                                         ((FLASH_MAX_DATA_PARTITION_SIZE > \
+                                           FLASH_AREA_SCRATCH_SIZE) ?      \
+                                           FLASH_MAX_DATA_PARTITION_SIZE : \
+                                           FLASH_AREA_SCRATCH_SIZE))
 
 /* BL2 flash areas */
 #define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_SCRATCH_SIZE+FLASH_AREA_BL2_SIZE)

@@ -538,8 +538,8 @@ static const struct sau_cfg_t region_sau_load_cfg[] =
 /* MPCBB : All SRAM block non secure */
 #define GTZC_MPCBB_ALL_NSEC (0x00000000UL)
 
-/* MPCBB : All SRAM block privileged only */
-#define GTZC_MPCBB_ALL_PRIV (0xFFFFFFFFUL)
+/* MPCBB : All SRAM block non privileged + privileged */
+#define GTZC_MPCBB_ALL_NPRIV (0x00000000UL)
 /* MPU configuration
    ================= */
 static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
@@ -1366,6 +1366,7 @@ static void gtzc_loader_cfg(void)
     {
       /*SRAM1 -> MPCBB1*/
       GTZC_MPCBB1_S->SECCFGR[i] = GTZC_MPCBB_ALL_NSEC;
+      GTZC_MPCBB1_S->PRIVCFGR[i] = GTZC_MPCBB_ALL_NPRIV;
     }
 
     /* All bocks of SRAM3 configured non secure / privileged (default value)  */
@@ -1373,15 +1374,21 @@ static void gtzc_loader_cfg(void)
     {
       /*SRAM3 -> MPCBB3*/
       GTZC_MPCBB3_S->SECCFGR[i] = GTZC_MPCBB_ALL_NSEC;
+      GTZC_MPCBB3_S->PRIVCFGR[i] = GTZC_MPCBB_ALL_NPRIV;
     }
 
     /* Execution stopped if flow control failed */
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_GTZC_L_EN_MPCBB1, FLOW_CTRL_GTZC_L_EN_MPCBB1);
 
-    /* Required peripherals configured non secure (default value) / privileged */
-    GTZC_TZSC1_S->PRIVCFGR1 = TZSC_MASK_R1;
-    GTZC_TZSC1_S->PRIVCFGR2 = TZSC_MASK_R2;
-    GTZC_TZSC1_S->PRIVCFGR3 = TZSC_MASK_R3;
+    /* Required peripherals configured non secure / non privileged */
+    GTZC_TZSC1_S->PRIVCFGR1 = ~TZSC_MASK_R1;
+    GTZC_TZSC1_S->PRIVCFGR2 = ~TZSC_MASK_R2;
+    GTZC_TZSC1_S->PRIVCFGR3 = ~TZSC_MASK_R3;
+
+    GTZC_TZSC1_S->SECCFGR1 = ~TZSC_MASK_R1;
+    GTZC_TZSC1_S->SECCFGR2 = ~TZSC_MASK_R2;
+    GTZC_TZSC1_S->SECCFGR3 = ~TZSC_MASK_R3;
+
     /* Execution stopped if flow control failed */
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_GTZC_L_EN_TZSC, FLOW_CTRL_GTZC_L_EN_TZSC);
   }
@@ -1393,7 +1400,7 @@ static void gtzc_loader_cfg(void)
     {
       uint32_t privcfgr = GTZC_MPCBB1->PRIVCFGR[i];
       uint32_t seccfgr = GTZC_MPCBB1_S->SECCFGR[i];
-      if ((seccfgr != GTZC_MPCBB_ALL_NSEC) || (privcfgr != GTZC_MPCBB_ALL_PRIV))
+      if ((seccfgr != GTZC_MPCBB_ALL_NSEC) || (privcfgr != GTZC_MPCBB_ALL_NPRIV))
       {
         Error_Handler();
       }
@@ -1413,11 +1420,11 @@ static void gtzc_loader_cfg(void)
     uint32_t seccfgr3 = GTZC_TZSC1_S->SECCFGR3;
     uint32_t privcfgr3 = GTZC_TZSC1_S->PRIVCFGR3;
     if (((seccfgr1 | ~TZSC_MASK_R1) != ~TZSC_MASK_R1) ||
-        ((privcfgr1 & TZSC_MASK_R1) != TZSC_MASK_R1) ||
+        ((privcfgr1 | ~TZSC_MASK_R1) != ~TZSC_MASK_R1) ||
         ((seccfgr2 | ~TZSC_MASK_R2) != ~TZSC_MASK_R2) ||
-        ((privcfgr2 & TZSC_MASK_R2) != TZSC_MASK_R2) ||
+          ((privcfgr2 | ~TZSC_MASK_R2) != ~TZSC_MASK_R2) ||
         ((seccfgr3 | ~TZSC_MASK_R3) != ~TZSC_MASK_R3) ||
-        ((privcfgr3 & TZSC_MASK_R3) != TZSC_MASK_R3))
+        ((privcfgr3 | ~TZSC_MASK_R3) != ~TZSC_MASK_R3))
     {
       Error_Handler();
     }

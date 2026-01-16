@@ -423,6 +423,15 @@ HAL_StatusTypeDef RCCEx_PeriphCLKConfig(const RCC_PeriphCLKInitTypeDef  *pPeriph
 }
 
 /**
+  * Initializes the Global MSP.
+  */
+void HAL_MspInit(void)
+{
+  /* Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral */
+  HAL_PWREx_DisableUCPDDeadBattery();
+}
+
+/**
   * @brief RTC MSP Initialization
   *        This function configures the hardware resources used in this example:
   *           - Peripheral's clock enable
