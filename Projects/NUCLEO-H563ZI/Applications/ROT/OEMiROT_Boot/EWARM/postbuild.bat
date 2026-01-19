@@ -1,4 +1,5 @@
 @ECHO OFF
+:: Getting the Trusted Package Creator and STM32CubeProgammer CLI path
 set "projectdir=%~dp0"
 pushd %projectdir%\..\..\..\..\ROT_Provisioning
 set provisioningdir=%cd%
@@ -333,6 +334,10 @@ IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================ Update %ns_code_init_xml% =============================================================
 IF "%app_full_secure%" == "1" (goto :bypass_ns_code_xml_update)
+set "command=%python%%applicfg% xmlname --layout %preprocess_bl2_file% -m RE_APP_IMAGE_NUMBER -n %auth_ns% -sn %auth_s% -v 1 -c k %ns_code_init_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %ns_code_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
