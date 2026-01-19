@@ -35,6 +35,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/README.md</locationURI>
 		</link>
 		<link>
+			<name>Drivers/BSP/stm32h5xx_nucleo.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Drivers/BSP/STM32H5xx_Nucleo/stm32h5xx_nucleo.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/CMSIS/system_stm32h5xx.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/system_stm32h5xx.c</locationURI>
+		</link>
+		<link>
 			<name>Drivers/STM32H5xx_HAL_Driver/stm32h5xx_hal.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal.c</locationURI>
@@ -110,6 +120,11 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_uart_ex.c</locationURI>
 		</link>
 		<link>
+			<name>Example/User/loader.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/loader.c</locationURI>
+		</link>
+		<link>
 			<name>Example/User/low_level_device.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/low_level_device.c</locationURI>
@@ -120,34 +135,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/low_level_flash.c</locationURI>
 		</link>
 		<link>
-			<name>Example/User/main.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/main.c</locationURI>
-		</link>
-		<link>
-			<name>Example/User/com.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/com.c</locationURI>
-		</link>
-		<link>
-			<name>Example/User/loader.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/loader.c</locationURI>
-		</link>
-		<link>
 			<name>Example/User/low_level_security.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/low_level_security.c</locationURI>
 		</link>
 		<link>
+			<name>Example/User/main.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/main.c</locationURI>
+		</link>
+		<link>
 			<name>Example/User/stm32h5xx_it.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/stm32h5xx_it.c</locationURI>
-		</link>
-		<link>
-			<name>Drivers/CMSIS/system_stm32h5xx.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/system_stm32h5xx.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
