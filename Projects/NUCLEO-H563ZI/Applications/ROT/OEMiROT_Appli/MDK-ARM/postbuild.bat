@@ -2,7 +2,7 @@
 :: arg1 is the binary type (nonsecure, secure)
 :: When script is called from STM32CubeIDE : set signing="%1"
 :: When script is called from IAR or KEIL  : set "signing=%1"
-set "signing=%1"
+set signing="%1"
 
 :: Getting the Trusted Package Creator CLI path
 set "projectdir=%~dp0"
