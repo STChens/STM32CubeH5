@@ -34,6 +34,7 @@ __asm("  .global __ARM_use_no_argv\n");
 
 
 /* Private define ------------------------------------------------------------*/
+#define APP_DATA_SIZE 32
 
 extern ARM_DRIVER_FLASH FLASH_PRIMARY_DATA_SECURE_DEV_NAME;
 extern ARM_DRIVER_FLASH FLASH_PRIMARY_SECURE_DEV_NAME;
@@ -282,6 +283,9 @@ void FW_APP_PrintMainMenu(void)
 {
   printf("\r\n=================== Main Menu ============================\r\n\n");
   printf("  Start BootLoader -------------------------------------- 1\r\n\n");
+#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+  printf("  Display Data content ---------------------------------- 2\r\n\n");
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
 #if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_APP_IMAGE_NUMBER == 1)
   printf("  Validate App Image ------------------------------------ 3\r\n\n");
 #endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_APP_IMAGE_NUMBER == 1) */
@@ -315,6 +319,22 @@ void FW_APP_Run(void)
         case '1' :
           LOADER_Run();
           break;
+#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+        case '2':
+          {
+            uint8_t *p = (uint8_t *)(FLASH_BASE+S_DATA_IMAGE_PRIMARY_PARTITION_OFFSET+32);
+            printf("Display data from offset %x\r\n", p);            
+            int i;
+            printf("=================================================\r\n");
+            for ( i = 0; i< APP_DATA_SIZE; i++)
+            {
+              printf("%02x ", p[i]);
+              if ( (i+1)%16 == 0) printf("\r\n");
+            }
+            printf("\r\n");
+          }
+          break;  
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */          
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
         case '3':
           FW_Valid_SecureAppImage();

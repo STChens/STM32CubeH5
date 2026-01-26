@@ -337,7 +337,6 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\Inc</state>
-                    <state>$PROJ_DIR$\..\Secure_nsclib</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\..\Drivers\CMSIS\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\..\Drivers\CMSIS\Device\ST\STM32H5xx\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Inc</state>
@@ -670,7 +669,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild></prebuild>
-                <postbuild>$PROJ_DIR$\postbuild.bat "secure"</postbuild>
+                <postbuild>$PROJ_DIR$\postbuild.bat</postbuild>
             </data>
         </settings>
         <settings>

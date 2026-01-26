@@ -45,6 +45,7 @@
 /* Total number of images */
 #define MCUBOOT_IMAGE_NUMBER (MCUBOOT_APP_IMAGE_NUMBER + MCUBOOT_DATA_IMAGE_NUMBER)
 #define MCUBOOT_S_DATA_IMAGE_NUMBER MCUBOOT_DATA_IMAGE_NUMBER /* For MCUBOOT, do not remove */
+#define MCUBOOT_NS_DATA_IMAGE_NUMBER 0 /* For MCUBOOT, do not remove */
 
 /* Use image hash reference to reduce boot time (signature check bypass) */
 #define MCUBOOT_USE_HASH_REF

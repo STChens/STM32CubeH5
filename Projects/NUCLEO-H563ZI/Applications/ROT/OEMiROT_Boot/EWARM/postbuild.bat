@@ -97,6 +97,7 @@ call %img_config%
 IF "%app_full_secure%" == "1" (
 set s_icf_file=%appli_dir%\EWARM\stm32h563xx_flash.icf
 set s_main="%appli_dir%\Inc\main.h"
+set appli_flash_layout="%appli_dir%\Inc\appli_flash_layout.h"
 ) else (
 set s_icf_file="%appli_dir%\EWARM\Secure\stm32h563xx_flash_s.icf"
 set ns_icf_file="%appli_dir%\EWARM\NonSecure\stm32h563xx_flash_ns.icf"
