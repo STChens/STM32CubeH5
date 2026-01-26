@@ -73,7 +73,7 @@
             <RunUserProg1>0</RunUserProg1>
             <RunUserProg2>1</RunUserProg2>
             <UserProg1Name></UserProg1Name>
-            <UserProg2Name>$J\..\bin\armclang --target=arm-arm-none-eabi -march=armv8-m.main -E -P -xc -DSTM32H563xx -DBL2 -I..\..\Linker -I..\Inc -I..\..\..\..\..\..\Drivers\CMSIS\Include -I..\..\..\..\..\..\Drivers\CMSIS\Device\ST\STM32H5xx\Include -I..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Inc ..\Src\image_macros_to_preprocess_bl2.c -o image_macros_preprocessed_bl2.c</UserProg2Name>
+            <UserProg2Name>$J\..\bin\armclang --target=arm-arm-none-eabi -march=armv8-m.main -E -P -xc -DSTM32H563xx -DBL2 -I..\..\Linker -I..\Inc -I..\..\..\..\..\..\Drivers\CMSIS\Include -I..\..\..\..\..\..\Drivers\CMSIS\Device\ST\STM32H5xx\Include -I..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Inc ..\Src\image_macros_to_preprocess_bl2_ntz.c -o image_macros_preprocessed_bl2.c</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopB1X>0</nStopB1X>
@@ -193,7 +193,7 @@
             <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
-            <nSecure>1</nSecure>
+            <nSecure>2</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>4</RwSelD>
             <CodeSel>0</CodeSel>
@@ -338,7 +338,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32H563xx,USE_HAL_DRIVER,NDEBUG,MCUBOOT_TARGET_CONFIG=&lt;flash_layout.h&gt;,MBEDTLS_CONFIG_FILE=&lt;mbedtls_config.h&gt;,MCUBOOT_DOUBLE_SIGN_VERIF,FLOW_CONTROL,BL2,DEFAULT_UART_BAUDRATE=115200,OEMIROT_DEV_MODE,BOOT_MAX_ALIGN=16</Define>
+              <Define>STM32H563xx,USE_HAL_DRIVER,NDEBUG,MCUBOOT_TARGET_CONFIG=&lt;flash_layout.h&gt;,MBEDTLS_CONFIG_FILE=&lt;mbedtls_config.h&gt;,MCUBOOT_DOUBLE_SIGN_VERIF,__NO_FLOW_CONTROL,BL2,DEFAULT_UART_BAUDRATE=115200,OEMIROT_DEV_MODE,BOOT_MAX_ALIGN=16</Define>
               <Undefine></Undefine>
               <IncludePath>../Inc;../../../../../../Drivers/CMSIS/Include;../../../../../../Drivers/CMSIS/Device/ST/STM32H5xx/Include;../../../../../../Drivers/STM32H5xx_HAL_Driver/Inc;../../../../../../Middlewares/Third_Party/mbed-crypto/include;../../../../../../Middlewares/Third_Party/mbed-crypto/include/psa;../../../../../../Middlewares/Third_Party/mcuboot;../../../../../../Middlewares/Third_Party/mcuboot/platform/include;../../../../../../Middlewares/Third_Party/mcuboot/platform/ext/common;../../../../../../Middlewares/Third_Party/mcuboot/platform/ext/driver;../../../../../../Middlewares/Third_Party/mcuboot/bl2/include;../../../../../../Middlewares/Third_Party/mcuboot/bl2/ext/mcuboot;../../../../../../Middlewares/Third_Party/mcuboot/bl2/ext/mcuboot/include;../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/include;../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/src;../../../../../../Middlewares/Third_Party/mcuboot/ext/tinycrypt/lib/include</IncludePath>
             </VariousControls>
@@ -726,11 +726,6 @@
           <GroupName>Application/User</GroupName>
           <Files>
             <File>
-              <FileName>low_level_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/low_level_flash.c</FilePath>
-            </File>
-            <File>
               <FileName>low_level_com.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/low_level_com.c</FilePath>
@@ -739,11 +734,6 @@
               <FileName>low_level_rng.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/low_level_rng.c</FilePath>
-            </File>
-            <File>
-              <FileName>low_level_security.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/low_level_security.c</FilePath>
             </File>
             <File>
               <FileName>tick.c</FileName>
@@ -799,6 +789,16 @@
               <FileName>startup_stm32h5xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\startup_stm32h5xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>low_level_flash_ntz.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\low_level_flash_ntz.c</FilePath>
+            </File>
+            <File>
+              <FileName>low_level_security_ntz.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\low_level_security_ntz.c</FilePath>
             </File>
           </Files>
         </Group>

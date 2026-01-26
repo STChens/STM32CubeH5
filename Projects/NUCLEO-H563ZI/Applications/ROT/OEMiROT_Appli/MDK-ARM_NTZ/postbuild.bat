@@ -9,7 +9,7 @@ set "projectdir=%~dp0"
 pushd %projectdir%\..\..\..\..\ROT_Provisioning
 set provisioningdir=%cd%
 popd
-call "%provisioningdir%\env.bat"
+call "%provisioningdir%\env_ntz.bat"
 
 :: Enable delayed expansion
 setlocal EnableDelayedExpansion
@@ -22,30 +22,21 @@ echo. > %current_log_file%
 ::Variables updated by OEMiROT_Boot postbuild
 ::=============================================================================================
 :: flag to switch between OEMiROT and OEMuROT
-set oemurot_enable=0
-
-if %oemurot_enable% == 1 (
-set project=OEMuROT
-set bootpath=STiROT_OEMuROT
-)
-
-if %oemurot_enable% == 0 (
 set project=OEMiROT
-set bootpath=OEMiROT
-)
+set bootpath=OEMiROT_NTZ
 
 ::=============================================================================================
 ::image binary files
 ::=============================================================================================
-set s_code_bin="%projectdir%\..\Binary\rot_tz_s_app.bin"
+set code_bin="%projectdir%\..\Binary\rot_app.bin"
 
 ::=============================================================================================
 ::image xml configuration files
 ::=============================================================================================
-set s_code_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Code_Image.xml"
-set s_code_init_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Code_Init_Image.xml"
-set s_data_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Data_Image.xml"
-set s_data_init_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Data_Init_Image.xml"
+set app_code_xml="%provisioningdir%\%bootpath%\Images\%project%_Code_Image.xml"
+set app_code_init_xml="%provisioningdir%\%bootpath%\Images\%project%_Code_Init_Image.xml"
+set app_data_xml="%provisioningdir%\%bootpath%\Images\%project%_Data_Image.xml"
+set app_data_init_xml="%provisioningdir%\%bootpath%\Images\%project%_Data_Init_Image.xml"
 
 ::=================================================================================================
 :: Variables for image xml configuration(ROT_Provisioning\%bootpath%\Images)
@@ -54,11 +45,11 @@ set s_data_init_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Data_Init_I
 set bin_path_xml_field="..\..\..\Applications\ROT\OEMiROT_Appli\Binary"
 set fw_in_bin_xml_field="Firmware binary input file"
 set fw_out_bin_xml_field="Image output file"
-set s_app_bin_xml_field="%bin_path_xml_field%\rot_tz_s_app.bin"
-set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_s_app_enc_sign.hex"
-set s_app_init_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_s_app_init_sign.hex"
-set s_data_enc_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_enc_sign.hex"
-set s_data_init_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_init_sign.hex"
+set app_bin_xml_field="%bin_path_xml_field%\rot_app.bin"
+set app_enc_sign_hex_xml_field="%bin_path_xml_field%\rot_app_enc_sign.hex"
+set app_init_sign_hex_xml_field="%bin_path_xml_field%\rot_app_init_sign.hex"
+set app_data_enc_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\app_data_enc_sign.hex"
+set app_data_init_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\app_data_init_sign.hex"
 
 ::Make sure we have a Binary sub-folder in UserApp folder
 if not exist "%bin_path_xml_field%" (
@@ -109,32 +100,32 @@ set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 echo Postbuild %signing% image >> %current_log_file% 2>>&1
 
 ::update xml file : input file
-%python%%applicfg% xmlval -v %s_app_bin_xml_field% --string -n %fw_in_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_bin_xml_field% --string -n %fw_in_bin_xml_field% %app_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 ::update xml file : output file
-%python%%applicfg% xmlval -v %s_app_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %app_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-%stm32tpccli% -pb %s_code_xml% >> %current_log_file% 2>>&1
+%stm32tpccli% -pb %app_code_xml% >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 ::update xml file : input file
-%python%%applicfg% xmlval -v %s_app_bin_xml_field% --string -n %fw_in_bin_xml_field% %s_code_init_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_bin_xml_field% --string -n %fw_in_bin_xml_field% %app_code_init_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 ::update xml file : output file
-%python%%applicfg% xmlval -v %s_app_init_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_code_init_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_init_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %app_code_init_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 ::update data xml file : output file
-%python%%applicfg% xmlval -v %s_data_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_data_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_data_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %app_data_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-%python%%applicfg% xmlval -v %s_data_init_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_data_init_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_data_init_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %app_data_init_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-%stm32tpccli% -pb %s_code_init_xml% >> %current_log_file% 2>>&1
+%stm32tpccli% -pb %app_code_init_xml% >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 exit 0

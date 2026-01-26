@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#if !defined(__ARM_FEATURE_CMSE)
+#if ! (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) )
 #include "region_defs_ntz.h"
 #else
 
