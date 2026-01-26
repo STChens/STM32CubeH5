@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if !defined(__ARM_FEATURE_CMSE)
+#include "region_defs_ntz.h"
+#else
 
 #ifndef __REGION_DEFS_H__
 #define __REGION_DEFS_H__
@@ -133,3 +136,4 @@
 #endif /* FLASH_AREA_END_OFFSET > FLASH_AREA_END_OFFSET_MAX */
 
 #endif /* __REGION_DEFS_H__ */
+#endif

@@ -49,12 +49,13 @@ void LOADER_Run(void)
 
   pwr_loader_cfg();
 
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
   /* configure GTZC to allow non secure / privileged loader execution */
   gtzc_loader_cfg();
 
   /* configure SAU to allow non secure / privileged loader execution */
   sau_loader_cfg();
-
+#endif
   /* Configure NVIC */
   nvic_loader_cfg();
 
@@ -67,14 +68,18 @@ void LOADER_Run(void)
   /* Configure flash to non-secure */
   flash_loader_cfg();
 
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
   uint32_t boot_address = cmse_nsfptr_create(*(uint32_t *)(BOOTLOADER_BASE_NS + 4U));
-
+#else
+  uint32_t boot_address = *(uint32_t *)(BOOTLOADER_BASE_NS + 4U);
+#endif
+  
   /*Increment HDPL to HDPL3*/
   SET_BIT(SBS->HDPLCR,  SBS_HDPLCR_INCR_HDPL);
 
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
   __TZ_set_MSP_NS((*(uint32_t *)BOOTLOADER_BASE_NS));
   SCB_NS->VTOR = BOOTLOADER_BASE_NS;
-
 
   __asm volatile("movs r0, %0\n"
                "movs r1, #0\n" /*clear registers before jumping to non-secure*/
@@ -92,4 +97,25 @@ void LOADER_Run(void)
                "MSR APSR_nzcvq,r1\n" /*clear APSR*/
                "bxns r0\n"::"r"(boot_address)); /*jump to non-secure address*/
   /*BXNS, no return here possible*/
+#else
+  __set_MSP((*(uint32_t *)BOOTLOADER_BASE_NS));
+  SCB->VTOR = BOOTLOADER_BASE_NS;
+  
+    __asm volatile("movs r0, %0\n"
+               "movs r1, #0\n" /*clear registers before jumping to non-secure*/
+               "movs r2, #0\n"
+               "movs r3, #0\n"
+               "movs r4, #0\n"
+               "movs r5, #0\n"
+               "movs r6, #0\n"
+               "movs r7, #0\n"
+               "mov r8, r5\n"
+               "mov r9, r5\n"
+               "mov r10, r5\n"
+               "mov r11, r5\n"
+               "mov r12, r5\n"
+               "MSR APSR_nzcvq,r1\n" /*clear APSR*/
+               "bx r0\n"::"r"(boot_address)); /*jump to non-secure address*/
+  /*BX, no return here possible*/
+#endif  
 }

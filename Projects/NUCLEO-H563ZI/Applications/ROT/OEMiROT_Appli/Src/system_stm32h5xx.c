@@ -324,7 +324,7 @@ void SystemInit(void)
   RCC->CIER = 0U;
 
   /* Configure the Vector Table location ------------------*/
-  SCB->VTOR = S_CODE_START; /* Vector Table Relocation in Internal FLASH */
+  SCB->VTOR = APP_CODE_START; /* Vector Table Relocation in Internal FLASH */
 
   /* Check OPSR register to verify if there is an ongoing swap or option bytes update interrupted by a reset */
   reg_opsr = FLASH->OPSR & FLASH_OPSR_CODE_OP;

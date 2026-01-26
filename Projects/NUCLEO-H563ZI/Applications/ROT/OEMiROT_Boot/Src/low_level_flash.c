@@ -447,6 +447,7 @@ static int32_t Flash_ProgramData(uint32_t address,
   }
 #endif /* DEBUG_FLASH_ACCESS */
 
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
   /* Check that the flash base address is consistent with the range (Secure or Non Secure) */
   if (((is_range_secure(&ARM_FLASH0_DEV, address, cnt)) &&
        ((flash_base != (uint32_t)FLASH_BASE_S) || (write_type != FLASH_TYPEPROGRAM_QUADWORD)))
@@ -455,7 +456,12 @@ static int32_t Flash_ProgramData(uint32_t address,
   {
     err = HAL_ERROR;
   }
-
+#else
+  if (write_type != FLASH_TYPEPROGRAM_QUADWORD)
+  {
+    err = HAL_ERROR;
+  }
+#endif
   return (err == HAL_OK) ? ARM_DRIVER_OK : ARM_DRIVER_ERROR;
 }
 
@@ -540,13 +546,20 @@ static int32_t Flash_EraseSector(uint32_t addr)
   }
 #endif /* CHECK_ERASE */
 
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) 
   /* Check that the flash base address is consistent with the range (Secure or Non Secure) */
   if (((is_range_secure(&ARM_FLASH0_DEV, addr, 4)) && (EraseInit.TypeErase != FLASH_TYPEERASE_SECTORS))
      || ((!is_range_secure(&ARM_FLASH0_DEV, addr, 4)) && (EraseInit.TypeErase != FLASH_TYPEERASE_SECTORS_NS)))
   {
     err = HAL_ERROR;
   }
-
+#else
+  if (EraseInit.TypeErase != FLASH_TYPEERASE_SECTORS)
+  {
+    err = HAL_ERROR;
+  }
+#endif
+  
   return (err == HAL_OK) ? ARM_DRIVER_OK : ARM_DRIVER_ERROR;
 }
 #if !defined(LOCAL_LOADER_CONFIG)

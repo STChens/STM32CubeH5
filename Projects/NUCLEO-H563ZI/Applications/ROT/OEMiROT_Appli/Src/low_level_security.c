@@ -177,6 +177,7 @@ const struct sau_cfg_t sau_load_cfg[] =
 #define GTZC_MPCBB_ALL_NSEC (0x00000000UL)
 
 /* Functions Definition ------------------------------------------------------*/
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
 
 /**
   * @brief  GTZC configuration before jumping into loader
@@ -244,6 +245,7 @@ void sau_loader_cfg(void)
   /* Enable SAU */
   TZ_SAU_Enable();
 }
+#endif
 
 /**
   * @brief  Enable FPU before jumping into loader

@@ -31,10 +31,10 @@
 **
 ******************************************************************************
 */
-S_CODE_OFFSET = 0x18000;          /* This definition is updated automatically from OEMiROT_Boot postbuild */
+S_CODE_OFFSET = 0x28000;          /* This definition is updated automatically from OEMiROT_Boot postbuild */
 S_CODE_SIZE = 0x6000;             /* This definition is updated automatically from OEMiROT_Boot postbuild */
 IMAGE_HEADER_SIZE = 0x400;        /* mcuboot header size */
-CMSE_VENEER_REGION_SIZE = 0x400;  /* Include TLVs and trailer. User configurable */
+CMSE_VENEER_REGION_SIZE = 0x2000;  /* Include TLVs and trailer. User configurable */
 
 /* Entry Point */
 ENTRY(Reset_Handler)

@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if !defined(__ARM_FEATURE_CMSE)
+#include "flash_layout_ntz.h"
+#else
 
 #ifndef __FLASH_LAYOUT_H__
 #define __FLASH_LAYOUT_H__
+
 
 /* This header file is included from linker scatter file as well, where only a
  * limited C constructs are allowed. Therefore it is not possible to include
@@ -25,7 +29,7 @@
  */
 
 /* Flash layout configuration : begin ****************************************/
-/*#define MCUBOOT_OVERWRITE_ONLY  */   /* Defined: the FW installation uses overwrite method.
+#define MCUBOOT_OVERWRITE_ONLY  /* */   /* Defined: the FW installation uses overwrite method.
                                       UnDefined: The FW installation uses swap mode. */
 
 #define MCUBOOT_EXT_LOADER         /* Defined: Use system bootloader (in system flash).
@@ -414,3 +418,4 @@
 #define STM32_DESCRIPTOR_END_NS             (STM32_DESCRIPTOR_BASE_NS_1 + STM32_DESCRIPTOR_SIZE -1) /* to cover all descriptors */
 
 #endif /* __FLASH_LAYOUT_H__ */
+#endif

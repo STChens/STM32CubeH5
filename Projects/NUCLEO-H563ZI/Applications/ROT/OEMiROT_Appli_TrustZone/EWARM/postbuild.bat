@@ -63,7 +63,7 @@ mkdir "%bin_path_xml_field%"
 ::=================================================
 ::Variables updated by OEMiROT_Boot postbuild
 ::=================================================
-set app_image_number=2
+set app_image_number=1
 set image_s_size=0x6000
 
 :start

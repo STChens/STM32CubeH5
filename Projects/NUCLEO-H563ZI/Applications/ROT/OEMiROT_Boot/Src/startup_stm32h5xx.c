@@ -35,9 +35,9 @@ extern uint32_t __STACK_LIMIT;
 
 extern void __PROGRAM_START(void) __NO_RETURN;
 
-#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
+//#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
 extern void Error_Handler(void);
-#endif
+//#endif
 
 /*----------------------------------------------------------------------------
   Internal References
@@ -249,7 +249,11 @@ extern const pFunc __VECTOR_TABLE[];
   Error_Handler,                    /* -12: MPU Fault Handler */
   Error_Handler,                    /* -11: Bus Fault Handler */
   Error_Handler,                    /* -10: Usage Fault Handler */
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
   Error_Handler,                    /*  -9: Secure Fault Handler */
+#else
+  0,                                /*      Reserved */    
+#endif
   0,                                /*      Reserved */
   0,                                /*      Reserved */
   0,                                /*      Reserved */

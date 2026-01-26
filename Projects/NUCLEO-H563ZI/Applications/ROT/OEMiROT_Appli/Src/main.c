@@ -67,8 +67,10 @@ void FW_APP_Run(void);
 void LOADER_Run(void);
 
 /* Callbacks prototypes */
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
 void SecureFault_Callback(void);
 void SecureError_Callback(void);
+#endif
 void Error_Handler(void);
 void NS_DATA_Display(void);
 
@@ -387,6 +389,8 @@ static void FW_Valid_SecureAppImage(void)
 }
 #endif /* !defined(MCUBOOT_OVERWRITE_ONLY) */
 
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
+
 /**
   * @brief  Callback called by secure code following a secure fault interrupt
   * @note   This callback is called by secure code thanks to the registration
@@ -415,6 +419,7 @@ void SecureError_Callback(void)
   /* because of illegal access */
   Error_Handler();
 }
+#endif
 
 /**
   * @brief  This function is executed in case of error occurrence.

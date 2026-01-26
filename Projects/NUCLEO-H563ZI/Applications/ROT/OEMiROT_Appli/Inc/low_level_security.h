@@ -38,8 +38,10 @@ struct sau_cfg_t
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
 
 /* Exported functions ------------------------------------------------------- */
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
 void gtzc_loader_cfg(void);
 void sau_loader_cfg(void);
+#endif
 void nvic_loader_cfg(void);
 void fpu_enable_cfg(void);
 void flash_loader_cfg(void);
