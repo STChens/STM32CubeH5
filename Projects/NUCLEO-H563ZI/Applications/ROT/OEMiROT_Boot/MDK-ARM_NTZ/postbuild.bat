@@ -46,8 +46,7 @@ set "appli_dir=../../../../%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
 
-set appli_postbuild="%appli_dir%\EWARM_NTZ\postbuild.bat"
-
+set appli_postbuild="%appli_dir%\MDK-ARM\postbuild.bat"
 set "img_config=%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\img_config.bat"
 set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
 
@@ -63,6 +62,7 @@ set xml_fw_app_item_name="Firmware binary input file"
 set xml_fw_data_item_name="Data binary input file"
 set xml_output_item_name="Image output file"
 set xml_enc_item_name="Encryption key"
+
 set code_size="Firmware area size"
 set data_size="Data download slot size"
 set oemurot_firmware_size="Firmware area size"
@@ -81,7 +81,7 @@ IF !errorlevel! NEQ 0 goto :error
 
 call %img_config%
 
-set app_icf_file=%appli_dir%\EWARM_NTZ\stm32h563xx_flash.icf
+set app_sct_file="%appli_dir%\MDK-ARM\stm32h563xx.sct"
 set app_main="%appli_dir%\Inc\main.h"
 set appli_flash_layout="%appli_dir%\Inc\appli_flash_layout.h"
 :: ============================================================ Update %map_properties% ===============================================================
@@ -171,12 +171,12 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b app_data
 IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================= Update %postbuild_appli% =============================================================
-:: =============================================================== Update %app_icf_file% ================================================================
-set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n APP_CODE_OFFSET %app_icf_file% --vb >> %current_log_file% 2>&1"
+:: =============================================================== Update %app_sct_file% ================================================================
+set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n APP_CODE_OFFSET %app_sct_file% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -n APP_CODE_SIZE %app_icf_file% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -n APP_CODE_SIZE %app_sct_file% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
