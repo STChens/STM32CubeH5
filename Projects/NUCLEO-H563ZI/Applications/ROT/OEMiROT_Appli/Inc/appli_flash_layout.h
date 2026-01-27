@@ -20,7 +20,7 @@
 #define __APPLI_FLASH_LAYOUT_H__
 
 
-#define MCUBOOT_OVERWRITE_ONLY                 /* Defined: the FW installation uses overwrite method.
+/*#define MCUBOOT_OVERWRITE_ONLY*/                 /* Defined: the FW installation uses overwrite method.
                                                   UnDefined: The FW installation uses swap mode. */
 
 #define MCUBOOT_APP_IMAGE_NUMBER       0x1      /* 1: S and NS application binaries are assembled in one single image.
@@ -32,7 +32,7 @@
 #define MCUBOOT_NS_DATA_IMAGE_NUMBER   0x0      /* 1: NS data image for NS application.
                                                    0: No NS data image. */
 
-#define FLASH_AREA_0_OFFSET            0x1A000 /* Secure app image primary slot offset */
+#define FLASH_AREA_0_OFFSET            0x2A000 /* Secure app image primary slot offset */
 
 #define FLASH_AREA_0_SIZE              0xC6000   /* Secure app image primary slot size */
 
@@ -40,7 +40,7 @@
 
 #define FLASH_AREA_1_SIZE              0x0   /* Non-secure app image primary slot size */
 
-#define FLASH_AREA_2_OFFSET            0xE0000  /* Secure app image secondary slot */
+#define FLASH_AREA_2_OFFSET            0xF0000  /* Secure app image secondary slot */
 
 #define FLASH_AREA_2_SIZE              0xC6000   /* Secure app image secondary slot size */
 
@@ -48,7 +48,7 @@
 
 #define FLASH_AREA_3_SIZE              0x0   /* Non-secure app image secondary slot size */
 
-#define FLASH_AREA_4_OFFSET            0x18000 /* Secure data image primary slot offset */
+#define FLASH_AREA_4_OFFSET            0x28000 /* Secure data image primary slot offset */
 
 #define FLASH_AREA_4_SIZE              0x2000   /* Secure data image primary slot size */
 
@@ -56,7 +56,7 @@
 
 #define FLASH_AREA_5_SIZE              0x0   /* Non-secure data image primary slot size */
 
-#define FLASH_AREA_6_OFFSET            0x1A6000 /* secure data image secondary slot offset */
+#define FLASH_AREA_6_OFFSET            0x1B6000 /* secure data image secondary slot offset */
 
 #define FLASH_AREA_6_SIZE              0x2000   /* secure data image secondary slot size */
 

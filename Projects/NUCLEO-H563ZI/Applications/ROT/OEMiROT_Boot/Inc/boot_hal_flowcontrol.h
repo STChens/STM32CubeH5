@@ -221,18 +221,13 @@ extern "C" {
 #define FLOW_STEP_RAMCFG_I_CH1      0x00000000U        /*!< No effect on control flow */
 #endif /* OEMIROT_SECURE_USER_SRAM2_ECC || OEMIROT_SECURE_USER_SRAM1_ECC */
 
-#ifdef OEMIROT_MPU_PROTECTION
+#if defined (OEMIROT_MPU_PROTECTION) 
 #define FLOW_STEP_MPU_A_EN_R1       0x000ac741U        /*!< Step MPU Region 1 Appli enable value */
 #define FLOW_STEP_MPU_A_CH_R1       0x000b3642U        /*!< Step MPU Region 1 Appli check value */
 #define FLOW_STEP_MPU_A_EN_R2       0x000b2437U        /*!< Step MPU Region 2 Appli enable value */
 #define FLOW_STEP_MPU_A_CH_R2       0x000b448eU        /*!< Step MPU Region 2 Appli check value */
-#if  (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))
-  #define FLOW_STEP_MPU_A_EN_R3       0x000b285cU        /*!< Step MPU Region 3 Appli enable value */
-  #define FLOW_STEP_MPU_A_CH_R3       0x000c0cb9U        /*!< Step MPU Region 3 Appli check value */
-#else
-  #define FLOW_STEP_MPU_A_EN_R3       0x00000000U        /*!< No effect on control flow */
-  #define FLOW_STEP_MPU_A_CH_R3       0x00000000U        /*!< No effect on control flow */
-#endif
+#define FLOW_STEP_MPU_A_EN_R3       0x000b285cU        /*!< Step MPU Region 3 Appli enable value */
+#define FLOW_STEP_MPU_A_CH_R3       0x000c0cb9U        /*!< Step MPU Region 3 Appli check value */
 #else
 #define FLOW_STEP_MPU_A_EN_R1       0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_A_CH_R1       0x00000000U        /*!< No effect on control flow */
@@ -262,16 +257,16 @@ extern "C" {
   #define FLOW_STEP_GPIO_L_CH         0x00000000U        /*!< No effect on control flow */
 #endif
 
-#if defined(MCUBOOT_EXT_LOADER) && defined(OEMIROT_MPU_PROTECTION)
-#define FLOW_STEP_MPU_L_EN_R7       0x000c12a7U        /*!< Step Loader Region 7 enable value */
-#define FLOW_STEP_MPU_L_CH_R7       0x000c64e2U        /*!< Step Loader Region 7 check value */
-#define FLOW_STEP_MPU_L_LCK         0x000a624fU        /*!< Step GTZC Lock Configuration enable */
-#define FLOW_STEP_MPU_L_LCK_CH      0x000aae83U        /*!< Step GTZC Lock Configuration Init check value */
+#if defined(MCUBOOT_EXT_LOADER) && defined(OEMIROT_MPU_PROTECTION) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))    
+  #define FLOW_STEP_MPU_L_EN_R7       0x000c12a7U        /*!< Step Loader Region 7 enable value */
+  #define FLOW_STEP_MPU_L_CH_R7       0x000c64e2U        /*!< Step Loader Region 7 check value */
+  #define FLOW_STEP_MPU_L_LCK         0x000a624fU        /*!< Step GTZC Lock Configuration enable */
+  #define FLOW_STEP_MPU_L_LCK_CH      0x000aae83U        /*!< Step GTZC Lock Configuration Init check value */
 #else
-#define FLOW_STEP_MPU_L_EN_R7       0x00000000U        /*!< No effect on control flow */
-#define FLOW_STEP_MPU_L_CH_R7       0x00000000U        /*!< No effect on control flow */
-#define FLOW_STEP_MPU_L_LCK         0x00000000U        /*!< No effect on control flow */
-#define FLOW_STEP_MPU_L_LCK_CH      0x00000000U        /*!< No effect on control flow */
+  #define FLOW_STEP_MPU_L_EN_R7       0x00000000U        /*!< No effect on control flow */
+  #define FLOW_STEP_MPU_L_CH_R7       0x00000000U        /*!< No effect on control flow */
+  #define FLOW_STEP_MPU_L_LCK         0x00000000U        /*!< No effect on control flow */
+  #define FLOW_STEP_MPU_L_LCK_CH      0x00000000U        /*!< No effect on control flow */
 #endif /*MCUBOOT_EXT_LOADER*/
 
 #if defined(MCUBOOT_EXT_LOADER) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))

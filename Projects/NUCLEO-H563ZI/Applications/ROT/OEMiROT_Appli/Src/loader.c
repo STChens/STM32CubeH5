@@ -47,15 +47,15 @@ void LOADER_Run(void)
 
   printf("\r\n");
 
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
   pwr_loader_cfg();
 
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
   /* configure GTZC to allow non secure / privileged loader execution */
   gtzc_loader_cfg();
 
   /* configure SAU to allow non secure / privileged loader execution */
   sau_loader_cfg();
-#endif
+
   /* Configure NVIC */
   nvic_loader_cfg();
 
@@ -68,7 +68,6 @@ void LOADER_Run(void)
   /* Configure flash to non-secure */
   flash_loader_cfg();
 
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
   uint32_t boot_address = cmse_nsfptr_create(*(uint32_t *)(BOOTLOADER_BASE_NS + 4U));
 #else
   uint32_t boot_address = *(uint32_t *)(BOOTLOADER_BASE_NS + 4U);

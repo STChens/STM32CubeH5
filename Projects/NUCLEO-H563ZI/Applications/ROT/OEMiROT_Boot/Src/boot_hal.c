@@ -119,6 +119,8 @@ void boot_platform_noimage(void)
 {
 #if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
   uint32_t rsslib_sec_jump_HDP_lvl3ns;
+#else
+  uint32_t nsslib_jump_HDP_lvl3;
 #endif
   
   BOOT_LOG_INF("Jumping to bootloader");
@@ -127,6 +129,8 @@ void boot_platform_noimage(void)
 #if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
   /* Init RSS jump function descriptor */
   rsslib_sec_jump_HDP_lvl3ns = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3NS);
+#else
+    nsslib_jump_HDP_lvl3 = (uint32_t)(Nss_lib_p->JumpHDPLvl3);
 #endif
   /* Check Flow control */
   FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_2);
@@ -147,10 +151,14 @@ void boot_platform_noimage(void)
   /* Check Flow control */
   FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_4_L);
 
+  __set_MSPLIM(0);
+
   /* Jump into BL through RSS */
 #if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
   /* last parameter (0U) not used in RSSLIB_Sec_JumpHDPL3NS(BOOTLOADER_BASE_NS); */
   boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl3ns, (uint32_t) BOOTLOADER_BASE_NS, 0U);
+#else
+  boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, nsslib_jump_HDP_lvl3, (uint32_t) BOOTLOADER_BASE_NS, 0U);
 #endif
   /* Avoid compiler to pop registers after having changed MSP */
 #if !defined(__ICCARM__)

@@ -116,7 +116,7 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
     FLOW_CTRL_MPU_I_CH_R4,
 #endif /* FLOW_CONTROL */
   },
-  /* Region 5: Allows read access to STM32 descriptors & NSSLIB */
+  /* Region 5: Allows read access to STM32 descriptors */
   /* start = the start of the new descriptor address and the
      end = the end of the old descriptor address */
   {
@@ -138,7 +138,7 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
   {
     6,
     ENGI_BASE_NS,
-    ENGI_BASE_NS + ENGI_SIZE - 1,
+    ENGI_BASE_NS - 1, /* + ENGI_SIZE */
     MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
     MPU_ARMV8M_AP_RO_PRIV_ONLY,
@@ -173,7 +173,7 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_appli[] = {
   /* the region will be activated later by RSS jump service. Following regions */
   /*  in this list are configured and activated at this stage. */
 
-  /* Region 1: Allows execution of appli */
+  /* Region 1 (overwrite): Allows execution of appli */
   {
     1,
     FLASH_BASE + APP_IMAGE_PRIMARY_PARTITION_OFFSET,
@@ -192,7 +192,7 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_appli[] = {
   /* Region 3: Allows RW access to end of flash area for image confirmation (swap mode) */
   {
     3,
-    FLASH_BASE + APP_IMAGE_PRIMARY_PARTITION_OFFSET + FLASH_APP_PARTITION_SIZE - 1 - (~MPU_RLAR_LIMIT_Msk +1),
+    FLASH_BASE + APP_IMAGE_PRIMARY_PARTITION_OFFSET + FLASH_APP_PARTITION_SIZE  - (~MPU_RLAR_LIMIT_Msk +1),
     FLASH_BASE + FLASH_AREA_END_OFFSET - 1,
     MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
@@ -203,6 +203,22 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_appli[] = {
     FLOW_CTRL_MPU_A_EN_R2,
     FLOW_STEP_MPU_A_CH_R2,
     FLOW_CTRL_MPU_A_CH_R2,
+#endif /* FLOW_CONTROL */
+  },  
+  /* Region 5 (Overwrite): Allow NSSLIB and system bootloader to execute  */
+  {
+    5,
+    0x0BF90000,
+    STM32_DESCRIPTOR_END_NS + NSS_LIB_SIZE,
+    MPU_ARMV8M_MAIR_ATTR_CODE_IDX,
+    MPU_ARMV8M_XN_EXEC_OK,
+    MPU_ARMV8M_AP_RO_PRIV_ONLY,
+    MPU_ARMV8M_SH_NONE,
+#ifdef FLOW_CONTROL
+    FLOW_STEP_MPU_A_EN_R3,
+    FLOW_CTRL_MPU_A_EN_R3,
+    FLOW_STEP_MPU_A_CH_R3,
+    FLOW_CTRL_MPU_A_CH_R3,
 #endif /* FLOW_CONTROL */
   },  
 };
@@ -321,19 +337,21 @@ static const uint32_t ProductStatePrioList[] = {
 #define GTZC_MPCBB_ALL_NPRIV (0x00000000UL)
 
 #ifdef OEMIROT_MPU_PROTECTION
+
+#if 0 // FIXME we disable MPU to execute loader from system flash
 /* MPU configuration
    ================= */
 static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
 {
-  /* Region 7: Extend read access to STM32 descriptors and bootloader vector table */
+  /* Region 5 (Overwrite): Allow NSSLIB and system bootloader to execute  */
   {
-    7,
-    BOOTLOADER_BASE_NS,
+    5,
+    0x0BF90000,
     BOOTLOADER_BASE_NS + BOOTLOADER_SIZE - 1,
-    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
-    MPU_ARMV8M_XN_EXEC_NEVER,
+    MPU_ARMV8M_MAIR_ATTR_CODE_IDX,
+    MPU_ARMV8M_XN_EXEC_OK,
     MPU_ARMV8M_AP_RO_PRIV_ONLY,
-    MPU_ARMV8M_SH_NONE,
+    MPU_ARMV8M_SH_NONE,  
 #ifdef FLOW_CONTROL
     FLOW_STEP_MPU_L_EN_R7,
     FLOW_CTRL_MPU_L_EN_R7,
@@ -342,6 +360,7 @@ static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
 #endif /* FLOW_CONTROL */
   },
 };
+#endif /* FIXME we disable MPU to execute loader from system flash */
 #endif
 #endif /* MCUBOOT_EXT_LOADER */
 
@@ -713,7 +732,7 @@ static void hdpext_loader_cfg(void)
   /* verification stage */
   else
   {
-    hdp_ext = ((FLASH_S->HDPEXTR & FLASH_HDPEXTR_HDP1_EXT_Msk) >> FLASH_HDPEXTR_HDP1_EXT_Pos);
+    hdp_ext = ((FLASH->HDPEXTR & FLASH_HDPEXTR_HDP1_EXT_Msk) >> FLASH_HDPEXTR_HDP1_EXT_Pos);
     if (hdp_ext != hdp1_ext)
     {
       Error_Handler();
@@ -724,7 +743,7 @@ static void hdpext_loader_cfg(void)
       FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_HDPEXT_L_CH_B1, FLOW_CTRL_HDPEXT_L_CH_B1);
     }
 
-    hdp_ext = ((FLASH_S->HDPEXTR & FLASH_HDPEXTR_HDP2_EXT_Msk) >> FLASH_HDPEXTR_HDP2_EXT_Pos);
+    hdp_ext = ((FLASH->HDPEXTR & FLASH_HDPEXTR_HDP2_EXT_Msk) >> FLASH_HDPEXTR_HDP2_EXT_Pos);
     if (hdp_ext != hdp2_ext)
     {
       Error_Handler();
@@ -918,7 +937,12 @@ static void mpu_appli_cfg(void)
 static void mpu_loader_cfg(void)
 {
 #ifdef OEMIROT_MPU_PROTECTION
+#if 1  
   struct mpu_armv8m_dev_t dev_mpu_s = { MPU_BASE };
+  
+  /* we just disable MPU before jumping to loader, so region_cfg_loader_s is not used*/
+  mpu_armv8m_disable(&dev_mpu_s);
+#else
   uint32_t i = 0U;
   /* Secure coding  : volatile variable usage to force compiler to reload SBS->CSLCKR register address */
   __IO uint32_t read_reg = (uint32_t) &SBS->CSLCKR;
@@ -971,6 +995,8 @@ static void mpu_loader_cfg(void)
     }
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_MPU_L_LCK_CH, FLOW_CTRL_MPU_L_LCK_CH);
   }
+  
+#endif  
 #endif /* OEMIROT_MPU_PROTECTION */
 }
 #endif /* MCUBOOT_EXT_LOADER */

@@ -25,7 +25,7 @@
  */
 
 /* Flash layout configuration : begin ****************************************/
-#define MCUBOOT_OVERWRITE_ONLY  /* */   /* Defined: the FW installation uses overwrite method.
+/* #define MCUBOOT_OVERWRITE_ONLY   */   /* Defined: the FW installation uses overwrite method.
                                       UnDefined: The FW installation uses swap mode. */
 
 #define MCUBOOT_EXT_LOADER         /* Defined: Use system bootloader (in system flash).
@@ -280,7 +280,7 @@
 #define NSSLIB_PFUNC_2                      (0x0BF9FD6CUL)
 #define NSSLIB_PFUNC_1                      (0x0BF9FE6CUL)
 #define NSS_LIB_SIZE                        (0x2000U)
-#define STM32_DESCRIPTOR_SIZE               (0x100U)
+#define STM32_DESCRIPTOR_SIZE               (0x400U)
 #define STM32_DESCRIPTOR_BASE_NS            (STM32_DESCRIPTOR_BASE_NS_3) /* use for mpu region the lowest address*/
 #define STM32_DESCRIPTOR_END_NS             (STM32_DESCRIPTOR_BASE_NS_1 + STM32_DESCRIPTOR_SIZE -1) /* to cover all descriptors */
 #endif /* __FLASH_LAYOUT_H__ */

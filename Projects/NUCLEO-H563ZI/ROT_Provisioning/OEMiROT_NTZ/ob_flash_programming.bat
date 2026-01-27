@@ -10,7 +10,7 @@ setlocal EnableDelayedExpansion
 set wrpgrp1=0xFFFFFFF8
 set wrpgrp2=0xFFFFFFFF
 set hdp1_start=0
-set hdp1_end=0xb
+set hdp1_end=0x13
 set hdp2_start=0x7F
 set hdp2_end=0x0
 set boot_lck=0xB4
