@@ -68,12 +68,11 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
     FLOW_CTRL_MPU_I_CH_R0,
 #endif /* FLOW_CONTROL */
   },
-#if  (!defined(MCUBOOT_PRIMARY_ONLY) && !defined(MCUBOOT_OVERWRITE_ONLY))
-  /* Region 1: Allows RW access for scratch area */
+  /* Region 1: Allows RW access for flash area outside of BOOT code */
   {
     1,
-    FLASH_BASE + FLASH_AREA_SCRATCH_OFFSET,
-    FLASH_BASE + FLASH_AREA_SCRATCH_OFFSET + FLASH_AREA_SCRATCH_SIZE - 1,
+    FLASH_BASE + FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE,
+    FLASH_BASE + FLASH_AREA_END_OFFSET - 1,
     MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
     MPU_ARMV8M_AP_RW_PRIV_ONLY,
@@ -85,13 +84,12 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
     FLOW_CTRL_MPU_I_CH_R1,
 #endif /* FLOW_CONTROL */
   },
-#endif
-  /* Region 2: Allows RW access to all slots areas */
+  /* Region 2: Allows RW access to BL2 SRAM */
   {
     2,
-    FLASH_BASE + FLASH_AREA_BEGIN_OFFSET,
-    FLASH_BASE + FLASH_AREA_END_OFFSET - 1,
-    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
+    BL2_SRAM_AREA_BASE,
+    BL2_SRAM_AREA_END,
+    MPU_ARMV8M_MAIR_ATTR_DATA_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
     MPU_ARMV8M_AP_RW_PRIV_ONLY,
     MPU_ARMV8M_SH_NONE,
@@ -102,12 +100,12 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
     FLOW_CTRL_MPU_I_CH_R2,
 #endif /* FLOW_CONTROL */
   },
-  /* Region 4: Allows RW access to BL2 SRAM */
+  /* Region 4: Allows RW access to peripherals */
   {
     4,
-    BL2_SRAM_AREA_BASE,
-    BL2_SRAM_AREA_END,
-    MPU_ARMV8M_MAIR_ATTR_DATA_IDX,
+    PERIPH_BASE,
+    PERIPH_BASE + 0xFFFFFFF,
+    MPU_ARMV8M_MAIR_ATTR_DEVICE_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
     MPU_ARMV8M_AP_RW_PRIV_ONLY,
     MPU_ARMV8M_SH_NONE,
@@ -118,14 +116,16 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
     FLOW_CTRL_MPU_I_CH_R4,
 #endif /* FLOW_CONTROL */
   },
-  /* Region 5: Allows RW access to peripherals */
+  /* Region 5: Allows read access to STM32 descriptors & NSSLIB */
+  /* start = the start of the new descriptor address and the
+     end = the end of the old descriptor address */
   {
     5,
-    PERIPH_BASE,
-    PERIPH_BASE + 0xFFFFFFF,
-    MPU_ARMV8M_MAIR_ATTR_DEVICE_IDX,
+    STM32_DESCRIPTOR_BASE_NS,
+    STM32_DESCRIPTOR_END_NS + NSS_LIB_SIZE,
+    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
-    MPU_ARMV8M_AP_RW_PRIV_ONLY,
+    MPU_ARMV8M_AP_RO_PRIV_ONLY,
     MPU_ARMV8M_SH_NONE,
 #ifdef FLOW_CONTROL
     FLOW_STEP_MPU_I_EN_R5,
@@ -134,13 +134,13 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
     FLOW_CTRL_MPU_I_CH_R5,
 #endif /* FLOW_CONTROL */
   },
-  /* Region 6: Allows execution of RSSLIB */
+  /* Region 6: Allows read access to Engi bytes */
   {
     6,
-    RSS_LIB_BASE,
-    RSS_LIB_BASE + RSS_LIB_SIZE - 1,
-    MPU_ARMV8M_MAIR_ATTR_CODE_IDX,
-    MPU_ARMV8M_XN_EXEC_OK,
+    ENGI_BASE_NS,
+    ENGI_BASE_NS + ENGI_SIZE - 1,
+    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
+    MPU_ARMV8M_XN_EXEC_NEVER,
     MPU_ARMV8M_AP_RO_PRIV_ONLY,
     MPU_ARMV8M_SH_NONE,
 #ifdef FLOW_CONTROL
@@ -150,44 +150,9 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
     FLOW_CTRL_MPU_I_CH_R6,
 #endif /* FLOW_CONTROL */
   },
-
-  /* Region 7: Allows read access to STM32 descriptors */
-  /* start = the start of the new descriptor address and the
-     end = the end of the old descriptor address */
+  /* Region 7: Allows RW access to OBKeys HDPL1&2&3 area */
   {
     7,
-    STM32_DESCRIPTOR_BASE_NS,
-    STM32_DESCRIPTOR_END_NS,
-    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
-    MPU_ARMV8M_XN_EXEC_NEVER,
-    MPU_ARMV8M_AP_RO_PRIV_ONLY,
-    MPU_ARMV8M_SH_NONE,
-#ifdef FLOW_CONTROL
-    FLOW_STEP_MPU_I_EN_R7,
-    FLOW_CTRL_MPU_I_EN_R7,
-    FLOW_STEP_MPU_I_CH_R7,
-    FLOW_CTRL_MPU_I_CH_R7,
-#endif /* FLOW_CONTROL */
-  },
-  /* Region 8: Allows read access to Engi bytes */
-  {
-    8,
-    ENGI_BASE_NS,
-    ENGI_BASE_NS + ENGI_SIZE - 1,
-    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
-    MPU_ARMV8M_XN_EXEC_NEVER,
-    MPU_ARMV8M_AP_RO_PRIV_ONLY,
-    MPU_ARMV8M_SH_NONE,
-#ifdef FLOW_CONTROL
-    FLOW_STEP_MPU_I_EN_R8,
-    FLOW_CTRL_MPU_I_EN_R8,
-    FLOW_STEP_MPU_I_CH_R8,
-    FLOW_CTRL_MPU_I_CH_R8,
-#endif /* FLOW_CONTROL */
-  },
-  /* Region 9: Allows RW access to OBKeys HDPL1&2&3 area */
-  {
-    9,
     FLASH_OBK_BASE_S + OBK_HDPL1_OFFSET,
     FLASH_OBK_BASE_S + OBK_HDPL3_END,
     MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
@@ -195,27 +160,10 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_init[] = {
     MPU_ARMV8M_AP_RW_PRIV_ONLY,
     MPU_ARMV8M_SH_NONE,
 #ifdef FLOW_CONTROL
-    FLOW_STEP_MPU_I_EN_R9,
-    FLOW_CTRL_MPU_I_EN_R9,
-    FLOW_STEP_MPU_I_CH_R9,
-    FLOW_CTRL_MPU_I_CH_R9,
-#endif /* FLOW_CONTROL */
-  },
-  /* Region 10: Allows RW access to NS slot areas */
-  /* Secure HAL flash driver uses non secure flash address to perform access to non secure flash area */
-  {
-    10,
-    FLASH_BASE_NS + FLASH_AREA_BEGIN_OFFSET,
-    FLASH_BASE_NS + FLASH_AREA_END_OFFSET - 1,
-    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
-    MPU_ARMV8M_XN_EXEC_NEVER,
-    MPU_ARMV8M_AP_RW_PRIV_ONLY,
-    MPU_ARMV8M_SH_NONE,
-#ifdef FLOW_CONTROL
-    FLOW_STEP_MPU_I_EN_R10,
-    FLOW_CTRL_MPU_I_EN_R10,
-    FLOW_STEP_MPU_I_CH_R10,
-    FLOW_CTRL_MPU_I_CH_R10,
+    FLOW_STEP_MPU_I_EN_R7,
+    FLOW_CTRL_MPU_I_EN_R7,
+    FLOW_STEP_MPU_I_CH_R7,
+    FLOW_CTRL_MPU_I_CH_R7,
 #endif /* FLOW_CONTROL */
   },
 };
@@ -241,11 +189,11 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_appli[] = {
     FLOW_CTRL_MPU_A_CH_R1,
 #endif /* FLOW_CONTROL */
   },
-  /* Region 2: Allows RW access to end of area 0 for image confirmation (swap mode) */
+  /* Region 3: Allows RW access to end of flash area for image confirmation (swap mode) */
   {
-    2,
-    FLASH_BASE + APP_IMAGE_PRIMARY_PARTITION_OFFSET + FLASH_APP_PARTITION_SIZE - (~MPU_RLAR_LIMIT_Msk +1),
-    FLASH_BASE + APP_IMAGE_PRIMARY_PARTITION_OFFSET + FLASH_APP_PARTITION_SIZE - 1,
+    3,
+    FLASH_BASE + APP_IMAGE_PRIMARY_PARTITION_OFFSET + FLASH_APP_PARTITION_SIZE - 1 - (~MPU_RLAR_LIMIT_Msk +1),
+    FLASH_BASE + FLASH_AREA_END_OFFSET - 1,
     MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
     MPU_ARMV8M_XN_EXEC_NEVER,
     MPU_ARMV8M_AP_RW_PRIV_ONLY,
@@ -256,25 +204,7 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_appli[] = {
     FLOW_STEP_MPU_A_CH_R2,
     FLOW_CTRL_MPU_A_CH_R2,
 #endif /* FLOW_CONTROL */
-  },
-#if  MCUBOOT_DATA_IMAGE_NUMBER == 1
-  /* Region 3: Allows RW access to end of data image for image confirmation (swap mode) */
-  {
-    3,
-    FLASH_BASE + APP_DATA_IMAGE_PRIMARY_PARTITION_OFFSET,
-    FLASH_BASE + APP_DATA_IMAGE_PRIMARY_PARTITION_OFFSET + FLASH_DATA_PARTITION_SIZE - 1,
-    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
-    MPU_ARMV8M_XN_EXEC_NEVER,
-    MPU_ARMV8M_AP_RW_PRIV_ONLY,
-    MPU_ARMV8M_SH_NONE,
-#ifdef FLOW_CONTROL
-    FLOW_STEP_MPU_A_EN_R3,
-    FLOW_CTRL_MPU_A_EN_R3,
-    FLOW_STEP_MPU_A_CH_R3,
-    FLOW_CTRL_MPU_A_CH_R3,
-#endif /* FLOW_CONTROL */
-  },
-#endif /* (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
+  },  
 };
 
 /* Product state control
@@ -389,6 +319,8 @@ static const uint32_t ProductStatePrioList[] = {
 
 /* MPCBB : All SRAM block non privileged + privileged */
 #define GTZC_MPCBB_ALL_NPRIV (0x00000000UL)
+
+#ifdef OEMIROT_MPU_PROTECTION
 /* MPU configuration
    ================= */
 static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
@@ -410,6 +342,7 @@ static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
 #endif /* FLOW_CONTROL */
   },
 };
+#endif
 #endif /* MCUBOOT_EXT_LOADER */
 
 /**
@@ -471,7 +404,7 @@ void LL_SECU_ApplyRunTimeProtections(void)
   gtzc_init_cfg();
 
   /* Set MPU to forbid execution outside of immutable code  */
-  //mpu_init_cfg();
+  mpu_init_cfg();
 
   /* With OEMIROT_DEV_MODE , active tamper calls Error_Handler */
   /* Error_Handler requires sau_init_cfg */
@@ -930,7 +863,7 @@ static void mpu_appli_cfg(void)
     {
       /* First region configured should be activated by RSS JUMP service,
          execution rights given to primary code slot */
-      if (i == 0)
+      if ( i == 0 )
       {
         status = mpu_armv8m_region_config_only(&dev_mpu_s, (struct mpu_armv8m_region_cfg_t *)&mpu_region_cfg_appli[i]);
       }

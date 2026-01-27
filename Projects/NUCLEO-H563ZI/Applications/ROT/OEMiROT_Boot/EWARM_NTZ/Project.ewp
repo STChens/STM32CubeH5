@@ -220,7 +220,7 @@
                     <state>MCUBOOT_TARGET_CONFIG=&lt;flash_layout.h&gt;</state>
                     <state>MBEDTLS_CONFIG_FILE=&lt;mbedtls_config.h&gt;</state>
                     <state>MCUBOOT_DOUBLE_SIGN_VERIF</state>
-                    <state>__NO_FLOW_CONTROL</state>
+                    <state>FLOW_CONTROL</state>
                     <state>BL2</state>
                     <state>__INITIAL_SP=ARM_LIB_STACK$$Limit</state>
                     <state>__STACK_LIMIT=ARM_LIB_STACK$$Base</state>
