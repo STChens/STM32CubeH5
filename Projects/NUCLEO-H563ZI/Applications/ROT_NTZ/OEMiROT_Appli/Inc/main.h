@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    Applications/ROT/OEMiROT_Appli/Inc/main.h
+  * @file    Applications/ROT_NTZ/OEMiROT_Appli/Inc/main.h
   * @author  MCD Application Team
   * @brief   Header for main.c module
   ******************************************************************************

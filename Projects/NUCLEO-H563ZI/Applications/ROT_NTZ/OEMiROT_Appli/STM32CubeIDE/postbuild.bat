@@ -42,7 +42,7 @@ set app_data_init_xml="%provisioningdir%\%bootpath%\Images\%project%_Data_Init_I
 :: Variables for image xml configuration(ROT_Provisioning\%bootpath%\Images)
 :: relative path from ROT_Provisioning\%bootpath%\Images directory to retrieve binary files
 ::=================================================================================================
-set bin_path_xml_field="..\..\..\Applications\ROT\OEMiROT_Appli\Binary"
+set bin_path_xml_field="..\..\..\Applications\ROT_NTZ\OEMiROT_Appli\Binary"
 set fw_in_bin_xml_field="Firmware binary input file"
 set fw_out_bin_xml_field="Image output file"
 set app_bin_xml_field="%bin_path_xml_field%\rot_app.bin"

@@ -10,13 +10,13 @@ set stm32tpccli="C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgramm
 :: ==============================================================================
 ::                            OEMiROT Appli boot path
 :: Select application project below
-set oemirot_appli_path_project=Applications/ROT/OEMiROT_Appli
+set oemirot_appli_path_project=Applications/ROT_NTZ/OEMiROT_Appli
 
 :: ==============================================================================
 ::                            OEMiROT boot path
 :: ==============================================================================
 :: Select OEMiROT Boot project below
-set oemirot_boot_path_project=Applications/ROT/OEMiROT_Boot
+set oemirot_boot_path_project=Applications/ROT_NTZ/OEMiROT_Boot
 
 :: ==============================================================================
 
