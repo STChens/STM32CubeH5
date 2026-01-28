@@ -137,7 +137,7 @@ for /f %%A in ('"prompt $H & echo on & for %%B in (1) do rem"') do set "BS=%%A"
 set "action=Define product state value"
 echo    * %action%
 if [%1] neq [AUTO] (
-    set /p "product_state=%BS%       [ OPEN | PROVISIONED | TZ-CLOSED | CLOSED | LOCKED ]: "
+    set /p "product_state=%BS%       [ OPEN | PROVISIONED | CLOSED | LOCKED ]: "
 ) else (
     set "product_state=%2%"
     if /i "!product_state!" == "OPEN" (
@@ -155,12 +155,6 @@ goto connect_boot0
 if /i "!product_state!" == "PROVISIONED" (
 echo.
 set ps_value=0x2E
-goto set_provisionning_ps
-)
-
-if /i "!product_state!" == "TZ-CLOSED" (
-echo.
-set ps_value=0xC6
 goto set_provisionning_ps
 )
 
