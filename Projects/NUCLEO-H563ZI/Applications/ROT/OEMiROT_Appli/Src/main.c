@@ -92,7 +92,7 @@ int main(void)
 #endif /* PRINT_BOOT_TIME */
 
   /* Disable MPU or reconfigure MPU according to App needs */
-  MPU->CTRL &= 0xFFFFFFFE; 
+  //MPU->CTRL &= 0xFFFFFFFE; 
   
   /*  set example to const : this const changes in binary without rebuild */
   pUserAppId = (uint8_t *)&UserAppId;

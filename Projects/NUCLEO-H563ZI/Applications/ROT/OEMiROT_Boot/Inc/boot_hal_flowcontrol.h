@@ -226,8 +226,13 @@ extern "C" {
 #define FLOW_STEP_MPU_A_CH_R1       0x000b3642U        /*!< Step MPU Region 1 Appli check value */
 #define FLOW_STEP_MPU_A_EN_R2       0x000b2437U        /*!< Step MPU Region 2 Appli enable value */
 #define FLOW_STEP_MPU_A_CH_R2       0x000b448eU        /*!< Step MPU Region 2 Appli check value */
-#define FLOW_STEP_MPU_A_EN_R3       0x000b285cU        /*!< Step MPU Region 3 Appli enable value */
-#define FLOW_STEP_MPU_A_CH_R3       0x000c0cb9U        /*!< Step MPU Region 3 Appli check value */
+#if  (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))
+  #define FLOW_STEP_MPU_A_EN_R3       0x000b285cU        /*!< Step MPU Region 3 Appli enable value */
+  #define FLOW_STEP_MPU_A_CH_R3       0x000c0cb9U        /*!< Step MPU Region 3 Appli check value */
+#else
+  #define FLOW_STEP_MPU_A_EN_R3       0x000b285cU        /*!< No effect on control flow */
+  #define FLOW_STEP_MPU_A_CH_R3       0x000c0cb9U        /*!< No effect on control flow */
+#endif
 #else
 #define FLOW_STEP_MPU_A_EN_R1       0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_A_CH_R1       0x00000000U        /*!< No effect on control flow */

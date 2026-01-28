@@ -178,7 +178,7 @@ const struct mpu_armv8m_region_cfg_t mpu_region_cfg_appli[] = {
     1,
     FLASH_BASE + APP_IMAGE_PRIMARY_PARTITION_OFFSET,
     FLASH_BASE + APP_IMAGE_PRIMARY_PARTITION_OFFSET + FLASH_APP_PARTITION_SIZE - 1 - (~MPU_RLAR_LIMIT_Msk +1),
-    MPU_ARMV8M_MAIR_ATTR_DATA_IDX,
+    MPU_ARMV8M_MAIR_ATTR_CODE_IDX,
     MPU_ARMV8M_XN_EXEC_OK,
     MPU_ARMV8M_AP_RO_PRIV_ONLY,
     MPU_ARMV8M_SH_NONE,
@@ -347,11 +347,11 @@ static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
   {
     5,
     0x0BF90000,
-    BOOTLOADER_BASE_NS + BOOTLOADER_SIZE - 1,
+    STM32_DESCRIPTOR_END_NS + NSS_LIB_SIZE,
     MPU_ARMV8M_MAIR_ATTR_CODE_IDX,
     MPU_ARMV8M_XN_EXEC_OK,
     MPU_ARMV8M_AP_RO_PRIV_ONLY,
-    MPU_ARMV8M_SH_NONE,  
+    MPU_ARMV8M_SH_NONE, 
 #ifdef FLOW_CONTROL
     FLOW_STEP_MPU_L_EN_R7,
     FLOW_CTRL_MPU_L_EN_R7,
@@ -937,16 +937,15 @@ static void mpu_appli_cfg(void)
 static void mpu_loader_cfg(void)
 {
 #ifdef OEMIROT_MPU_PROTECTION
-#if 1  
   struct mpu_armv8m_dev_t dev_mpu_s = { MPU_BASE };
+  
+#if 1 // FIXME we disable MPU to execute loader from system flash
   
   /* we just disable MPU before jumping to loader, so region_cfg_loader_s is not used*/
   mpu_armv8m_disable(&dev_mpu_s);
 #else
   uint32_t i = 0U;
-  /* Secure coding  : volatile variable usage to force compiler to reload SBS->CSLCKR register address */
-  __IO uint32_t read_reg = (uint32_t) &SBS->CSLCKR;
-
+  
   /* configuration stage */
   if (uFlowStage == FLOW_STAGE_CFG)
   {
@@ -985,15 +984,7 @@ static void mpu_loader_cfg(void)
       }
     }
 
-    /* Lock MPU config */
-    __HAL_RCC_SBS_CLK_ENABLE();
-    SBS->CSLCKR |= SBS_CSLCKR_LOCKSMPU;
-    FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_MPU_L_LCK, FLOW_CTRL_MPU_L_LCK);
-    if (((* (uint32_t *)read_reg) & SBS_CSLCKR_LOCKSMPU) == 0U)
-    {
-      Error_Handler();
-    }
-    FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_MPU_L_LCK_CH, FLOW_CTRL_MPU_L_LCK_CH);
+    /* SBS can lock SMPU but not applicable to NTZ env, so skip the step to lock MPU config */
   }
   
 #endif  
