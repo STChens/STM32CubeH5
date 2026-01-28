@@ -46,7 +46,7 @@ set "appli_dir=../../../../%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
 
-set appli_postbuild="%appli_dir%\EWARM_NTZ\postbuild.bat"
+set appli_postbuild="%appli_dir%\EWARM\postbuild.bat"
 
 set "img_config=%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\img_config.bat"
 set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
@@ -81,7 +81,7 @@ IF !errorlevel! NEQ 0 goto :error
 
 call %img_config%
 
-set app_icf_file=%appli_dir%\EWARM_NTZ\stm32h563xx_flash.icf
+set app_icf_file=%appli_dir%\EWARM\stm32h563xx_flash.icf
 set app_main="%appli_dir%\Inc\main.h"
 set appli_flash_layout="%appli_dir%\Inc\appli_flash_layout.h"
 :: ============================================================ Update %map_properties% ===============================================================

@@ -45,7 +45,7 @@ set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
 set "appli_dir=../../../../%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
-set appli_postbuild="%appli_dir%\STM32CubeIDE_NTZ\postbuild.bat"
+set appli_postbuild="%appli_dir%\STM32CubeIDE\postbuild.bat"
 set "img_config=%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\img_config.bat"
 set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
 
@@ -80,7 +80,7 @@ IF !errorlevel! NEQ 0 goto :error
 
 call %img_config%
 
-set app_ld_file="%appli_dir%\STM32CubeIDE_NTZ\STM32H563ZITX_FLASH.ld"
+set app_ld_file="%appli_dir%\STM32CubeIDE\STM32H563ZITX_FLASH.ld"
 set app_main="%appli_dir%\Inc\main.h"
 set appli_flash_layout="%appli_dir%\Inc\appli_flash_layout.h"
 :: ============================================================ Update %map_properties% ===============================================================

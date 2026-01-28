@@ -46,7 +46,7 @@ set "appli_dir=../../../../%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
 
-set appli_postbuild="%appli_dir%\MDK-ARM_NTZ\postbuild.bat"
+set appli_postbuild="%appli_dir%\MDK-ARM\postbuild.bat"
 set "img_config=%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\img_config.bat"
 set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
 
@@ -81,7 +81,7 @@ IF !errorlevel! NEQ 0 goto :error
 
 call %img_config%
 
-set app_sct_file="%appli_dir%\MDK-ARM_NTZ\stm32h563xx.sct"
+set app_sct_file="%appli_dir%\MDK-ARM\stm32h563xx.sct"
 set app_main="%appli_dir%\Inc\main.h"
 set appli_flash_layout="%appli_dir%\Inc\appli_flash_layout.h"
 :: ============================================================ Update %map_properties% ===============================================================
