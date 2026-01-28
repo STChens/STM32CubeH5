@@ -10,7 +10,7 @@ set connect_reset=-c port=SWD speed=fast ap=1 mode=Hotplug -hardRst
 set "action=Configure OBKeys HDPL1-DA config area"
 echo %action%
 %stm32programmercli% %connect_reset%
-%stm32programmercli% %connect_no_reset% -sdp ../DA/Binary/DA_Config.obk
+%stm32programmercli% %connect_no_reset% -sdp ../DA/Binary/DA_ConfigWithPassword.obk
 IF !errorlevel! NEQ 0 goto :error
 
 set "action=Configure OBKeys HDPL1-OEM-iRoT config area"
