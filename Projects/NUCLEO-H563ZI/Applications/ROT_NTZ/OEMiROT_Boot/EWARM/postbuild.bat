@@ -42,7 +42,7 @@ set bootpath=OEMiROT_NTZ
 set project=OEMiROT
 set "map_properties=%projectdir%\..\map.properties"
 set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
-set "appli_dir=../../../../%oemirot_appli_path_project%"
+set "appli_dir=%projectdir%\..\..\..\..\%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
 

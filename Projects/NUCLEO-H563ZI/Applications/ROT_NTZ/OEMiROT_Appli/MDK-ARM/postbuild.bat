@@ -52,9 +52,9 @@ set app_data_enc_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\app_dat
 set app_data_init_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\app_data_init_sign.hex"
 
 ::Make sure we have a Binary sub-folder in UserApp folder
-if not exist "%bin_path_xml_field%" (
-mkdir "%bin_path_xml_field%"
-)
+::if not exist "%projectdir%\..\Binary" (
+::mkdir "%projectdir%\..\Binary"
+::)
 
 :start
 ::=================================================================================================

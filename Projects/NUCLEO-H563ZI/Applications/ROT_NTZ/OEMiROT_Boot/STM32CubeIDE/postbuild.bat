@@ -42,7 +42,7 @@ set bootpath=OEMiROT_NTZ
 set project=OEMiROT
 set "map_properties=%projectdir%\..\map.properties"
 set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
-set "appli_dir=../../../../%oemirot_appli_path_project%"
+set "appli_dir=%projectdir%\..\..\..\..\%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
 set appli_postbuild="%appli_dir%\STM32CubeIDE\postbuild.bat"
@@ -81,6 +81,7 @@ IF !errorlevel! NEQ 0 goto :error
 call %img_config%
 
 set app_ld_file="%appli_dir%\STM32CubeIDE\STM32H563ZITX_FLASH.ld"
+
 set app_main="%appli_dir%\Inc\main.h"
 set appli_flash_layout="%appli_dir%\Inc\appli_flash_layout.h"
 :: ============================================================ Update %map_properties% ===============================================================
