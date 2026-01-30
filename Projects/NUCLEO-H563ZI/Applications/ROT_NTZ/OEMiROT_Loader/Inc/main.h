@@ -26,15 +26,17 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h5xx_hal.h"
-#include "stm32h5xx_nucleo.h"
   
 /* Private includes ----------------------------------------------------------*/
 #include "com.h"
+
 /* Private define ------------------------------------------------------------*/
 #define APP_CODE_OFFSET      0x2A000 /* This define is updated automatically from ROT_BOOT project */
 #define APP_CODE_SIZE        0xC6000 /* This define is updated automatically from ROT_BOOT project */
 #define IMAGE_HEADER_SIZE  (0x400)  /* mcuboot headre size */
-#define APP_CODE_START       (FLASH_BASE + APP_CODE_OFFSET + IMAGE_HEADER_SIZE)
+
+#define LOADER_CODE_OFFSET      0x2A000 /* This define is updated automatically from ROT_BOOT project */
+#define LOADER_CODE_START       (FLASH_BASE + LOADER_CODE_OFFSET)
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/

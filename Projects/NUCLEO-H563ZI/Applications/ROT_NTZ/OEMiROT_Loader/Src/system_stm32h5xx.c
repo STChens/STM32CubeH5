@@ -142,60 +142,6 @@
                                    This value must be a multiple of 0x200. */
 #endif /* VECT_TAB_OFFSET */
 
-/* Definitions for RCC PWR GTZC TZSC & TZIC ALL register values */
-/* RCC ALL register values */
-#define RCC_AHB1ENR_ALL         (0x013ED103UL)
-#define RCC_AHB2ENR_ALL         (0xC13F1DFFUL)
-#define RCC_AHB4ENR_ALL         (0x00111880UL)
-#define RCC_APB1LENR_ALL        (0xDFFFC9FFUL)
-#define RCC_APB1HENR_ALL        (0x0080022BUL)
-#define RCC_APB2ENR_ALL         (0x017F7800UL)
-#define RCC_APB3ENR_ALL         (0x00F0FBD2UL)
-#define RCC_SECCFGR_ALL         (0x00003BFFUL)
-
-/* GTZC ALL register values */
-
-#define TZIC1_IER1_ALL         (0xFFFFFFFFUL)
-#define TZIC1_IER2_ALL         (0xFF0FFF17UL)
-#define TZIC1_IER3_ALL         (0x05FFFF57UL)
-#define TZIC1_IER4_ALL         (0x3F1F1FDFUL)
-
-#define TZSC1_SECCFGR1_ALL     (0xFFFFFFFFUL)
-#define TZSC1_SECCFGR2_ALL     (0xFF0FFF17UL)
-#define TZSC1_SECCFGR3_ALL     (0x05FFFF57UL)
-
-/* PWR ALL register values */
-#define PWR_SECCFGR_ALL        (0x0000F8FFUL)
-
-/* GPIO ALL register values */
-#define GPIOA_SECCFGR_ALL      (0x0000FFFFUL)
-#define GPIOB_SECCFGR_ALL      (0x0000FFFFUL)
-#define GPIOC_SECCFGR_ALL      (0x0000FFFFUL)
-#define GPIOD_SECCFGR_ALL      (0x0000FFFFUL)
-#define GPIOE_SECCFGR_ALL      (0x0000FFFFUL)
-#define GPIOF_SECCFGR_ALL      (0x0000FFFFUL)
-#define GPIOG_SECCFGR_ALL      (0x0000FFFFUL)
-#define GPIOH_SECCFGR_ALL      (0x0000FFFFUL)
-#define GPIOI_SECCFGR_ALL      (0x00000FFFUL)
-
-/* SYSCFG ALL register values */
-///////////#define SYSCFG_SECCFGR_ALL     (0x)
-
-/* DMA ALL register values */
-#define GPDMA1_SECCFGR_ALL     (0x000000FFUL)
-
-/* EXTI ALL register values */
-#define EXTI_SECCFGR1_ALL      (0xFFFFFFFFUL)
-
-/* RTC ALL register values */
-#define RTC_SECCFGR_ALL        (0x0000D00FUL)
-
-/* TAMP ALL register values */
-#define TAMP_SECCFGR_ALL       (0x80FF80FFUL)
-
-/******************************************************************************/
-
-static void flash_init_cfg(void);
 
 /**
   * @}
@@ -233,7 +179,6 @@ static void flash_init_cfg(void);
   */
 /*
 */
-void SecureSystemInit(void);
 /**
   * @}
   */
@@ -242,33 +187,6 @@ void SecureSystemInit(void);
   * @{
   */
 
-/*----------------------------------------------------------------------------
-  * @brief  Initialize the flash to full secure.
-  * @param  None
-  * @retval None
- *----------------------------------------------------------------------------*/
-static void flash_init_cfg(void)
-{
-  const uint32_t flash_bb_all_sec = 0xFFFFFFFF;
-  __IO uint32_t *reg;
-  uint32_t i = 0U;
-
-  /* Configure Bank1 flash on Secure */
-  reg = &(FLASH->SECBB1R1);
-
-  for (i = 0U; i < FLASH_BLOCKBASED_NB_REG; i++)
-  {
-    *(reg + i) = flash_bb_all_sec;
-  }
-
-  /* Configure Bank2 flash on Secure */
-  reg = &(FLASH->SECBB2R1);
-
-  for (i = 0U; i < FLASH_BLOCKBASED_NB_REG; i++)
-  {
-    *(reg + i) = flash_bb_all_sec;
-  }
-}
 
 /**
   * @brief  Setup the microcontroller system.
@@ -283,9 +201,6 @@ void SystemInit(void)
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
     SCB->CPACR |= ((3UL << 20U)|(3UL << 22U));     /* set CP10 and CP11 Full Access */
 #endif
-
-  /* Init the flash to full secure -------------------------------------------*/
-  flash_init_cfg();
 
   /* Reset the RCC clock configuration to the default reset state ------------*/
   /* Set HSION bit */
@@ -324,7 +239,7 @@ void SystemInit(void)
   RCC->CIER = 0U;
 
   /* Configure the Vector Table location ------------------*/
-  SCB->VTOR = APP_CODE_START; /* Vector Table Relocation in Internal FLASH */
+  SCB->VTOR = LOADER_CODE_START; /* Vector Table Relocation in Internal FLASH */
 
   /* Check OPSR register to verify if there is an ongoing swap or option bytes update interrupted by a reset */
   reg_opsr = FLASH->OPSR & FLASH_OPSR_CODE_OP;
@@ -343,10 +258,6 @@ void SystemInit(void)
     /* Lock the FLASH Option Control Register access */
     FLASH->OPTCR |= FLASH_OPTCR_OPTLOCK;
   }
-
-  /* Set resources as secure */
-  SecureSystemInit();
-
 }
 
 
@@ -464,84 +375,6 @@ void SystemCoreClockUpdate(void)
   /* HCLK clock frequency */
   SystemCoreClock >>= tmp;
 
-}
-
-/**
-  * @brief  Configure all securable resources as secure
-  * @param  None
-  * @retval None
-  */
-void SecureSystemInit(void)
-{
-  SystemCoreClockUpdate();
-  /* Clock enabling */
-  RCC->AHB1ENR  |= RCC_AHB1ENR_ALL;
-  RCC->AHB2ENR  |= RCC_AHB2ENR_ALL;
-  RCC->AHB4ENR  |= RCC_AHB4ENR_ALL;
-  RCC->APB1LENR |= RCC_APB1LENR_ALL;
-  RCC->APB1HENR |= RCC_APB1HENR_ALL;
-  RCC->APB2ENR  |= RCC_APB2ENR_ALL;
-  RCC->APB3ENR  |= RCC_APB3ENR_ALL;
-  RCC->SECCFGR  |= RCC_SECCFGR_ALL;
-
-  /* Illegal access interrupts configuration */
-  GTZC_TZIC1->IER1 |= TZIC1_IER1_ALL;
-  GTZC_TZIC1->IER2 |= TZIC1_IER2_ALL;
-  GTZC_TZIC1->IER3 |= TZIC1_IER3_ALL;
-  GTZC_TZIC1->IER4 |= TZIC1_IER4_ALL;
-
-  /* Securable peripherals security and privilege management */
-  GTZC_TZSC1->SECCFGR1  |= TZSC1_SECCFGR1_ALL;
-  GTZC_TZSC1->SECCFGR2  |= TZSC1_SECCFGR2_ALL;
-  GTZC_TZSC1->SECCFGR3  |= TZSC1_SECCFGR3_ALL;
-
- /* TrustZone-aware peripherals security and privilege management */
-
-  /* PWR */
-  PWR->SECCFGR  |= PWR_SECCFGR_ALL;
-
-  /* RCC */
-  RCC->SECCFGR  |= RCC_SECCFGR_ALL;
-
-  /* GPIO */
-  GPIOA->SECCFGR |= GPIOA_SECCFGR_ALL;
-  GPIOB->SECCFGR |= GPIOB_SECCFGR_ALL;
-  GPIOC->SECCFGR |= GPIOC_SECCFGR_ALL;
-  GPIOD->SECCFGR |= GPIOD_SECCFGR_ALL;
-  GPIOE->SECCFGR |= GPIOE_SECCFGR_ALL;
-  GPIOF->SECCFGR |= GPIOF_SECCFGR_ALL;
-  GPIOG->SECCFGR |= GPIOG_SECCFGR_ALL;
-  GPIOH->SECCFGR |= GPIOH_SECCFGR_ALL;
-  GPIOI->SECCFGR |= GPIOI_SECCFGR_ALL;
-
-  /* DMA */
-  GPDMA1->SECCFGR  |= GPDMA1_SECCFGR_ALL;
-
-  /* EXTI */
-  EXTI->SECCFGR1  |= EXTI_SECCFGR1_ALL;
-
-  /* RTC and TAMP */
-  /* Registers accesses enabling */
-  PWR->DBPCR     |= PWR_DBPCR_DBP;
-
-  /* RTC */
-  RTC->SECCFGR  |= RTC_SECCFGR_ALL;
-
-  /* TAMP */
-  TAMP->SECCFGR  |= TAMP_SECCFGR_ALL;
-
-  /* Registers accesses disabling */
-  PWR->DBPCR     &= ~PWR_DBPCR_DBP;
-
-   /* Clock disabling */
-  RCC->AHB1ENR  &= ~ (RCC_AHB1ENR_ALL & ~(RCC_AHB1ENR_SRAM1EN | RCC_AHB1ENR_TZSC1EN | RCC_AHB1ENR_FLITFEN));
-  RCC->AHB2ENR  &= ~ (RCC_AHB2ENR_ALL & ~(RCC_AHB2ENR_SRAM2EN | RCC_AHB2ENR_SRAM3EN ));
-  RCC->AHB4ENR  &= ~ RCC_AHB4ENR_ALL;
-  RCC->APB1LENR &= ~ RCC_APB1LENR_ALL;
-  RCC->APB1HENR &= ~ RCC_APB1HENR_ALL;
-  RCC->APB2ENR  &= ~ RCC_APB2ENR_ALL;
-  RCC->APB3ENR  &= ~ RCC_APB3ENR_ALL;
-  RCC->SECCFGR  &= ~ RCC_SECCFGR_ALL;
 }
 
 /**

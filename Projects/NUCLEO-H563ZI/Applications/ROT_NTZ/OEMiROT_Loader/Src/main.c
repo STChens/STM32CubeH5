@@ -46,38 +46,25 @@ extern ARM_DRIVER_FLASH FLASH_PRIMARY_SECURE_DEV_NAME;
 /* Enable print of boot time (obtained through DWT).
    DWT usage requires product state is not closed/locked.
    OEMxRoT logs must be disabled for relevant boot time. */
-/* #define PRINT_BOOT_TIME */
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint8_t *pUserAppId;
-const uint8_t UserAppId = 'B';
-uint64_t time;
-uint32_t end;
-
 /* Private function prototypes -----------------------------------------------*/
-static void MX_GTZC_Init(void);
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
 static void FW_Valid_SecureAppImage(void);
 #endif /* defined(MCUBOOT_OVERWRITE_ONLY) */
-#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
+#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
 static void FW_Valid_SecureDataImage(void);
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
-#endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
+#endif /* (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
 
 static void SystemClock_Config(void);
-void FW_APP_PrintMainMenu(void);
-void FW_APP_Run(void);
-void LOADER_Run(void);
+void Loader_PrintMainMenu(void);
+void Loader_Run(void);
 
 /* Callbacks prototypes */
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
-void SecureFault_Callback(void);
-void SecureError_Callback(void);
-#endif
 void Error_Handler(void);
-void NS_DATA_Display(void);
 
 #if defined(__ICCARM__)
 #include <LowLevelIOInterface.h>
@@ -155,43 +142,13 @@ size_t __write(int file, unsigned char const *ptr, size_t len)
 int main(void)
 /*int main(void) */
 {
-#ifdef PRINT_BOOT_TIME
-  /* Get boot cycles */
-  end = DWT->CYCCNT;
-#endif /* PRINT_BOOT_TIME */
-
   /* Disable MPU or reconfigure MPU according to App needs */
   //MPU->CTRL &= 0xFFFFFFFE; 
-  
-  /*  set example to const : this const changes in binary without rebuild */
-  pUserAppId = (uint8_t *)&UserAppId;
-
-  /* SAU/IDAU, FPU and interrupts secure/non-secure allocation setup done */
-  /* in SystemInit() based on partition_stm32h573xx.h file's definitions. */
-
-
-  /* Enable SecureFault handler (HardFault is default) */
-  SCB->SHCSR |= SCB_SHCSR_SECUREFAULTENA_Msk;
-
-  /* STM32H5xx **SECURE** HAL library initialization:
-       - Secure Systick timer is configured by default as source of time base,
-         but user can eventually implement his proper time base source (a general
-         purpose timer for example or other time source), keeping in mind that
-         Time base duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined
-         and handled in milliseconds basis.
-       - Low Level Initialization
-     */
-
 
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-#ifdef PRINT_BOOT_TIME
-  /* Get Boot Time */
-  time = ((uint64_t)(end) * 1000U / SystemCoreClock);
-#endif /* PRINT_BOOT_TIME */
 
   /* !!! To boot in a secure way, the RoT has configured and activated the Memory Protection Unit
       In order to keep a secure environment execution, you should reconfigure the
@@ -205,21 +162,7 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* Configure Communication module */
-  /*
-  COM_InitTypeDef com;
-  com.BaudRate = 115200;
-  com.WordLength = COM_WORDLENGTH_8B;
-  com.StopBits = COM_STOPBITS_1;
-  com.Parity = COM_PARITY_NONE;
-  com.HwFlowCtl = COM_HWCONTROL_NONE;
-  
-  BSP_COM_Init(COM1, &com);
-*/
   COM_Init();
-
-  /* GTZC initialisation */
-  MX_GTZC_Init();
 
   /* All IOs are by default allocated to secure */
 #if defined(GPIOA)
@@ -244,19 +187,15 @@ int main(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
 #endif /* GPIOH */
 
-#ifdef PRINT_BOOT_TIME
-  printf("\r\nBoot time : %u ms at %u MHz", (unsigned int)(time), (unsigned int)(SystemCoreClock/1000000U));
-  printf("\r\n");
-#endif
   printf("\r\n======================================================================");
   printf("\r\n=              (C) COPYRIGHT 2025 STMicroelectronics                 =");
   printf("\r\n=                                                                    =");
-  printf("\r\n=                          User App #%c                               =", *pUserAppId);
+  printf("\r\n=                      OEMiROT Loader                                =");
   printf("\r\n======================================================================");
   printf("\r\n\r\n");
 
   /* User App firmware runs*/
-  FW_APP_Run();
+  Loader_Run();
 
   while (1)
   {
@@ -264,20 +203,6 @@ int main(void)
   }
 }
 
-/**
-  * @brief GTZC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GTZC_Init(void)
-{
-
-  if (HAL_GTZC_TZSC_ConfigPeriphAttributes(GTZC_PERIPH_ICACHE_REG,
-                                           GTZC_TZSC_PERIPH_SEC | GTZC_TZSC_PERIPH_NPRIV) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
 
 /**
   * @brief  System Clock Configuration
@@ -354,19 +279,16 @@ static void SystemClock_Config(void)
   * @param  None.
   * @retval None.
   */
-void FW_APP_PrintMainMenu(void)
+void Loader_PrintMainMenu(void)
 {
   printf("\r\n=================== Main Menu ============================\r\n\n");
-  printf("  Start BootLoader -------------------------------------- 1\r\n\n");
-#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-  printf("  Display Data content ---------------------------------- 2\r\n\n");
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_APP_IMAGE_NUMBER == 1)
-  printf("  Validate App Image ------------------------------------ 3\r\n\n");
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_APP_IMAGE_NUMBER == 1) */
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-  printf("  Validate Data Image ----------------------------------- 5\r\n\n");
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+  printf("  App FW/Data Update ------------------------------------ 1\r\n\n");
+#if !defined(MCUBOOT_OVERWRITE_ONLY) 
+  printf("  Validate App Image ------------------------------------ 2\r\n\n");
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
+  printf("  Validate Data Image ----------------------------------- 3\r\n\n");
+#endif /* (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) */
   printf("  Selection :\r\n\n");
 }
 
@@ -375,66 +297,46 @@ void FW_APP_PrintMainMenu(void)
   * @param  None.
   * @retval None.
   */
-void FW_APP_Run(void)
+void Loader_Run(void)
 {
   uint8_t key = 0U;
 
   /*##1- Print Main Menu message*/
-  FW_APP_PrintMainMenu();
+  Loader_PrintMainMenu();
 
   while (1U)
   {
     /* Receive key */
-    extern UART_HandleTypeDef hcom_uart[];
-
-    //if (HAL_UART_Receive(&hcom_uart [COM1], &key, 1U, 1000) == HAL_OK)
     if (COM_Receive(&key, 1U, 1000) == HAL_OK)
     {
       switch (key)
       {
-        case '1' :
-          //LOADER_Run();
+        case '1' :          
           FW_UPDATE_Run();
           break;
-#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-        case '2':
-          {
-            uint8_t *p = (uint8_t *)(FLASH_BASE+S_DATA_IMAGE_PRIMARY_PARTITION_OFFSET+32);
-            printf("Display data from offset %x\r\n", p);            
-            int i;
-            printf("=================================================\r\n");
-            for ( i = 0; i< APP_DATA_SIZE; i++)
-            {
-              printf("%02x ", p[i]);
-              if ( (i+1)%16 == 0) printf("\r\n");
-            }
-            printf("\r\n");
-          }
-          break;  
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */          
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
-        case '3':
+        case '2':
           FW_Valid_SecureAppImage();
           break;
 #endif /* defined(MCUBOOT_OVERWRITE_ONLY) && defined(MCUBOOT_APP_IMAGE_NUMBER == 1) */
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-        case '5':
+#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
+        case '3':
           FW_Valid_SecureDataImage();
           break;
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
         default:
           printf("Invalid Number !\r");
           break;
       }
 
       /* Print Main Menu message */
-      FW_APP_PrintMainMenu();
+      Loader_PrintMainMenu();
     }
   }
 }
 
 
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
 /**
   * @brief  Secure Operation to confirm Secure Data Image.
   * @param  None
@@ -456,7 +358,7 @@ static void FW_Valid_SecureDataImage(void)
     printf("  -- Confirm Flag Not Correctlty Written \r\n\n");
   }
 }
-#endif /* MCUBOOT_S_DATA_IMAGE_NUMBER == 1 */
+#endif /* MCUBOOT_DATA_IMAGE_NUMBER == 1 */
 
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
 /**
