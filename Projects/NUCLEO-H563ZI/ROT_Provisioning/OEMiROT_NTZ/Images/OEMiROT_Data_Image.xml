@@ -6,18 +6,11 @@
 		<Title>Data image generation</Title>
 		<LinkedXML>../Config/OEMiRoT_Config.xml</LinkedXML>
 	</GlobalParam>
-	<Param>
-		<Name>Authentication secure key</Name>
+    <Param>
+		<Name>Authentication key</Name>
 		<Link></Link>
 		<Type>File</Type>
 		<Command>-k</Command>
-		<Hidden>1</Hidden>
-		<Default></Default>
-	</Param>
-	<Param>
-		<Name>Write Option</Name>
-		<Type>Data</Type>
-		<Command>--overwrite-only</Command>
 		<Hidden>1</Hidden>
 		<Default></Default>
 	</Param>
@@ -44,8 +37,8 @@
 		<Default></Default>
 	</Param>
 	<Param>
-		<Name>Data download slot size</Name>
-		<Value>0x0</Value>
+		<Name>Data area size</Name>
+		<Value>0x2000</Value>
 		<Type>Data</Type>
 		<Command>-S</Command>
 		<Hidden>1</Hidden>
@@ -66,12 +59,21 @@
 		<Default></Default>
 	</Param>
 	<Param>
-		<Name>Dependency with S code image</Name>
+		<Name>Number of scratch sectors</Name>
+		<Value>1</Value>
+		<Type>Data</Type>
+		<Command>-M</Command>
+		<Hidden>1</Hidden>
+		<Tooltip>This is the data area size divided by the scratch area size</Tooltip>
+		<Default>1</Default>
+	</Param>
+    <Param>
+		<Name>Dependency with firmware image</Name>
 		<Value>0,1.0.0</Value>
 		<Type>Dependency</Type>
 		<Command>-d</Command>
 		<Enable>0</Enable>
-		<Tooltip>To be enabled when a compatibility with a specific S code image version is required. S code image version format is x.y.z</Tooltip>
+		<Tooltip>To be enabled when a compatibility with a specific firmware image version is required. Firmware image version format is x.y.z</Tooltip>
 		<Default>0,1.0.0</Default>
 	</Param>
 	<Param>
@@ -98,23 +100,6 @@
 		<Default>16</Default>
 	</Param>
 	<Param>
-		<Name>Number of scratch sectors</Name>
-		<Value>0</Value>
-		<Type>Data</Type>
-		<Command>-M</Command>
-		<Hidden>1</Hidden>
-		<Tooltip>This is the data download slot size divided by the scratch area size</Tooltip>
-		<Default>0</Default>
-	</Param>
-	<Param>
-		<Name>Firmware download area offset</Name>
-		<Value>0x81A6000</Value>
-		<Type>Data</Type>
-		<Command>-x</Command>
-		<Hidden>1</Hidden>
-		<Default>0x8160000</Default>
-	</Param>
-	<Param>
 		<Name>Data binary input file</Name>
 		<Value>../Binary/app_data.bin</Value>
 		<Type>File</Type>
@@ -123,7 +108,7 @@
 	</Param>
 	<Output>
 		<Name>Image output file</Name>
-		<Value>app_data_enc_sign.hex</Value>
+		<Value>app_data_enc_sign.bin</Value>
 		<Default>../Binary/app_data_enc_sign.bin</Default>
 	</Output>
   </McubootFormat>

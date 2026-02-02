@@ -7,7 +7,7 @@
 		<LinkedXML>../Config/OEMiRoT_Config.xml</LinkedXML>
 	</GlobalParam>
 	<Param>
-		<Name>Authentication secure key</Name>
+		<Name>Authentication key</Name>
 		<Link></Link>
 		<Type>File</Type>
 		<Command>-k</Command>
@@ -51,8 +51,8 @@
 		<Default></Default>
 	</Param>
 	<Param>
-		<Name>Data download slot size</Name>
-		<Value>0x0</Value>
+		<Name>Data area size</Name>
+		<Value>0x2000</Value>
 		<Type>Data</Type>
 		<Command>-S</Command>
 		<Hidden>1</Hidden>
@@ -113,7 +113,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware execution area offset</Name>
-		<Value>0x8018000</Value>
+		<Value>0x8028000</Value>
 		<Type>Data</Type>
 		<Command>-x</Command>
 		<Hidden>1</Hidden>
@@ -129,7 +129,7 @@
 	<Output>
 		<Name>Image output file</Name>
 		<Value>app_data_init_sign.hex</Value>
-		<Default>../Binary/app_data_init_sign.bin</Default>
+		<Default>../Binary/app_data_init_sign.hex</Default>
 	</Output>
   </McubootFormat>
 </Root>

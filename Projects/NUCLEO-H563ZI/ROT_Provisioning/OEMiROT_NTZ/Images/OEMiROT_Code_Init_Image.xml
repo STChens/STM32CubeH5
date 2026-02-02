@@ -3,11 +3,11 @@
 <McubootFormat>
 	<GlobalParam>
 		<Command>sign</Command>
-		<Title>Firmware App image generation</Title>
+		<Title>Firmware image generation</Title>
 		<LinkedXML>../Config/OEMiRoT_Config.xml</LinkedXML>
 	</GlobalParam>
 	<Param>
-		<Name>Authentication secure key</Name>
+		<Name>Authentication key</Name>
 		<Link></Link>
 		<Type>File</Type>
 		<Command>-k</Command>
@@ -54,7 +54,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware area size</Name>
-		<Value>0xC6000</Value>
+		<Value>0xE6000</Value>
 		<Type>Data</Type>
 		<Command>-S</Command>
 		<Hidden>1</Hidden>
@@ -106,7 +106,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware execution area offset</Name>
-		<Value>0x801A000</Value>
+		<Value>0x802A000</Value>
 		<Type>Data</Type>
 		<Command>-x</Command>
 		<Hidden>1</Hidden>
@@ -123,15 +123,15 @@
 	</Param>
 	<Param>
 		<Name>Firmware binary input file</Name>
-		<Value>..\..\..\Applications\ROT\OEMiROT_Appli\Binary\rot_app.bin</Value>
+		<Value>..\..\..\Applications\ROT_NTZ\OEMiROT_Appli\Binary\rot_app.bin</Value>
 		<Type>File</Type>
 		<Tooltip>Select the firmware binary file to be processed for the image generation</Tooltip>
-		<Default>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_s_app.bin</Default>
+		<Default>../../../Applications/ROT_NTZ/OEMiROT_Appli/Binary/rot_app.bin</Default>
 	</Param>
 	<Output>
 		<Name>Image output file</Name>
-		<Value>..\..\..\Applications\ROT\OEMiROT_Appli\Binary\rot_app_init_sign.hex</Value>
-		<Default>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_s_app_init_sign.hex</Default>
+		<Value>..\..\..\Applications\ROT_NTZ\OEMiROT_Appli\Binary\rot_app_init_sign.hex</Value>
+		<Default>../../../Applications/ROT_NTZ/OEMiROT_Appli/Binary/rot_app_init_sign.hex</Default>
 	</Output>
   </McubootFormat>
 </Root>

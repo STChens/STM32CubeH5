@@ -7,16 +7,17 @@ set cube_fw_path=%cube_fw_path:"=%
 :: Enable delayed expansion
 setlocal EnableDelayedExpansion
 
-set wrpgrp1=0xFFFFFFF8
-set wrpgrp2=0xFFFFFFFF
+set wrpgrp1=0xfffffff8
+set wrpgrp2=0x7fffffff
 set hdp1_start=0
 set hdp1_end=0x13
 set hdp2_start=0x7F
 set hdp2_end=0x0
 set boot_lck=0xB4
 set bootaddress=0x8000000
+set loaderaddress=0x81F8000
+
 set bootob=0x80000
-set app_data_image_number=1
 
 set bootpath=OEMiROT_NTZ
 
@@ -81,6 +82,14 @@ goto :error
 )
 %stm32programmercli% %connect_no_reset% -d %rot_provisioning_path%\%bootpath%\Binary\%app_data_image% -v
 IF !errorlevel! NEQ 0 goto :error
+)
+
+if  "%ext_loader%" == "1" (
+set "action=Write OEMiROT_Loader"
+echo %action%
+%stm32programmercli% %connect_no_reset% -d %cube_fw_path%\Projects\NUCLEO-H563ZI\%oemirot_boot_path_project%\..\OEMiROT_Loader\Binary\OEMiROT_Loader.bin %loaderaddress% -v
+IF !errorlevel! NEQ 0 goto :error
+echo "OEMiROT_Loader Written"
 )
 
 set "action=Write OEMiROT_Boot"

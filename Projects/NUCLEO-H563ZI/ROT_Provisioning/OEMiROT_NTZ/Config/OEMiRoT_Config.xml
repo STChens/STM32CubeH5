@@ -18,8 +18,8 @@
 	<Hash>
 	</Hash>
 	<File>
-		<Name>Authentication secure key</Name>
-		<Value>./../Keys/OEMiRoT_Authentication_S.pem</Value>
+		<Name>Authentication key</Name>
+		<Value>./../Keys/OEMiRoT_Authentication.pem</Value>
 		<Align>4</Align>
 		<KeyType>ecdsa-p256</KeyType>
 		<Type>Public</Type>
@@ -28,7 +28,7 @@
 	</File>
 	<File>
 		<Name>Authentication non secure key</Name>
-		<Value>./../Keys/OEMiRoT_Authentication_NS.pem</Value>
+		<Value>./../Keys/OEMiRoT_Authentication_2.pem</Value>
 		<Align>4</Align>
 		<KeyType>ecdsa-p256</KeyType>
 		<Type>Public</Type>
