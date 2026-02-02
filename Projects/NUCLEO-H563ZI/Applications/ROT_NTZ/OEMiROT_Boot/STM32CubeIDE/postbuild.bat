@@ -53,7 +53,7 @@ set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
 ::======================================================================================
 ::image xml configuration files
 ::======================================================================================
-set app_code_xml="%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\Images\%project%_Code_Image.xml"
+set app_code_xml="%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\Images\%project%_Code_Image.xml"  
 set app_data_xml="%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\Images\%project%_Data_Image.xml"
 set app_code_init_xml="%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\Images\%project%_Code_Init_Image.xml"
 set app_data_init_xml="%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\Images\%project%_Data_Init_Image.xml"
@@ -162,17 +162,13 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file%  -b bootadd
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-:: wrp pages for BL2
+:: wrp1 pages for BL2
 set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b wrpgrp1 -ms RE_BL2_WRP_START -me RE_BL2_WRP_END -msec RE_FLASH_PAGE_NBR -d 0x8000 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-:: wrp pages for loader
-set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b wrpgrp1 -ms RE_LOADER_WRP_START -me RE_LOADER_WRP_END -msec RE_FLASH_PAGE_NBR -d 0x8000 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b wrpgrp2 -ms RE_BL2_WRP_START -me RE_LOADER_WRP_END -msec RE_FLASH_PAGE_NBR -d 0x8000 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
+:: wrp2 pages for loader
+set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b wrpgrp2 -ms RE_LOADER_WRP_START -me RE_LOADER_WRP_END -msec RE_FLASH_PAGE_NBR -d 0x8000 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -189,22 +185,10 @@ set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b hdp2_end
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b app_data_image_number -m RE_APP_DATA_IMAGE_NUMBER --decimal %ob_flash_programming% --vb >> %current_log_file% 2>&1"
+:: loader addresses
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b loaderaddress -m RE_LOADER_CODE_START %ob_flash_programming% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
-
-:: Application, data and loader addresses
-set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b appliaddress -m RE_IMAGE_FLASH_ADDRESS_APP %ob_flash_programming% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b dataaddress -m RE_IMAGE_FLASH_ADDRESS_DATA %ob_flash_programming% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-::set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b loaderaddress -m RE_LOADER_CODE_START %ob_flash_programming% --vb >> %current_log_file% 2>&1"
-::%command%
-::IF !errorlevel! NEQ 0 goto :error
 
 :: =============================================================== Update %loader_ld_file% ================================================================
 set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_LOADER_CODE_START -n LOADER_CODE_START %loader_ld_file% --vb >> %current_log_file% 2>&1"
@@ -221,6 +205,14 @@ echo %command%
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n APP_CODE_OFFSET %loader_main% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -n APP_CODE_SIZE %loader_main% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 :: ============================================================= Update %postbuild_appli% =============================================================
 :: =============================================================== Update %app_ld_file% ================================================================
 set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n APP_CODE_OFFSET %app_ld_file% --vb >> %current_log_file% 2>&1"
@@ -232,21 +224,13 @@ set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_IMAG
 IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================= Update %app_code_init_xml% =============================================================
-set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %app_code_init_xml% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% xmlname -n %firmware_execution_offset% -c x %app_code_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% xmlparam --option add -n "Confirm" -t Data -c --confirm -h 1 -d "" %app_code_init_xml% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_ADDRESS_APP -c x %app_code_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
-
-::set "command=%python%%applicfg% xmlname -n %firmware_execution_offset% -c x %app_code_init_xml% --vb >> %current_log_file% 2>&1"
-::%command%
-::IF !errorlevel! NEQ 0 goto :error
-
-::set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_ADDRESS_APP -c x %app_code_init_xml% --vb >> %current_log_file% 2>&1"
-::%command%
-::IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -c S %app_code_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
@@ -278,21 +262,13 @@ set "command=%python%%applicfg% xmlval -xml %app_code_xml% -nxml %code_size% -nx
 IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================ Update %app_data_init_xml% ==============================================================
-set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %app_data_init_xml% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% xmlname -n %firmware_execution_offset% -c x %app_data_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% xmlparam --option add -n "Confirm" -t Data -c --confirm -h 1 -d "" %app_data_init_xml% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_ADDRESS_DATA -c x %app_data_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
-
-::set "command=%python%%applicfg% xmlname -n %firmware_execution_offset% -c x %app_data_init_xml% --vb >> %current_log_file% 2>&1"
-::%command%
-::IF !errorlevel! NEQ 0 goto :error
-
-::set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_ADDRESS_DATA -c x %app_data_init_xml% --vb >> %current_log_file% 2>&1"
-::%command%
-::IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_DATA_IMAGE_SIZE -c S %app_data_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
@@ -330,6 +306,9 @@ set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE
 IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -n APP_CODE_SIZE %app_main% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 :: =========================================================== Update %appli_flash_layout% ============================================================
 :: Bypass configuration of appli_flash_layout file if not present
 if not exist %appli_flash_layout% (goto :end)
