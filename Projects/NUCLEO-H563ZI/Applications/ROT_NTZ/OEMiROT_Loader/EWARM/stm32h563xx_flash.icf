@@ -2,13 +2,13 @@
 /*-Editor annotation file-*/
 /* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\cortex_v1_0.xml" */
 /*-Specials-*/
-define exported symbol LOADER_CODE_OFFSET =0x2a000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+define exported symbol LOADER_CODE_START =0x2a000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
 define exported symbol LOADER_CODE_SIZE = 0xc6000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
 
-define exported symbol __ICFEDIT_intvec_start__ = 0x08000000 + LOADER_CODE_OFFSET;
+define exported symbol __ICFEDIT_intvec_start__ = LOADER_CODE_START;
 /*-Memory Regions-*/
-define exported symbol __ICFEDIT_region_ROM_start__     = 0x08000000 + LOADER_CODE_OFFSET;
-define symbol __ICFEDIT_region_ROM_end__       = 0x08000000 + LOADER_CODE_OFFSET + LOADER_CODE_SIZE - 1;
+define exported symbol __ICFEDIT_region_ROM_start__     = LOADER_CODE_START;
+define symbol __ICFEDIT_region_ROM_end__       = LOADER_CODE_START + LOADER_CODE_SIZE - 1;
 /* Only use SRAM2/3 as full secure for our application */
 /* Because when the application jump to the bootloader, the BL uses the SRAM1 resources */
 define symbol __ICFEDIT_region_RAM_start__     = 0x20040000;

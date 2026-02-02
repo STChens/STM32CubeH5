@@ -83,7 +83,7 @@ if [%1] neq [AUTO] pause >nul
 
 echo    * Code firmware image generation
 echo        Open the OEMiROT_Appli project with preferred toolchain.
-echo        Rebuild the Secure project. The rot_app_init_sign.hex and rot_app_enc_sign.hex files are
+echo        Rebuild the Secure project. The rot_app_init_sign.bin and rot_app_enc_sign.bin files are
 echo        generated with the postbuild command.
     
 echo        Press any key to continue...
@@ -93,7 +93,7 @@ if "%app_data_image_number%" == "0" (goto :no_app_data)
 
 echo    * Data generation (if Data image is enabled)
 echo        Select OEMiROT_Data_Image.xml(Default path is \ROT_Provisioning\OEMiROT_NTZ\Images\OEMiROT_Data_Image.xml)
-echo        Generate the ns_data_enc_sign.hex image
+echo        Generate the data_enc_sign.bin image
 echo        Press any key to continue...
 echo.
 if [%1] neq [AUTO] pause >nul
@@ -106,6 +106,14 @@ if !errorlevel! neq 0 goto :step_error
 
 :no_app_data
 
+if  "%ext_loader%" == "0" (goto :no_loader)
+echo    * Loader firmware image generation
+echo        Open the OEMiROT_Loader project with preferred toolchain and rebuild all files.
+echo        Press any key to continue...
+echo.
+if [%1] neq [AUTO] pause >nul
+
+:no_loader
 
 :: ========================================================= Board provisioning steps =======================================================
 :cubemx2

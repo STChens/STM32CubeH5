@@ -548,6 +548,15 @@ int32_t boot_platform_init(void)
          - Low Level Initialization
        */
     HAL_Init();
+
+#if defined (DEV_ENABLE_DEBUG)
+    /* open debug with SBS */
+    __HAL_RCC_SBS_CLK_ENABLE();
+    SBS->DBGCR = 0xb451b4b4;
+    //SBS->DBGLOCKR = 0x0000006a; /* 锁定SBS DBG配置*/
+    DBGMCU->CR |= 0x00010000;
+#endif
+
 #ifdef MCUBOOT_HAVE_LOGGING
     /* Init for log */
     stdio_init();

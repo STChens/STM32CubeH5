@@ -72,13 +72,15 @@
 /* Flash area IDs */
 #define FLASH_AREA_0_ID                 (1) /* FW primary slot */
 
+#if !defined (MCUBOOT_PRIMARY_ONLY)
 #define FLASH_AREA_2_ID                 (3) /* FW secondary slot */
+#endif /* !defined (MCUBOOT_PRIMARY_ONLY) */
 
 #if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
 #define FLASH_AREA_4_ID                 (5) /* Data primary slot */
 #endif /* MCUBOOT_S_DATA_IMAGE_NUMBER == 1 */
 
-#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+#if !defined (MCUBOOT_PRIMARY_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) 
 #define FLASH_AREA_6_ID                 (7) /* Data secondary slot */
 #endif /* MCUBOOT_S_DATA_IMAGE_NUMBER == 1 */
 
@@ -125,8 +127,18 @@
 #error "(FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) not aligned on FLASH_AREA_WRP_GROUP_SIZE"
 #endif /* ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_WRP_GROUP_SIZE) != 0 */
 
+/* Loader area */
+#if defined(MCUBOOT_EXT_LOADER)
+#define LOADER_CODE_SIZE                  (0x8000) /* 32 Kbytes  */
+#define FLASH_AREA_LOADER_OFFSET          (FLASH_AREA_SCRATCH_OFFSET + FLASH_AREA_SCRATCH_SIZE)
+/* Control Loader Image */
+#if (FLASH_AREA_LOADER_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_AREA_LOADER_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /* (FLASH_AREA_LOADER_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
+#endif /* defined(MCUBOOT_EXT_LOADER) */
+
 /* BL2 partitions size */
-#define FLASH_APP_PARTITION_SIZE            (0xC6000)
+#define FLASH_APP_PARTITION_SIZE            (0xE6000)
 
 #define FLASH_MAX_APP_PARTITION_SIZE    FLASH_APP_PARTITION_SIZE
 
@@ -149,7 +161,7 @@
                                            FLASH_AREA_SCRATCH_SIZE))
 
 /* BL2 flash areas */
-#define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_SCRATCH_SIZE+FLASH_AREA_BL2_SIZE)
+#define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_SCRATCH_OFFSET+FLASH_AREA_BL2_SIZE)
 #define FLASH_AREAS_DEVICE_ID           (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
 
 /* data image primary slot */

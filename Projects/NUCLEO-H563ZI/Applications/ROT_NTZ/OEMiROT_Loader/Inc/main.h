@@ -35,8 +35,7 @@ extern "C" {
 #define APP_CODE_SIZE        0xC6000 /* This define is updated automatically from ROT_BOOT project */
 #define IMAGE_HEADER_SIZE  (0x400)  /* mcuboot headre size */
 
-#define LOADER_CODE_OFFSET      0x2A000 /* This define is updated automatically from ROT_BOOT project */
-#define LOADER_CODE_START       (FLASH_BASE + LOADER_CODE_OFFSET)
+#define LOADER_CODE_START       0x08028000
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/

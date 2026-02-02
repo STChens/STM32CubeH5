@@ -72,8 +72,9 @@
 
 #define RAM_ALIAS_BASE                    (_SRAM1_BASE)
 
-/* Alias definitions for flash and ram areas*/
-#define ROM_ALIAS(x)                      (ROM_ALIAS_BASE + (x))
+/* Alias definitions for flash and ram */
+#define ROM_ALIAS(x)                     (ROM_ALIAS_BASE + (x))
+#define LOADER_ROM_ALIAS(x)              (_FLASH_BASE + (x))
 
 #define RAM_ALIAS(x)                      (RAM_ALIAS_BASE + (x))
 
@@ -110,6 +111,11 @@
 #define BL2_SRAM_AREA_END                   (_SRAM3_BASE + _SRAM3_SIZE_MAX - 1)
 #endif /* BL2 */
 
+#define LOADER_CODE_START                 (LOADER_ROM_ALIAS(FLASH_AREA_LOADER_OFFSET))
+#define LOADER_CODE_LIMIT                 (LOADER_CODE_START + LOADER_CODE_SIZE - 1)
+#define LOADER_DATA_START                 (RAM_ALIAS(0x0))
+#define LOADER_DATA_SIZE                  (_SRAM1_SIZE_MAX)
+#define LOADER_DATA_LIMIT                 (LOADER_DATA_START + LOADER_DATA_SIZE - 1)
 
 /* Additional Check to detect flash download slot overlap or overflow */
 #define FLASH_AREA_END_OFFSET_MAX (FLASH_TOTAL_SIZE)
