@@ -51,11 +51,7 @@ typedef struct
 
 STM32xx_Descriptor_t *DescriptorBase = (STM32xx_Descriptor_t *)STM32_DESCRIPTOR_BASE_NS_3;
 
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-RSSLIB_pFunc_TypeDef *Rss_lib_p = (RSSLIB_pFunc_TypeDef *)RSSLIB_PFUNC_3;
-#else
 NSSLIB_pFunc_TypeDef *Nss_lib_p = (NSSLIB_pFunc_TypeDef *)NSSLIB_PFUNC_3;
-#endif
 
 #if defined(MCUBOOT_DOUBLE_SIGN_VERIF)
 /* Global variables to memorize images validation status */
@@ -102,7 +98,7 @@ volatile uint32_t uFlowStage = FLOW_STAGE_CFG;
 /** @defgroup BOOT_HAL_Private_Functions  Private Functions
   * @{
   */
-static void boot_jump_to_RSS(uint32_t boot_jump_addr1, uint32_t boot_jump_addr2,
+static void boot_jump_to_NSS(uint32_t boot_jump_addr1, uint32_t boot_jump_addr2,
                              uint32_t vector_table, uint32_t MPU_region);
 void icache_init(void);
 void getDescriptorAdd(void);
@@ -117,21 +113,11 @@ void getDescriptorAdd(void);
   */
 void boot_platform_noimage(void)
 {
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-  uint32_t rsslib_sec_jump_HDP_lvl3ns;
-#else
   uint32_t nsslib_jump_HDP_lvl3;
-#endif
   
-  BOOT_LOG_INF("Jumping to bootloader");
-  BOOT_LOG_INF("Disconnect COM port if used by bootloader");
+  BOOT_LOG_INF("Jumping to OEMiROT_Loader");
 
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-  /* Init RSS jump function descriptor */
-  rsslib_sec_jump_HDP_lvl3ns = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3NS);
-#else
-    nsslib_jump_HDP_lvl3 = (uint32_t)(Nss_lib_p->JumpHDPLvl3);
-#endif
+  nsslib_jump_HDP_lvl3 = (uint32_t)(Nss_lib_p->JumpHDPLvl3);
   /* Check Flow control */
   FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_2);
   uFlowStage = FLOW_STAGE_CFG;
@@ -154,12 +140,8 @@ void boot_platform_noimage(void)
   __set_MSPLIM(0);
 
   /* Jump into BL through RSS */
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-  /* last parameter (0U) not used in RSSLIB_Sec_JumpHDPL3NS(BOOTLOADER_BASE_NS); */
-  boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl3ns, (uint32_t) BOOTLOADER_BASE_NS, 0U);
-#else
-  boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, nsslib_jump_HDP_lvl3, (uint32_t) BOOTLOADER_BASE_NS, 0U);
-#endif
+  boot_jump_to_NSS((uint32_t)&boot_jump_to_NSS, nsslib_jump_HDP_lvl3, (uint32_t) LOADER_CODE_START, 0U);
+
   /* Avoid compiler to pop registers after having changed MSP */
 #if !defined(__ICCARM__)
   __builtin_unreachable();
@@ -175,12 +157,12 @@ fih_int boot_platform_wakeup(void);
 
 /**
   * @brief  Jumping to next image using RSS service, after erasing SRAM twice
-  * @param  boot_jump_addr1 boot_jump_to_RSS address in order to execute twice SRAM erasing
+  * @param  boot_jump_addr1 boot_jump_to_NSS address in order to execute twice SRAM erasing
   * @param  boot_jump_addr2 RSS service address
   * @param  vector table vector table of the next image
   * @param  MPU_region MPU region to be enabled (not applicable if RSS service is jumping to NS image)
   */
-__attribute__((naked)) void boot_jump_to_RSS(uint32_t boot_jump_addr1, uint32_t boot_jump_addr2,
+__attribute__((naked)) void boot_jump_to_NSS(uint32_t boot_jump_addr1, uint32_t boot_jump_addr2,
                                              uint32_t vector_table, uint32_t MPU_region)
 {
   __ASM volatile(
@@ -241,11 +223,8 @@ fih_int boot_platform_wakeup(void)
 void boot_platform_quit(struct boot_arm_vector_table *vector)
 {
     static struct boot_arm_vector_table *vt;
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-    uint32_t rsslib_sec_jump_HDP_lvl3;
-#else
     uint32_t nsslib_jump_HDP_lvl3;
-#endif
+
 #if defined(MCUBOOT_DOUBLE_SIGN_VERIF)
     uint32_t image_index;
 
@@ -272,11 +251,7 @@ void boot_platform_quit(struct boot_arm_vector_table *vector)
 #endif /* MCUBOOT_DOUBLE_SIGN_VERIF */
 
     /* Init RSS jump function descriptor */
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-    rsslib_sec_jump_HDP_lvl3 = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3);
-#else
     nsslib_jump_HDP_lvl3 = (uint32_t)(Nss_lib_p->JumpHDPLvl3);
-#endif
     
 #if defined(MCUBOOT_USE_HASH_REF)
     /* Store new hash references in flash for next boot */
@@ -322,11 +297,8 @@ void boot_platform_quit(struct boot_arm_vector_table *vector)
     /*  change stack limit  */
     __set_MSPLIM(0);
 
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-    boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl3, (uint32_t) vt, 1U);
-#else
-    boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, nsslib_jump_HDP_lvl3, (uint32_t) vt, 1U);
-#endif
+    boot_jump_to_NSS((uint32_t)&boot_jump_to_NSS, nsslib_jump_HDP_lvl3, (uint32_t) vt, 1U);
+
     /* Avoid compiler to pop registers after having changed MSP */
 #if !defined(__ICCARM__)
     __builtin_unreachable();
@@ -499,11 +471,8 @@ void getDescriptorAdd(void)
     if(strcmp(ReadMagic, "DSCTR484") != 0)
     {
       DescriptorBase = (STM32xx_Descriptor_t *)STM32_DESCRIPTOR_BASE_NS_2;
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-      Rss_lib_p = (RSSLIB_pFunc_TypeDef *)RSSLIB_PFUNC_2;
-#else
       Nss_lib_p = (NSSLIB_pFunc_TypeDef *)NSSLIB_PFUNC_2;
-#endif
+
       for(int i=0; i<8; i++)
       {
         ReadMagic[i] = DescriptorBase->Magic[i];
@@ -511,11 +480,7 @@ void getDescriptorAdd(void)
       if(strcmp(ReadMagic, "DSCTR484") != 0)
       {
         DescriptorBase = (STM32xx_Descriptor_t *)STM32_DESCRIPTOR_BASE_NS_1;
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)   
-        Rss_lib_p = (RSSLIB_pFunc_TypeDef *)RSSLIB_PFUNC_1;
-#else
         Nss_lib_p = (NSSLIB_pFunc_TypeDef *)NSSLIB_PFUNC_1;
-#endif
       }
     }
 }

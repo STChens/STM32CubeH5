@@ -4,6 +4,9 @@
         <path>$WS_DIR$\OEMiROT_Boot\EWARM\Project.ewp</path>
     </project>
     <project>
+        <path>$WS_DIR$\OEMiROT_Loader\EWARM\Project.ewp</path>
+    </project>
+    <project>
         <path>$WS_DIR$\OEMiROT_Appli\EWARM\Project.ewp</path>
     </project>
     <batchBuild>
@@ -12,6 +15,10 @@
             <member>
                 <project>Project</project>
                 <configuration>NUCLEO-H563ZI_OEMiROT_Boot</configuration>
+            </member>
+            <member>
+                <project>Project</project>
+                <configuration>NUCLEO-H563ZI_OEMiROT_Loader</configuration>
             </member>
             <member>
                 <project>Project</project>

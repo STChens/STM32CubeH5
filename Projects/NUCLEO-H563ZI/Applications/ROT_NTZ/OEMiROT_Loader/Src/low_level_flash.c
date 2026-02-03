@@ -332,7 +332,6 @@ static int32_t Flash_ProgramData(uint32_t addr,
   void *dest;
 #endif
   ARM_FLASH0_STATUS.error = DRIVER_STATUS_NO_ERROR;
-  flash_base = (uint32_t)FLASH_BASE_S;
   write_type = FLASH_TYPEPROGRAM_QUADWORD;
 
 #if defined(CHECK_WRITE) || defined(DEBUG_FLASH_ACCESS)
@@ -425,7 +424,9 @@ static int32_t Flash_EraseSector(uint32_t addr)
   /*  erase 1 page because we declare that we have 8192 bytes per page */
   EraseInit.NbSectors = 1;
   EraseInit.Sector = page_number(&ARM_FLASH0_DEV, addr);
-
+#ifdef DEBUG_FLASH_ACCESS
+  printf("%s, %d: Erase bank %d, sector %d\r\n", __FUNCTION__, __LINE__, EraseInit.Banks, EraseInit.Sector);
+#endif
   ARM_FLASH0_STATUS.error = DRIVER_STATUS_NO_ERROR;
   HAL_FLASH_Unlock();
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_BUSY;

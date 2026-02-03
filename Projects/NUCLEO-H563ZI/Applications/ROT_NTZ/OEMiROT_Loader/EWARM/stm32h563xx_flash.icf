@@ -2,8 +2,8 @@
 /*-Editor annotation file-*/
 /* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\cortex_v1_0.xml" */
 /*-Specials-*/
-define exported symbol LOADER_CODE_START =0x2a000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
-define exported symbol LOADER_CODE_SIZE = 0xc6000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+define exported symbol LOADER_CODE_START =0x81f8000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+define exported symbol LOADER_CODE_SIZE = 0x8000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
 
 define exported symbol __ICFEDIT_intvec_start__ = LOADER_CODE_START;
 /*-Memory Regions-*/

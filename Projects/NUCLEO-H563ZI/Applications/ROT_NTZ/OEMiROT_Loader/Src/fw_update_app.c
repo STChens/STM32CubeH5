@@ -25,7 +25,7 @@
 #include "common.h"
 #include "ymodem.h"
 #include "fw_update_app.h"
-#include "region_defs.h"
+#include "appli_flash_layout.h"
 #include "Driver_Flash.h"
 #include "string.h"
 
@@ -307,7 +307,7 @@ static HAL_StatusTypeDef FW_UPDATE_DownloadNewFirmware(SFU_FwImageFlashTypeDef *
        sector_address += m_uFlashSectorSize)
   {
     ret_arm = LOADER_FLASH_DEV_NAME.EraseSector(sector_address);
-    printf("  -- erase page @%08x ret = %d\r\n", sector_address, ret_arm);
+    /* printf("  -- erase page @%08x ret = %d\r\n", sector_address, ret_arm); */
     if (ret_arm < 0)
     {
       return HAL_ERROR;

@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "main.h"
 #include "low_level_flash.h"
-
+#include "appli_flash_layout.h"
 #include "com.h"
 #include "common.h"
 #include "fw_update_app.h"
@@ -51,11 +51,11 @@ extern ARM_DRIVER_FLASH FLASH_PRIMARY_SECURE_DEV_NAME;
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
-static void FW_Valid_SecureAppImage(void);
+static void FW_Valid_AppImage(void);
 #endif /* defined(MCUBOOT_OVERWRITE_ONLY) */
 #if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
-static void FW_Valid_SecureDataImage(void);
+#if !defined(MCUBOOT_OVERWRITE_ONLY)
+static void FW_Valid_DataImage(void);
 #endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
 #endif /* (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
 
@@ -316,12 +316,12 @@ void Loader_Run(void)
           break;
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
         case '2':
-          FW_Valid_SecureAppImage();
+          FW_Valid_AppImage();
           break;
 #endif /* defined(MCUBOOT_OVERWRITE_ONLY) && defined(MCUBOOT_APP_IMAGE_NUMBER == 1) */
 #if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
         case '3':
-          FW_Valid_SecureDataImage();
+          FW_Valid_DataImage();
           break;
 #endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
         default:
@@ -343,7 +343,7 @@ void Loader_Run(void)
   * @param  None
   * @retval None
   */
-static void FW_Valid_SecureDataImage(void)
+static void FW_Valid_DataImage(void)
 {
   const uint8_t FlagPattern[]={0x1 ,0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff };
@@ -351,7 +351,7 @@ static void FW_Valid_SecureDataImage(void)
 
   if (FLASH_PRIMARY_DATA_SECURE_DEV_NAME.ProgramData(ConfirmAddress, FlagPattern, sizeof(FlagPattern)) == ARM_DRIVER_OK)
   {
-    printf("  -- Secure Data Firmware Confirm Done\r\n\n");
+    printf("  -- Data Firmware Confirm Done\r\n\n");
   }
   else
   {
@@ -367,7 +367,7 @@ static void FW_Valid_SecureDataImage(void)
   * @param  None
   * @retval None
   */
-static void FW_Valid_SecureAppImage(void)
+static void FW_Valid_AppImage(void)
 {
   const uint8_t FlagPattern[]={0x1 ,0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff };

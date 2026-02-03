@@ -25,6 +25,9 @@
  */
 
 /* Flash layout configuration : begin ****************************************/
+/* #define MCUBOOT_PRIMARY_ONLY  */     /* Defined: No secondary slot for download.
+                                      UnDefined: Both primary slot and secondary slot for app and data (if any). */
+
 /* #define MCUBOOT_OVERWRITE_ONLY   */   /* Defined: the FW installation uses overwrite method.
                                       UnDefined: The FW installation uses swap mode. */
 
@@ -128,7 +131,40 @@
 #endif /* ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_WRP_GROUP_SIZE) != 0 */
 
 /* BL2 partitions size */
-#define FLASH_APP_PARTITION_SIZE            (0xE6000)
+
+/* Application FW Partition (2M User Flash in total)
+ * +------+-------------------+-----------------+---------------+----------------+--------------+
+ * | case | App Slot Max Size |  Data Slot Size | PRIMARY ONLY  | OVERWRITE ONLY | Loader Size  |
+ * +------+-------------------+-----------------+---------------+----------------+--------------+
+ * |  1   | 0xE6000 (920KB)   |  0x2000 (8KB)   |      N        |        N       | 0x80000 32KB |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  2   | 0xEE000 (952KB)   |  0              |      N        |        N       | 0x80000 32KB |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  3   | 0xEA000 (936KB)   |  0x2000 (8KB)   |      N        |        N       | 0            |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  4   | 0xEC000 (944KB)   |  0              |      N        |        N       | 0            |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  5   | 0xEE000 (952KB)   |  0x2000 (8KB)   |      N        |        Y       | 0x80000 32KB |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  6   | 0xF0000 (960KB)   |  0              |      N        |        Y       | 0x80000 32KB |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  7   | 0xF2000 (968KB)   |  0x2000 (8KB)   |      N        |        Y       | 0            |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  8   | 0xF4000 (976KB)   |  0              |      N        |        Y       | 0            |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  9   | 0x1DC000 (1904KB) |  0x2000 (8KB)   |      Y        |        Y       | 0x80000 32KB |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  10  | 0x1E0000 (1920KB) |  0              |      Y        |        Y       | 0x80000 32KB |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  11  | 0x1E4000 (1936KB) |  0x2000 (8KB)   |      Y        |        Y       | 0            |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ * |  12  | 0x1E8000 (1952KB) |  0              |      Y        |        Y       | 0            |
+ * +-------+------------------+-----------------+---------------+----------------+--------------+
+ */
+#define FLASH_APP_PARTITION_SIZE            (0x16000)  /* Size definition for App FW Slot. \
+                                                          Max size may differ according to configuration, see table above */
 
 #define FLASH_MAX_APP_PARTITION_SIZE    FLASH_APP_PARTITION_SIZE
 
@@ -214,12 +250,19 @@
 #define FLASH_AREA_6_SIZE               (0x0)
 #endif /* FLASH_AREA_6_ID */
 
+/* flash areas end offset */
+#define FLASH_AREA_END_OFFSET           (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
+                                         FLASH_AREA_0_SIZE + FLASH_AREA_2_SIZE + \
+                                         FLASH_AREA_6_SIZE)
+/* Control flash area end */
+#if (FLASH_AREA_END_OFFSET  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_AREA_END_OFFSET  not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /*  (FLASH_AREA_END_OFFSET  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
+
 /* Loader area ==> Put at the end of the user flash, so that it is the top pages of bank 2, wrpgrp2 will be set for write protection */
 #if defined(MCUBOOT_EXT_LOADER)
 #define LOADER_CODE_SIZE                  (0x8000) /* 32 Kbytes  */
-#define FLASH_AREA_LOADER_OFFSET          (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
-                                           FLASH_AREA_0_SIZE + FLASH_AREA_2_SIZE + \
-                                           FLASH_AREA_6_SIZE)
+#define FLASH_AREA_LOADER_OFFSET          (FLASH_TOTAL_SIZE - LOADER_CODE_SIZE)
 /* Control Loader Image */
 #if (FLASH_AREA_LOADER_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
 #error "FLASH_AREA_LOADER_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
@@ -227,15 +270,6 @@
 #else
 #define LOADER_CODE_SIZE                  (0)
 #endif /* defined(MCUBOOT_EXT_LOADER) */
-
-/* flash areas end offset */
-#define FLASH_AREA_END_OFFSET           (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
-                                         FLASH_AREA_0_SIZE + FLASH_AREA_2_SIZE + \
-                                         FLASH_AREA_6_SIZE + LOADER_CODE_SIZE)
-/* Control flash area end */
-#if (FLASH_AREA_END_OFFSET  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
-#error "FLASH_AREA_END_OFFSET  not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
-#endif /*  (FLASH_AREA_END_OFFSET  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
 
 /*
  * The maximum number of status entries supported by the bootloader.
@@ -252,7 +286,6 @@
 
 #define APP_IMAGE_OFFSET             (0x0)
 #define APP_IMAGE_MAX_SIZE           FLASH_APP_PARTITION_SIZE
-
 
 /* Flash device name used by BL2 and NV Counter
  * Name is defined in flash driver file: low_level_flash.c

@@ -46,10 +46,10 @@ set bin_path_xml_field="..\..\..\Applications\ROT_NTZ\OEMiROT_Appli\Binary"
 set fw_in_bin_xml_field="Firmware binary input file"
 set fw_out_bin_xml_field="Image output file"
 set app_bin_xml_field="%bin_path_xml_field%\rot_app.bin"
-set app_enc_sign_hex_xml_field="%bin_path_xml_field%\rot_app_enc_sign.hex"
-set app_init_sign_hex_xml_field="%bin_path_xml_field%\rot_app_init_sign.hex"
-set app_data_enc_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\app_data_enc_sign.hex"
-set app_data_init_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\app_data_init_sign.hex"
+set app_enc_sign_bin_xml_field="%bin_path_xml_field%\rot_app_enc_sign.bin"
+set app_init_sign_bin_xml_field="%bin_path_xml_field%\rot_app_init_sign.hex"
+set app_data_enc_sign_bin_xml_field="%provisioningdir%\%bootpath%\Binary\app_data_enc_sign.bin"
+set app_data_init_sign_bin_xml_field="%provisioningdir%\%bootpath%\Binary\app_data_init_sign.hex"
 
 ::Make sure we have a Binary sub-folder in UserApp folder
 ::if not exist "%projectdir%\..\Binary" (
@@ -104,7 +104,7 @@ echo Postbuild %signing% image >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 ::update xml file : output file
-%python%%applicfg% xmlval -v %app_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %app_code_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_enc_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %app_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 %stm32tpccli% -pb %app_code_xml% >> %current_log_file% 2>>&1
@@ -115,14 +115,14 @@ if !errorlevel! neq 0 goto :error
 if !errorlevel! neq 0 goto :error
 
 ::update xml file : output file
-%python%%applicfg% xmlval -v %app_init_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %app_code_init_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_init_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %app_code_init_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 ::update data xml file : output file
-%python%%applicfg% xmlval -v %app_data_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %app_data_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_data_enc_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %app_data_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-%python%%applicfg% xmlval -v %app_data_init_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %app_data_init_xml% --vb >> %current_log_file% 2>>&1
+%python%%applicfg% xmlval -v %app_data_init_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %app_data_init_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 %stm32tpccli% -pb %app_code_init_xml% >> %current_log_file% 2>>&1

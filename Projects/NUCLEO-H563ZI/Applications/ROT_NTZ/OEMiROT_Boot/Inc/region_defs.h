@@ -119,7 +119,7 @@
 
 /* Additional Check to detect flash download slot overlap or overflow */
 #define FLASH_AREA_END_OFFSET_MAX (FLASH_TOTAL_SIZE)
-#if FLASH_AREA_END_OFFSET > FLASH_AREA_END_OFFSET_MAX
+#if FLASH_AREA_END_OFFSET + LOADER_CODE_SIZE > FLASH_AREA_END_OFFSET_MAX
 #error "Flash memory overflow"
 #endif /* FLASH_AREA_END_OFFSET > FLASH_AREA_END_OFFSET_MAX */
 

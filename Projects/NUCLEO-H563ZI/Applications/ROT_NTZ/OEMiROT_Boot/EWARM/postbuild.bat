@@ -42,6 +42,7 @@ set bootpath=OEMiROT_NTZ
 set project=OEMiROT
 set "map_properties=%projectdir%\..\map.properties"
 set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
+set "loader_dir=%projectdir%\..\..\OEMiROT_Loader"
 set "appli_dir=%projectdir%\..\..\..\..\%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
@@ -64,8 +65,7 @@ set xml_fw_data_item_name="Data binary input file"
 set xml_output_item_name="Image output file"
 set xml_enc_item_name="Encryption key"
 set code_size="Firmware area size"
-set data_size="Data download slot size"
-set oemurot_firmware_size="Firmware area size"
+set data_size="Data area size"
 set scratch_sector_number="Number of scratch sectors"
 set oemurot_firmware_offset="Firmware download area offset"
 set firmware_execution_offset="Firmware execution area offset"
@@ -79,11 +79,19 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b app_data
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b ext_loader -m RE_LOADER --decimal %img_config% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 call %img_config%
 
 set app_icf_file=%appli_dir%\EWARM\stm32h563xx_flash.icf
 set app_main="%appli_dir%\Inc\main.h"
 set appli_flash_layout="%appli_dir%\Inc\appli_flash_layout.h"
+
+set loader_icf_file="%loader_dir%\EWARM\stm32h563xx_flash.icf"
+set loader_main="%loader_dir%\Inc\main.h"
+
 :: ============================================================ Update %map_properties% ===============================================================
 set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b APP_CODE_REGION_START -m RE_ADDRESS_APP_CODE_START %map_properties% --vb >> %current_log_file% 2>&1"
 %command%
@@ -137,6 +145,15 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b DOWNLOAD
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b LOADER_REGION_START -m RE_LOADER_CODE_START %map_properties% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b LOADER_REGION_SIZE -m RE_LOADER_CODE_SIZE %map_properties% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+
 :: ============================================================ Update %ob_flash_programming% =========================================================
 set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b bootob -m RE_BL2_BOOT_ADDRESS -d 0x100 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
 %command%
@@ -146,14 +163,17 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file%  -b bootadd
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+:: wrp1 pages for BL2
 set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b wrpgrp1 -ms RE_BL2_WRP_START -me RE_BL2_WRP_END -msec RE_FLASH_PAGE_NBR -d 0x8000 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b wrpgrp2 -ms RE_BL2_WRP_START -me RE_BL2_WRP_END -msec RE_FLASH_PAGE_NBR -d 0x8000 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
+:: wrp2 pages for loader
+set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b wrpgrp2 -ms RE_LOADER_WRP_START -me RE_LOADER_WRP_END -msec RE_FLASH_PAGE_NBR -d 0x8000 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+:: hdp protection for BL2
 set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b hdp1_end -ms RE_BL2_HDP_START -me RE_BL2_HDP_END -msec RE_FLASH_PAGE_NBR -d 0x2000 %ob_flash_programming% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -166,7 +186,31 @@ set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b hdp2_end
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b app_data_image_number -m RE_APP_DATA_IMAGE_NUMBER --decimal %ob_flash_programming% --vb >> %current_log_file% 2>&1"
+:: loader addresses
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b loaderaddress -m RE_LOADER_CODE_START %ob_flash_programming% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: =============================================================== Update %loader_icf_file% ================================================================
+set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_LOADER_CODE_START -n LOADER_CODE_START %loader_icf_file% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_LOADER_CODE_SIZE -n LOADER_CODE_SIZE %loader_icf_file% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: =============================================================== Update %loader_main% ================================================================
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_LOADER_CODE_START -n LOADER_CODE_START %loader_main% --vb >> %current_log_file% 2>&1"
+echo %command%
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n APP_CODE_OFFSET %loader_main% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -n APP_CODE_SIZE %loader_main% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -181,14 +225,6 @@ set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_IMAG
 IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================= Update %app_code_init_xml% =============================================================
-set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %app_code_init_xml% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% xmlparam --option add -n "Confirm" -t Data -c --confirm -h 1 -d "" %app_code_init_xml% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
 set "command=%python%%applicfg% xmlname -n %firmware_execution_offset% -c x %app_code_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -202,9 +238,9 @@ set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAG
 IF !errorlevel! NEQ 0 goto :error
 
 :: =============================================================== Update %app_code_xml% ================================================================
-set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_UPDATE -c x %app_code_xml% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
+::set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_UPDATE -c x %app_code_xml% --vb >> %current_log_file% 2>&1"
+::%command%
+::IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -c S %app_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
@@ -227,14 +263,6 @@ set "command=%python%%applicfg% xmlval -xml %app_code_xml% -nxml %code_size% -nx
 IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================ Update %app_data_init_xml% ==============================================================
-set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %app_data_init_xml% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% xmlparam --option add -n "Confirm" -t Data -c --confirm -h 1 -d "" %app_data_init_xml% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
 set "command=%python%%applicfg% xmlname -n %firmware_execution_offset% -c x %app_data_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -248,9 +276,9 @@ set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAG
 IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================== Update %app_data_xml% =================================================================
-set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_DATA_UPDATE -c x %app_data_xml% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
+::set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_DATA_UPDATE -c x %app_data_xml% --vb >> %current_log_file% 2>&1"
+::%command%
+::IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_DATA_IMAGE_SIZE -c S %app_data_xml% --vb >> %current_log_file% 2>&1"
 %command%
@@ -279,6 +307,9 @@ set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE
 IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -n APP_CODE_SIZE %app_main% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 :: =========================================================== Update %appli_flash_layout% ============================================================
 :: Bypass configuration of appli_flash_layout file if not present
 if not exist %appli_flash_layout% (goto :end)

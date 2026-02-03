@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 #include "stm32h5xx_hal.h"
-#include "appli_flash_layout.h"
+#include "flash_layout.h"
 
 /* General return codes */
 #define ARM_DRIVER_OK                 0 ///< Operation succeeded
@@ -49,9 +49,6 @@ struct low_level_device
 {
   struct flash_vect erase;
   struct flash_vect write;
-#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) && !defined(LOCAL_LOADER_CONFIG)
-  struct flash_vect secure;
-#endif
 #if  !defined(LOCAL_LOADER_CONFIG)
   uint32_t read_error;
 #endif
