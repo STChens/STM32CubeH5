@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>NUCLEO-H563ZI_OEMiROT_Appli</TargetName>
+      <TargetName>NUCLEO-H563ZI_OEMiROT_Loader</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6210000::V6.21::ARMCLANG</pCCUsed>
@@ -48,7 +48,7 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>.\NUCLEO-H563ZI_OEMiROT_Appli\Exe\</OutputDirectory>
+          <OutputDirectory>.\NUCLEO-H563ZI_OEMiROT_Loader\Exe\</OutputDirectory>
           <OutputName>Project</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
@@ -82,8 +82,8 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>1</RunUserProg2>
-            <UserProg1Name>fromelf #L --bin --output=$L"\..\..\..\Binary\rot_app.bin"</UserProg1Name>
-            <UserProg2Name>.\postbuild.bat</UserProg2Name>
+            <UserProg1Name>fromelf #L --bin --output=$L"\..\..\..\Binary\OEMiROT_Loader.bin"</UserProg1Name>
+            <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopA1X>0</nStopA1X>
@@ -338,9 +338,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32H563xx,USE_HAL_DRIVER</Define>
+              <Define>STM32H563xx,USE_HAL_DRIVER,BL2</Define>
               <Undefine></Undefine>
-              <IncludePath>../../../../../../Drivers/CMSIS/Include;../../../../../../Drivers/CMSIS/Device/ST/STM32H5xx/Include;../../../../../../Drivers/STM32H5xx_HAL_Driver/Inc;../Inc;..\..\..\..\..\..\Drivers\BSP\STM32H5xx_Nucleo</IncludePath>
+              <IncludePath>../../../../../../Drivers/CMSIS/Include;../../../../../../Drivers/CMSIS/Device/ST/STM32H5xx/Include;../../../../../../Drivers/STM32H5xx_HAL_Driver/Inc;../Inc;..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\platform\ext\driver;..\..\OEMiROT_Boot\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -469,6 +469,16 @@
               <FileType>1</FileType>
               <FilePath>../../../../../../Drivers/STM32H5xx_HAL_Driver/Src/stm32h5xx_hal_uart_ex.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h5xx_hal_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h5xx_hal_crc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_crc_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -490,9 +500,9 @@
               <FilePath>../Src/main.c</FilePath>
             </File>
             <File>
-              <FileName>loader.c</FileName>
+              <FileName>low_level_security.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Src/loader.c</FilePath>
+              <FilePath>../Src/low_level_security.c</FilePath>
             </File>
             <File>
               <FileName>stm32h5xx_it.c</FileName>
@@ -514,15 +524,25 @@
               <FileType>2</FileType>
               <FilePath>.\startup_stm32h563xx.s</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Drivers/BSP</GroupName>
-          <Files>
             <File>
-              <FileName>stm32h5xx_nucleo.c</FileName>
+              <FileName>com.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\Drivers\BSP\STM32H5xx_Nucleo\stm32h5xx_nucleo.c</FilePath>
+              <FilePath>..\Src\com.c</FilePath>
+            </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\common.c</FilePath>
+            </File>
+            <File>
+              <FileName>fw_update_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\fw_update_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>ymodem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\ymodem.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -539,7 +559,7 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
         <targetInfos>
-          <targetInfo name="NUCLEO-H563ZI_OEMiROT_Appli"/>
+          <targetInfo name="NUCLEO-H563ZI_OEMiROT_Loader"/>
         </targetInfos>
       </component>
     </components>

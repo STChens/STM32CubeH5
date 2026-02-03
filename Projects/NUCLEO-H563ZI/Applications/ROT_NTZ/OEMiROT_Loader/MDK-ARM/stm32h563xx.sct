@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-#define APP_CODE_OFFSET 0x2a000                       /* This definition is updated automatically from OEMiROT_Boot postbuild*/
-#define APP_CODE_SIZE 0x16000                          /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+#define LOADER_CODE_START 0x81f8000                       /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+#define LOADER_CODE_SIZE 0x8000                          /* This definition is updated automatically from OEMiROT_Boot postbuild*/
 #define IMAGE_HEADER_SIZE 0x400                     /* mcuboot header size */
 
-#define CODE_START 0x08000000 + APP_CODE_OFFSET + IMAGE_HEADER_SIZE
-#define APP_FW_CODE_SIZE APP_CODE_SIZE - IMAGE_HEADER_SIZE
+#define CODE_START LOADER_CODE_START
+#define APP_FW_CODE_SIZE LOADER_CODE_SIZE
 
 /* Only use SRAM2/3 as full secure for our application */
 /* Because when the application jump to the bootloader, the BL uses the SRAM1 ressources */

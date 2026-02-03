@@ -1434,9 +1434,6 @@
                 <name>$PROJ_DIR$\..\Src\low_level_flash.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Src\low_level_security.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\Src\main.c</name>
             </file>
             <file>

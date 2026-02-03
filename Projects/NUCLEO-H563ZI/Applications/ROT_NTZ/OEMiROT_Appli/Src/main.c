@@ -24,6 +24,10 @@
 #include "main.h"
 #include "low_level_flash.h"
 
+#include "com.h"
+#include "common.h"
+#include "fw_update_app.h"
+
 /* Avoids the semihosting issue */
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
 __asm("  .global __ARM_use_no_argv\n");
@@ -52,15 +56,14 @@ uint64_t time;
 uint32_t end;
 
 /* Private function prototypes -----------------------------------------------*/
-static void MX_GTZC_Init(void);
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
-static void FW_Valid_SecureAppImage(void);
+static void FW_Valid_AppImage(void);
 #endif /* defined(MCUBOOT_OVERWRITE_ONLY) */
-#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-static void FW_Valid_SecureDataImage(void);
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
-#endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
+#if !defined(MCUBOOT_OVERWRITE_ONLY)
+static void FW_Valid_DataImage(void);
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
+#endif /* (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
 
 static void SystemClock_Config(void);
 void FW_APP_PrintMainMenu(void);
@@ -68,12 +71,7 @@ void FW_APP_Run(void);
 void LOADER_Run(void);
 
 /* Callbacks prototypes */
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
-void SecureFault_Callback(void);
-void SecureError_Callback(void);
-#endif
 void Error_Handler(void);
-void NS_DATA_Display(void);
 
 #if defined(__ICCARM__)
 #include <LowLevelIOInterface.h>
@@ -102,7 +100,7 @@ int main(void)
 
 
   /* Enable SecureFault handler (HardFault is default) */
-  SCB->SHCSR |= SCB_SHCSR_SECUREFAULTENA_Msk;
+  //SCB->SHCSR |= SCB_SHCSR_SECUREFAULTENA_Msk;
 
   /* STM32H5xx **SECURE** HAL library initialization:
        - Secure Systick timer is configured by default as source of time base,
@@ -137,6 +135,7 @@ int main(void)
   SystemClock_Config();
 
   /* Configure Communication module */
+  
   COM_InitTypeDef com;
   com.BaudRate = 115200;
   com.WordLength = COM_WORDLENGTH_8B;
@@ -147,7 +146,7 @@ int main(void)
   BSP_COM_Init(COM1, &com);
 
   /* GTZC initialisation */
-  MX_GTZC_Init();
+  //MX_GTZC_Init();
 
   /* All IOs are by default allocated to secure */
 #if defined(GPIOA)
@@ -189,21 +188,6 @@ int main(void)
   while (1)
   {
 
-  }
-}
-
-/**
-  * @brief GTZC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GTZC_Init(void)
-{
-
-  if (HAL_GTZC_TZSC_ConfigPeriphAttributes(GTZC_PERIPH_ICACHE_REG,
-                                           GTZC_TZSC_PERIPH_SEC | GTZC_TZSC_PERIPH_NPRIV) != HAL_OK)
-  {
-    Error_Handler();
   }
 }
 
@@ -286,15 +270,15 @@ void FW_APP_PrintMainMenu(void)
 {
   printf("\r\n=================== Main Menu ============================\r\n\n");
   printf("  Start BootLoader -------------------------------------- 1\r\n\n");
-#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
   printf("  Display Data content ---------------------------------- 2\r\n\n");
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
 #if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_APP_IMAGE_NUMBER == 1)
   printf("  Validate App Image ------------------------------------ 3\r\n\n");
 #endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_APP_IMAGE_NUMBER == 1) */
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
   printf("  Validate Data Image ----------------------------------- 5\r\n\n");
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
   printf("  Selection :\r\n\n");
 }
 
@@ -320,12 +304,12 @@ void FW_APP_Run(void)
       switch (key)
       {
         case '1' :
-          LOADER_Run();
+          LOADER_Run();          
           break;
-#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
         case '2':
           {
-            uint8_t *p = (uint8_t *)(FLASH_BASE+S_DATA_IMAGE_PRIMARY_PARTITION_OFFSET+32);
+            uint8_t *p = (uint8_t *)(FLASH_BASE + DATA_IMAGE_PRIMARY_PARTITION_OFFSET+32);
             printf("Display data from offset %x\r\n", p);            
             int i;
             printf("=================================================\r\n");
@@ -337,17 +321,17 @@ void FW_APP_Run(void)
             printf("\r\n");
           }
           break;  
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */          
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
         case '3':
-          FW_Valid_SecureAppImage();
+          FW_Valid_AppImage();
           break;
 #endif /* defined(MCUBOOT_OVERWRITE_ONLY) && defined(MCUBOOT_APP_IMAGE_NUMBER == 1) */
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
         case '5':
-          FW_Valid_SecureDataImage();
+          FW_Valid_DataImage();
           break;
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
         default:
           printf("Invalid Number !\r");
           break;
@@ -360,14 +344,14 @@ void FW_APP_Run(void)
 }
 
 
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
 /**
   * @brief  Secure Operation to confirm Secure Data Image.
   * @param  None
   * @param  None
   * @retval None
   */
-static void FW_Valid_SecureDataImage(void)
+static void FW_Valid_DataImage(void)
 {
   const uint8_t FlagPattern[]={0x1 ,0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff };
@@ -375,14 +359,14 @@ static void FW_Valid_SecureDataImage(void)
 
   if (FLASH_PRIMARY_DATA_SECURE_DEV_NAME.ProgramData(ConfirmAddress, FlagPattern, sizeof(FlagPattern)) == ARM_DRIVER_OK)
   {
-    printf("  -- Secure Data Firmware Confirm Done\r\n\n");
+    printf("  -- Data Firmware Confirm Done\r\n\n");
   }
   else
   {
     printf("  -- Confirm Flag Not Correctlty Written \r\n\n");
   }
 }
-#endif /* MCUBOOT_S_DATA_IMAGE_NUMBER == 1 */
+#endif /* MCUBOOT_DATA_IMAGE_NUMBER == 1 */
 
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
 /**
@@ -391,7 +375,7 @@ static void FW_Valid_SecureDataImage(void)
   * @param  None
   * @retval None
   */
-static void FW_Valid_SecureAppImage(void)
+static void FW_Valid_AppImage(void)
 {
   const uint8_t FlagPattern[]={0x1 ,0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff };

@@ -28,63 +28,46 @@
 
 #define MCUBOOT_S_DATA_IMAGE_NUMBER    0x1      /* 1: S data image for S application.
                                                    0: No S data image. */
+#define MCUBOOT_DATA_IMAGE_NUMBER       MCUBOOT_S_DATA_IMAGE_NUMBER      
 
-#define MCUBOOT_NS_DATA_IMAGE_NUMBER   0x0      /* 1: NS data image for NS application.
-                                                   0: No NS data image. */
+#define FLASH_AREA_0_OFFSET            0x2A000 /* app image primary slot offset */
 
-#define FLASH_AREA_0_OFFSET            0x2A000 /* Secure app image primary slot offset */
+#define FLASH_AREA_0_SIZE              0x16000   /* app image primary slot size */
 
-#define FLASH_AREA_0_SIZE              0xC6000   /* Secure app image primary slot size */
 
-#define FLASH_AREA_1_OFFSET            0x0  /* Non-secure app image primary slot offset */
+#define FLASH_AREA_2_OFFSET            0x40000  /* app image secondary slot */
 
-#define FLASH_AREA_1_SIZE              0x0   /* Non-secure app image primary slot size */
+#define FLASH_AREA_2_SIZE              0x16000   /* app image secondary slot size */
 
-#define FLASH_AREA_2_OFFSET            0xF0000  /* Secure app image secondary slot */
 
-#define FLASH_AREA_2_SIZE              0xC6000   /* Secure app image secondary slot size */
+#define FLASH_AREA_4_OFFSET            0x28000 /*  data image primary slot offset */
 
-#define FLASH_AREA_3_OFFSET            0x0  /* Non-secure app image secondary slot offset */
+#define FLASH_AREA_4_SIZE              0x2000   /*  data image primary slot size */
 
-#define FLASH_AREA_3_SIZE              0x0   /* Non-secure app image secondary slot size */
 
-#define FLASH_AREA_4_OFFSET            0x28000 /* Secure data image primary slot offset */
+#define FLASH_AREA_6_OFFSET            0x56000 /*  data image secondary slot offset */
 
-#define FLASH_AREA_4_SIZE              0x2000   /* Secure data image primary slot size */
+#define FLASH_AREA_6_SIZE              0x2000   /*  data image secondary slot size */
 
-#define FLASH_AREA_5_OFFSET            0x0  /* Non-secure data image primary slot offset */
 
-#define FLASH_AREA_5_SIZE              0x0   /* Non-secure data image primary slot size */
+#define FLASH_PARTITION_SIZE           0x16000  /* Secure and Non Secure partition size */
 
-#define FLASH_AREA_6_OFFSET            0x1B6000 /* secure data image secondary slot offset */
+#define FLASH_DATA_PARTITION_SIZE    0x2000   /* secure data partition size */
 
-#define FLASH_AREA_6_SIZE              0x2000   /* secure data image secondary slot size */
-
-#define FLASH_AREA_7_OFFSET            0x0 /* Non-secure data image secondary slot offset */
-
-#define FLASH_AREA_7_SIZE              0x0   /* Non-secure data image secondary slot size */
-
-#define FLASH_PARTITION_SIZE           0xC6000  /* Secure and Non Secure partition size */
-
-#define FLASH_NS_PARTITION_SIZE        0x0  /* Non Secure partition size */
-
-#define FLASH_S_PARTITION_SIZE         0xC6000   /* secure partition size */
-
-#define FLASH_S_DATA_PARTITION_SIZE    0x2000   /* secure data partition size */
-
-#define FLASH_NS_DATA_PARTITION_SIZE   0x0   /* non secure data partition size */
 
 #define FLASH_B_SIZE                   0x100000   /* flash bank size: 1 MBytes*/
 
 #define FLASH_TOTAL_SIZE               (FLASH_B_SIZE+FLASH_B_SIZE) /* total flash size: 2 MBytes */
 
+#define LOADER_CODE_START			0x81F8000 /* start address of OEMiROT_Loader */
+
 #define TRAILER_MAGIC_SIZE 16
 
-#define S_IMAGE_PRIMARY_PARTITION_OFFSET     FLASH_AREA_0_OFFSET
-#define S_IMAGE_SECONDARY_PARTITION_OFFSET   FLASH_AREA_2_OFFSET
-#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
-#define S_DATA_IMAGE_PRIMARY_PARTITION_OFFSET     FLASH_AREA_4_OFFSET
-#define S_DATA_IMAGE_SECONDARY_PARTITION_OFFSET   FLASH_AREA_6_OFFSET
+#define IMAGE_PRIMARY_PARTITION_OFFSET     FLASH_AREA_0_OFFSET
+#define IMAGE_SECONDARY_PARTITION_OFFSET   FLASH_AREA_2_OFFSET
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
+#define DATA_IMAGE_PRIMARY_PARTITION_OFFSET     FLASH_AREA_4_OFFSET
+#define DATA_IMAGE_SECONDARY_PARTITION_OFFSET   FLASH_AREA_6_OFFSET
 #endif /* MCUBOOT_S_DATA_IMAGE_NUMBER == 1 */
 
 #if !defined(MCUBOOT_OVERWRITE_ONLY)

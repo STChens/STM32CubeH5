@@ -326,23 +326,11 @@ set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_NS_DATA_IMAGE_NUMBER -n MCUBOOT_NS_DATA_IMAGE_NUMBER %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n FLASH_AREA_0_OFFSET %appli_flash_layout% --vb  >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_SIZE -n FLASH_AREA_0_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_1_OFFSET -n FLASH_AREA_1_OFFSET %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_1_SIZE -n FLASH_AREA_1_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -354,27 +342,11 @@ set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_3_OFFSET -n FLASH_AREA_3_OFFSET %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_3_SIZE -n FLASH_AREA_3_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_4_OFFSET -n FLASH_AREA_4_OFFSET %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_4_SIZE -n FLASH_AREA_4_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_5_OFFSET -n FLASH_AREA_5_OFFSET %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_5_SIZE -n FLASH_AREA_5_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -386,31 +358,15 @@ set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_7_OFFSET -n FLASH_AREA_7_OFFSET %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_APP_IMAGE_SIZE -n FLASH_PARTITION_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_7_SIZE -n FLASH_AREA_7_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_DATA_IMAGE_SIZE -n FLASH_DATA_PARTITION_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_S_NS_PARTITION_SIZE -n FLASH_PARTITION_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_NON_SECURE_IMAGE_SIZE -n FLASH_NS_PARTITION_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_SECURE_IMAGE_SIZE -n FLASH_S_PARTITION_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_SECURE_DATA_IMAGE_SIZE -n FLASH_S_DATA_PARTITION_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_NON_SECURE_DATA_IMAGE_SIZE -n FLASH_NS_DATA_PARTITION_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_LOADER_CODE_START -n LOADER_CODE_START %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
