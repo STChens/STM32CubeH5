@@ -269,7 +269,7 @@ static void SystemClock_Config(void)
 void FW_APP_PrintMainMenu(void)
 {
   printf("\r\n=================== Main Menu ============================\r\n\n");
-  printf("  Start BootLoader -------------------------------------- 1\r\n\n");
+  printf("  Start Loader ------------------------------------------ 1\r\n\n");
 #if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
   printf("  Display Data content ---------------------------------- 2\r\n\n");
 #endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */

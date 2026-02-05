@@ -43,7 +43,14 @@
 /*#define DEVICE_1M_FLASH_ENABLE */  /*Defined: the project is for 1M FLASH device
                                        Undefined: the project is for 2M FLASH device */
 /* Flash layout configuration : end ******************************************/
+/* Validate flash layout config definition */
+#if (MCUBOOT_APP_IMAGE_NUMBER != 1)
+#error "For TrustZone disabled scenario, MCUBOOT_APP_IMAGE_NUMBER shall be defined as 1!"
+#endif
 
+#if (defined MCUBOOT_PRIMARY_ONLY) && (!defined MCUBOOT_OVERWRITE_ONLY)
+#error "When MCUBOOT_OVERWRITE_ONLY must be defined along with MCUBOOT_PRIMARY_ONLY!"
+#endif
 
 /* Total number of images */
 #define MCUBOOT_IMAGE_NUMBER (MCUBOOT_APP_IMAGE_NUMBER + MCUBOOT_DATA_IMAGE_NUMBER)

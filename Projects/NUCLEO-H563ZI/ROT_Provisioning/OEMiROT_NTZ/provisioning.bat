@@ -17,6 +17,7 @@ set provisioning_log="provisioning.log"
 
 :: Get config updated by OEMiROT_Boot
 set tmp_file=%projectdir%/img_config.bat
+call %tmp_file%
 
 set app_data_xml="%projectdir%Images\OEMiROT_Data_Image.xml"
 set app_data_init_xml="%projectdir%Images\OEMiROT_Data_Init_Image.xml"

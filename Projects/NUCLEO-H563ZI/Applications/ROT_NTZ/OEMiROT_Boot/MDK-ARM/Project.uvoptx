@@ -73,7 +73,7 @@
         <LExpSel>0</LExpSel>
       </OPTXL>
       <OPTFL>
-        <tvExp>1</tvExp>
+        <tvExp>0</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
@@ -141,7 +141,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/src/image_validate.c</Filename>
+          <Filename>&lt;1&gt;../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/src/image_validate.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>

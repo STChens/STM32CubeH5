@@ -31,7 +31,7 @@
 **
 ******************************************************************************
 */
-APP_CODE_OFFSET = 0x2a000;          /* This definition is updated automatically from OEMiROT_Boot postbuild */
+APP_CODE_OFFSET = 0x1a000;          /* This definition is updated automatically from OEMiROT_Boot postbuild */
 APP_CODE_SIZE = 0x16000;             /* This definition is updated automatically from OEMiROT_Boot postbuild */
 IMAGE_HEADER_SIZE = 0x400;        /* mcuboot header size */
 

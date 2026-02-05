@@ -50,15 +50,6 @@ extern ARM_DRIVER_FLASH FLASH_PRIMARY_SECURE_DEV_NAME;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
-#if !defined(MCUBOOT_OVERWRITE_ONLY)
-static void FW_Valid_AppImage(void);
-#endif /* defined(MCUBOOT_OVERWRITE_ONLY) */
-#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
-#if !defined(MCUBOOT_OVERWRITE_ONLY)
-static void FW_Valid_DataImage(void);
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
-#endif /* (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
-
 static void SystemClock_Config(void);
 void Loader_PrintMainMenu(void);
 void Loader_Run(void);
@@ -189,13 +180,13 @@ int main(void)
 
   printf("\r\n======================================================================");
   printf("\r\n=              (C) COPYRIGHT 2025 STMicroelectronics                 =");
-  printf("\r\n=                                                                    =");
+  printf("\r\n=               Built on %s %s                        =", __DATE__, __TIME__);
   printf("\r\n=                      OEMiROT Loader                                =");
   printf("\r\n======================================================================");
   printf("\r\n\r\n");
 
-  /* User App firmware runs*/
-  Loader_Run();
+  /* Run FW update menu */
+  FW_UPDATE_Run();
 
   while (1)
   {
@@ -274,151 +265,6 @@ static void SystemClock_Config(void)
   __HAL_FLASH_SET_PROGRAM_DELAY(FLASH_PROGRAMMING_DELAY_2);
 }
 
-/**
-  * @brief  Display the TEST Main Menu choices on HyperTerminal
-  * @param  None.
-  * @retval None.
-  */
-void Loader_PrintMainMenu(void)
-{
-  printf("\r\n=================== Main Menu ============================\r\n\n");
-  printf("  App FW/Data Update ------------------------------------ 1\r\n\n");
-#if !defined(MCUBOOT_OVERWRITE_ONLY) 
-  printf("  Validate App Image ------------------------------------ 2\r\n\n");
-#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
-  printf("  Validate Data Image ----------------------------------- 3\r\n\n");
-#endif /* (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) */
-  printf("  Selection :\r\n\n");
-}
-
-/**
-  * @brief  Display the TEST Main Menu choices on HyperTerminal
-  * @param  None.
-  * @retval None.
-  */
-void Loader_Run(void)
-{
-  uint8_t key = 0U;
-
-  /*##1- Print Main Menu message*/
-  Loader_PrintMainMenu();
-
-  while (1U)
-  {
-    /* Receive key */
-    if (COM_Receive(&key, 1U, 1000) == HAL_OK)
-    {
-      switch (key)
-      {
-        case '1' :          
-          FW_UPDATE_Run();
-          break;
-#if !defined(MCUBOOT_OVERWRITE_ONLY)
-        case '2':
-          FW_Valid_AppImage();
-          break;
-#endif /* defined(MCUBOOT_OVERWRITE_ONLY) && defined(MCUBOOT_APP_IMAGE_NUMBER == 1) */
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
-        case '3':
-          FW_Valid_DataImage();
-          break;
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1) */
-        default:
-          printf("Invalid Number !\r");
-          break;
-      }
-
-      /* Print Main Menu message */
-      Loader_PrintMainMenu();
-    }
-  }
-}
-
-
-#if !defined(MCUBOOT_OVERWRITE_ONLY) && (MCUBOOT_DATA_IMAGE_NUMBER == 1)
-/**
-  * @brief  Secure Operation to confirm Secure Data Image.
-  * @param  None
-  * @param  None
-  * @retval None
-  */
-static void FW_Valid_DataImage(void)
-{
-  const uint8_t FlagPattern[]={0x1 ,0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff };
-  const uint32_t ConfirmAddress = FLASH_AREA_4_OFFSET  + FLASH_AREA_4_SIZE - (TRAILER_MAGIC_SIZE + sizeof(FlagPattern));
-
-  if (FLASH_PRIMARY_DATA_SECURE_DEV_NAME.ProgramData(ConfirmAddress, FlagPattern, sizeof(FlagPattern)) == ARM_DRIVER_OK)
-  {
-    printf("  -- Data Firmware Confirm Done\r\n\n");
-  }
-  else
-  {
-    printf("  -- Confirm Flag Not Correctlty Written \r\n\n");
-  }
-}
-#endif /* MCUBOOT_DATA_IMAGE_NUMBER == 1 */
-
-#if !defined(MCUBOOT_OVERWRITE_ONLY)
-/**
-  * @brief  Secure Operation to confirm Secure App Image.
-  * @param  None
-  * @param  None
-  * @retval None
-  */
-static void FW_Valid_AppImage(void)
-{
-  const uint8_t FlagPattern[]={0x1 ,0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff };
-  const uint32_t ConfirmAddress = FLASH_AREA_0_OFFSET  + FLASH_AREA_0_SIZE - (TRAILER_MAGIC_SIZE + sizeof(FlagPattern));
-
-  if (FLASH_PRIMARY_SECURE_DEV_NAME.ProgramData(ConfirmAddress, FlagPattern, sizeof(FlagPattern)) == ARM_DRIVER_OK)
-  {
-#if defined(__ARMCC_VERSION)
-    printf("  --  Confirm Flag  correctly written %x %x \r\n\n",ConfirmAddress ,FlagPattern[0] );
-#else
-    printf("  --  Confirm Flag  correctly written %lx %x \r\n\n",ConfirmAddress , FlagPattern[0] );
-#endif
-  }
-  else
-  {
-    printf("  -- Confirm Flag Not Correctlty Written \r\n\n");
-  }
-}
-#endif /* !defined(MCUBOOT_OVERWRITE_ONLY) */
-
-#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)      
-
-/**
-  * @brief  Callback called by secure code following a secure fault interrupt
-  * @note   This callback is called by secure code thanks to the registration
-  *         done by the non-secure application with non-secure callable API
-  *         SECURE_RegisterCallback(SECURE_FAULT_CB_ID, (void *)SecureFault_Callback);
-  * @retval None
-  */
-void SecureFault_Callback(void)
-{
-  /* Go to error infinite loop when Secure fault generated by IDAU/SAU check */
-  /* because of illegal access */
-  Error_Handler();
-}
-
-
-/**
-  * @brief  Callback called by secure code following a GTZC TZIC secure interrupt (GTZC_IRQn)
-  * @note   This callback is called by secure code thanks to the registration
-  *         done by the non-secure application with non-secure callable API
-  *         SECURE_RegisterCallback(GTZC_ERROR_CB_ID, (void *)SecureError_Callback);
-  * @retval None
-  */
-void SecureError_Callback(void)
-{
-  /* Go to error infinite loop when Secure error generated by GTZC check */
-  /* because of illegal access */
-  Error_Handler();
-}
-#endif
 
 /**
   * @brief  This function is executed in case of error occurrence.

@@ -29,7 +29,7 @@
 #include "Driver_Flash.h"
 #include "string.h"
 
-#if   !defined(MCUBOOT_PRIMARY_ONLY)
+//#if   !defined(MCUBOOT_PRIMARY_ONLY)
 /** @addtogroup USER_APP User App Example
   * @{
   */
@@ -460,4 +460,4 @@ HAL_StatusTypeDef Ymodem_DataPktRxCpltCallback(uint8_t *pData, uint32_t uFlashDe
 /**
   * @}
   */
-#endif /* !defined(MCUBOOT_PRIMARY_ONLY) */
+//#endif /* !defined(MCUBOOT_PRIMARY_ONLY) */
