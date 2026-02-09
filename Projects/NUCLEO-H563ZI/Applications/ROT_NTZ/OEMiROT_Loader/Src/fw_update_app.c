@@ -154,8 +154,14 @@ static HAL_StatusTypeDef FW_UPDATE_APP_IMAGE(void)
   /* Print Firmware Update welcome message */
   printf("Download App Image\r\n");
   /* Get Info about the download area */
+#if defined (MCUBOOT_PRIMARY_ONLY)
+  /* Incase PRIMARY_ONLY is defined, we download to active slot directly */
+  fw_image_dwl_area.DownloadAddr =  FLASH_AREA_0_OFFSET;
+  fw_image_dwl_area.MaxSizeInBytes = FLASH_AREA_0_SIZE;
+#else /* defined (MCUBOOT_PRIMARY_ONLY) */
   fw_image_dwl_area.DownloadAddr =  FLASH_AREA_2_OFFSET;
   fw_image_dwl_area.MaxSizeInBytes = FLASH_AREA_2_SIZE;
+#endif /* defined (MCUBOOT_PRIMARY_ONLY) */
   fw_image_dwl_area.ImageOffsetInBytes = 0x0;
   m_uFlashSectorSize = data->sector_size;
   m_uFlashMinWriteSize = data->program_unit;
@@ -211,8 +217,13 @@ static HAL_StatusTypeDef FW_UPDATE_DATA_IMAGE(void)
   /* Print Firmware Update welcome message */
   printf("Download Data Image\r\n");
   /* Get Info about the download area */
+#if defined (MCUBOOT_PRIMARY_ONLY)
+  fw_image_dwl_area.DownloadAddr =  FLASH_AREA_4_OFFSET;
+  fw_image_dwl_area.MaxSizeInBytes = FLASH_AREA_4_SIZE;
+#else  /* defined (MCUBOOT_PRIMARY_ONLY) */
   fw_image_dwl_area.DownloadAddr =  FLASH_AREA_6_OFFSET;
   fw_image_dwl_area.MaxSizeInBytes = FLASH_AREA_6_SIZE;
+#endif /* defined (MCUBOOT_PRIMARY_ONLY) */
   fw_image_dwl_area.ImageOffsetInBytes = 0x0;
   m_uFlashSectorSize = data->sector_size;
   m_uFlashMinWriteSize = data->program_unit;

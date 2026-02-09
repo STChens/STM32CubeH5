@@ -258,7 +258,7 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Write Option" -t Data -c --primary-only -h 1 -d "" %app_code_xml% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c --primary-only -h 1 -d "" %app_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -266,9 +266,9 @@ set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLAS
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% xmlval -xml %app_code_xml% -nxml %code_size% -nxml %scratch_sector_number% --decimal -e (((val1+1)/val2)+1) -cond val2 -c M %app_code_xml% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
+::set "command=%python%%applicfg% xmlval -xml %app_code_xml% -nxml %code_size% -nxml %scratch_sector_number% --decimal -e (((val1+1)/val2)+1) -cond val2 -c M %app_code_xml% --vb >> %current_log_file% 2>&1"
+::%command%
+::IF !errorlevel! NEQ 0 goto :error
 
 :: ============================================================ Update %app_data_init_xml% ==============================================================
 set "command=%python%%applicfg% xmlname -n %firmware_execution_offset% -c x %app_data_init_xml% --vb >> %current_log_file% 2>&1"
@@ -300,9 +300,13 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %app_data_xml% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c --primary-only -h 1 -d "" %app_data_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
+
+::set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %app_data_xml% --vb >> %current_log_file% 2>&1"
+::%command%
+::IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% xmlval -xml %app_data_xml% -nxml %data_size% -nxml %scratch_sector_number% --decimal -e (((val1+1)/val2)+1) -cond val2 -c M %app_data_xml% --vb >> %current_log_file% 2>&1"
 %command%

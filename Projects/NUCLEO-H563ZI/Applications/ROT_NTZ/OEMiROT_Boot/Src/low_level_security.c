@@ -381,9 +381,6 @@ static void hdpext_loader_cfg(void);
 #endif
 #if defined(MCUBOOT_EXT_LOADER)
 static void mpu_loader_cfg(void);
-#if defined(MCUBOOT_PRIMARY_ONLY)
-static void secure_internal_flash(uint32_t offset_start, uint32_t offset_end);
-#endif /* MCUBOOT_PRIMARY_ONLY */
 #endif /* MCUBOOT_EXT_LOADER */
 static void active_tamper(void);
 /**
