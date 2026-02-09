@@ -56,15 +56,11 @@ extern "C" {
 #define FLOW_STEP_MPU_I_EN_R5       0x0000d2d3U        /*!< Step MPU  Region 5 Init enable value */
 #define FLOW_STEP_MPU_I_EN_R6       0x00043d7aU        /*!< Step MPU  Region 6 Init enable value */
 #define FLOW_STEP_MPU_I_EN_R7       0x0001cf0eU        /*!< Step MPU  Region 7 Init enable value */
-#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
-  #define FLOW_STEP_MPU_I_EN_R8       0x0051445dU        /*!< Step MPU  Region 8 Init enable value */
-  #define FLOW_STEP_MPU_I_EN_R9       0x00517d08U        /*!< Step MPU Secure Region 9 Init enable value */
-  #define FLOW_STEP_MPU_I_EN_R10      0x0000b4abU        /*!< Step MPU Secure Region 10 Init enable value */
-#else /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
+
   #define FLOW_STEP_MPU_I_EN_R8       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_MPU_I_EN_R9       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_MPU_I_EN_R10      0x00000000U        /*!< No effect on control flow */  
-#endif /* #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
+
 #define FLOW_STEP_MPU_I_EN          0x0000e3dcU        /*!< Step MPU Secure Init enable value */
 #define FLOW_STEP_MPU_NS_I_EN_R0    0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_NS_I_EN       0x00000000U        /*!< No effect on control flow */
@@ -86,15 +82,6 @@ extern "C" {
 #define FLOW_STEP_MPU_NS_I_EN       0x00000000U        /*!< No effect on control flow */
 #endif /* OEMIROT_MPU_PROTECTION */
 
-#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
-  #define FLOW_STEP_SAU_I_EN_R0       0x000165baU        /*!< Step SAU Region 0 Init enable value */
-  #define FLOW_STEP_SAU_I_EN_R1       0x00017ba4U        /*!< Step SAU Region 1 Init enable value */
-  #define FLOW_STEP_SAU_I_EN_R2       0x00018799U        /*!< Step SAU Region 2 Init enable value */
-  #define FLOW_STEP_SAU_I_EN_R3       0x00019987U        /*!< Step SAU Region 3 Init enable value */
-  #define FLOW_STEP_SAU_I_EN_R4       0x00000000U        /*!< No effect on control flow */
-  #define FLOW_STEP_SAU_I_EN_R5       0x00000000U        /*!< No effect on control flow */
-  #define FLOW_STEP_SAU_I_EN          0x0001b696U        /*!< Step SAU enable Init value */
-#else /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)  */
   #define FLOW_STEP_SAU_I_EN_R0       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_I_EN_R1       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_I_EN_R2       0x00000000U        /*!< No effect on control flow */
@@ -102,7 +89,6 @@ extern "C" {
   #define FLOW_STEP_SAU_I_EN_R4       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_I_EN_R5       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_I_EN          0x00000000U        /*!< No effect on control flow */  
-#endif /* #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
   
 #if  (OEMIROT_TAMPER_ENABLE == ALL_TAMPER)
 #define FLOW_STEP_TAMP_ACT_EN       0x000673eaU        /*!< Step Tamper active enable value */
@@ -146,15 +132,11 @@ extern "C" {
 #define FLOW_STEP_MPU_I_CH_R5       0x00029cf6U        /*!< Step MPU  Region 5 Init check value */
 #define FLOW_STEP_MPU_I_CH_R6       0x0003da37U        /*!< Step MPU  Region 6 Init check value */
 #define FLOW_STEP_MPU_I_CH_R7       0x0001fe01U        /*!< Step MPU  Region 7 Init check value */
-#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
-  #define FLOW_STEP_MPU_I_CH_R8       0x0052a4e2U        /*!< Step MPU  Region 8 Init check value */
-  #define FLOW_STEP_MPU_I_CH_R9       0x0052fd77U        /*!< Step MPU  Region 9 Init check value */
-  #define FLOW_STEP_MPU_I_CH_R10      0x00539246U        /*!< Step MPU Region 10 Init enable value */
-#else /* #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
+
   #define FLOW_STEP_MPU_I_CH_R8       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_MPU_I_CH_R9       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_MPU_I_CH_R10      0x00000000U        /*!< No effect on control flow */
-#endif /* #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
+
 #define FLOW_STEP_MPU_I_CH          0x0002e8fbU        /*!< Step MPU  Init check value */
 #define FLOW_STEP_MPU_NS_I_CH_R0    0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_NS_I_CH       0x00000000U        /*!< No effect on control flow */
@@ -174,15 +156,6 @@ extern "C" {
 #define FLOW_STEP_MPU_NS_I_CH       0x00000000U        /*!< No effect on control flow */
 #endif /* OEMIROT_MPU_PROTECTION */
 
-#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
-  #define FLOW_STEP_SAU_I_CH_R0       0x00037d16U        /*!< Step SAU Region 0 Init check value */
-  #define FLOW_STEP_SAU_I_CH_R1       0x0003ae3aU        /*!< Step SAU Region 1 Init check value */
-  #define FLOW_STEP_SAU_I_CH_R2       0x0003b1daU        /*!< Step SAU Region 2 Init check value */
-  #define FLOW_STEP_SAU_I_CH_R3       0x0003bdb1U        /*!< Step SAU Region 3 Init check value */
-  #define FLOW_STEP_SAU_I_CH_R4       0x00000000U        /*!< No effect on control flow */
-  #define FLOW_STEP_SAU_I_CH_R5       0x00000000U        /*!< No effect on control flow */
-  #define FLOW_STEP_SAU_I_CH          0x0003c9bcU        /*!< Step SAU Init check value */
-#else /* defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
   #define FLOW_STEP_SAU_I_CH_R0       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_I_CH_R1       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_I_CH_R2       0x00000000U        /*!< No effect on control flow */
@@ -190,8 +163,7 @@ extern "C" {
   #define FLOW_STEP_SAU_I_CH_R4       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_I_CH_R5       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_I_CH          0x00000000U        /*!< No effect on control flow */
-#endif /* #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) */
-    
+  
 #if  (OEMIROT_TAMPER_ENABLE == ALL_TAMPER)
 #define FLOW_STEP_TAMP_ACT_CH       0x0006ca19U        /*!< Step Tamper active check value */
 #else
@@ -226,13 +198,10 @@ extern "C" {
 #define FLOW_STEP_MPU_A_CH_R1       0x000b3642U        /*!< Step MPU Region 1 Appli check value */
 #define FLOW_STEP_MPU_A_EN_R2       0x000b2437U        /*!< Step MPU Region 2 Appli enable value */
 #define FLOW_STEP_MPU_A_CH_R2       0x000b448eU        /*!< Step MPU Region 2 Appli check value */
-#if  (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))
-  #define FLOW_STEP_MPU_A_EN_R3       0x000b285cU        /*!< Step MPU Region 3 Appli enable value */
-  #define FLOW_STEP_MPU_A_CH_R3       0x000c0cb9U        /*!< Step MPU Region 3 Appli check value */
-#else
-  #define FLOW_STEP_MPU_A_EN_R3       0x000b285cU        /*!< No effect on control flow */
-  #define FLOW_STEP_MPU_A_CH_R3       0x000c0cb9U        /*!< No effect on control flow */
-#endif
+
+#define FLOW_STEP_MPU_A_EN_R3       0x000b285cU        /*!< No effect on control flow */
+#define FLOW_STEP_MPU_A_CH_R3       0x000c0cb9U        /*!< No effect on control flow */
+
 #else
 #define FLOW_STEP_MPU_A_EN_R1       0x00000000U        /*!< No effect on control flow */
 #define FLOW_STEP_MPU_A_CH_R1       0x00000000U        /*!< No effect on control flow */
@@ -242,56 +211,19 @@ extern "C" {
 #define FLOW_STEP_MPU_A_CH_R3       0x00000000U        /*!< No effect on control flow */
 #endif /* OEMIROT_MPU_PROTECTION */
 
-#if defined (MCUBOOT_EXT_LOADER) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))
-  #define FLOW_STEP_GTZC_L_EN_MPCBB1  0x000a0a73U        /*!< Step GTZC MPCBB1 Configuration enable */
-  #define FLOW_STEP_GTZC_L_CH_MPCBB1  0x000a71c4U        /*!< Step GTZC MPCBB1 Configuration check value */
-  #define FLOW_STEP_GTZC_L_EN_TZSC    0x000a146dU        /*!< Step GTZC TZSC Configuration enable */
-  #define FLOW_STEP_GTZC_L_CH_TZSC    0x000aa2e8U        /*!< Step GTZC TZSC Configuration check value */
-#else
   #define FLOW_STEP_GTZC_L_EN_MPCBB1  0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_GTZC_L_CH_MPCBB1  0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_GTZC_L_EN_TZSC    0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_GTZC_L_CH_TZSC    0x00000000U        /*!< No effect on control flow */
-#endif /* MCUBOOT_EXT_LOADER */
-
-#if defined(MCUBOOT_EXT_LOADER) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))
-  #define FLOW_STEP_GPIO_L_EN         0x000cc18bU        /*!< Step GPIO Secure enable value */
-  #define FLOW_STEP_GPIO_L_CH         0x000d2364U        /*!< Step GPIO Secure check value */
-#else
+  
   #define FLOW_STEP_GPIO_L_EN         0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_GPIO_L_CH         0x00000000U        /*!< No effect on control flow */
-#endif
 
-#if defined(MCUBOOT_EXT_LOADER) && defined(OEMIROT_MPU_PROTECTION) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))    
-  #define FLOW_STEP_MPU_L_EN_R7       0x000c12a7U        /*!< Step Loader Region 7 enable value */
-  #define FLOW_STEP_MPU_L_CH_R7       0x000c64e2U        /*!< Step Loader Region 7 check value */
-  #define FLOW_STEP_MPU_L_LCK         0x000a624fU        /*!< Step GTZC Lock Configuration enable */
-  #define FLOW_STEP_MPU_L_LCK_CH      0x000aae83U        /*!< Step GTZC Lock Configuration Init check value */
-#else
   #define FLOW_STEP_MPU_L_EN_R7       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_MPU_L_CH_R7       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_MPU_L_LCK         0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_MPU_L_LCK_CH      0x00000000U        /*!< No effect on control flow */
-#endif /*MCUBOOT_EXT_LOADER*/
-
-#if defined(MCUBOOT_EXT_LOADER) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))
-  #define FLOW_STEP_SAU_L_EN_R0       0x000547edU        /*!< Step SAU Region 0 Loader enable value */
-  #define FLOW_STEP_SAU_L_CH_R0       0x0005dd64U        /*!< Step SAU Region 0 Loader check value */
-  #define FLOW_STEP_SAU_L_EN_R1       0x000569ceU        /*!< Step SAU Region 1 Loader enable value */
-  #define FLOW_STEP_SAU_L_CH_R1       0x0005ed59U        /*!< Step SAU Region 1 Loader check value */
-  #define FLOW_STEP_SAU_L_EN_R2       0x000577d0U        /*!< Step SAU Region 2 Loader enable value */
-  #define FLOW_STEP_SAU_L_CH_R2       0x0005f347U        /*!< Step SAU Region 2 Loader check value */
-  #define FLOW_STEP_SAU_L_EN_R3       0x0005953fU        /*!< Step SAU Region 3 Loader enable value */
-  #define FLOW_STEP_SAU_L_CH_R3       0x0006072bU        /*!< Step SAU Region 3 Loader check value */
-  #define FLOW_STEP_SAU_L_EN_R4       0x0005bae2U        /*!< Step SAU Region 4 Loader enable value */
-  #define FLOW_STEP_SAU_L_CH_R4       0x00061935U        /*!< Step SAU Region 4 Loader check value */
-  #define FLOW_STEP_SAU_L_EN_R5       0x000c7b02U        /*!< Step SAU Region 5 Loader enable value */
-  #define FLOW_STEP_SAU_L_CH_R5       0x000ca9d0U        /*!< Step SAU Region 5 Loader check value */
-  #define FLOW_STEP_SAU_L_EN          0x0005c37aU        /*!< Step SAU enable Loader value */
-  #define FLOW_STEP_SAU_L_CH          0x00066153U        /*!< Step SAU check Loader value */
-  #define FLOW_STEP_SAU_L_LCK         0x00122f11U        /*!< Step SAU Lock enable Loader value */
-  #define FLOW_STEP_SAU_L_LCK_CH      0x000f930aU        /*!< Step SAU Lock check Loader value */
-#else
+  
   #define FLOW_STEP_SAU_L_EN_R0       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_L_CH_R0       0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_L_EN_R1       0x00000000U        /*!< No effect on control flow */
@@ -308,27 +240,14 @@ extern "C" {
   #define FLOW_STEP_SAU_L_CH          0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_L_LCK         0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_SAU_L_LCK_CH      0x00000000U        /*!< No effect on control flow */
-#endif /* MCUBOOT_EXT_LOADER && GENERATOR_TZ_AVAILABLE */
 
-#if defined(MCUBOOT_EXT_LOADER) && (defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))
-  #define FLOW_STEP_NVIC_L_EN         0x000d4653U        /*!< Step NVIC Secure enable value */
-  #define FLOW_STEP_NVIC_L_CH         0x000d7521U        /*!< Step NVIC Secure check value */
-#else
   #define FLOW_STEP_NVIC_L_EN         0x00000000U        /*!< No effect on control flow */
   #define FLOW_STEP_NVIC_L_CH         0x00000000U        /*!< No effect on control flow */
-#endif /* MCUBOOT_EXT_LOADER && GENERATOR_TZ_AVAILABLE */
 
-#if defined(MCUBOOT_EXT_LOADER)
-#define FLOW_STEP_HDPEXT_L_EN_B1    0x000d8b31U        /*!< Step HDPB1 Extend Loader enable value */
-#define FLOW_STEP_HDPEXT_L_CH_B1    0x000e5689U        /*!< Step HDPB1 Extend Loader check value */
-#define FLOW_STEP_HDPEXT_L_EN_B2    0x000e85a4U        /*!< Step HDPB2 Extend Loader enable value */
-#define FLOW_STEP_HDPEXT_L_CH_B2    0x000ee905U        /*!< Step HDPB2 Extend Loader check value */
-#else
 #define FLOW_STEP_HDPEXT_L_EN_B1    0x00000000U        /*!< Step HDPB1 Extend Loader enable value */
 #define FLOW_STEP_HDPEXT_L_CH_B1    0x00000000U        /*!< Step HDPB1 Extend Loader check value */
 #define FLOW_STEP_HDPEXT_L_EN_B2    0x00000000U        /*!< Step HDPB2 Extend Loader enable value */
 #define FLOW_STEP_HDPEXT_L_CH_B2    0x00000000U        /*!< Step HDPB2 Extend Loader check value */
-#endif /* MCUBOOT_EXT_LOADER && GENERATOR_TZ_AVAILABLE */
 
 /**
   * @brief  SFU_BOOT Flow Control : Control values runtime protections
