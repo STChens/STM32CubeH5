@@ -25,10 +25,6 @@
 #include "low_level_flash.h"
 #include "appli_flash_layout.h"
 
-#include "com.h"
-#include "common.h"
-#include "fw_update_app.h"
-
 /* Avoids the semihosting issue */
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
 __asm("  .global __ARM_use_no_argv\n");

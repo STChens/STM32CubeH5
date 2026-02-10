@@ -29,7 +29,7 @@ extern "C" {
 #include "stm32h5xx_nucleo.h"
   
 /* Private includes ----------------------------------------------------------*/
-#include "com.h"
+
 /* Private define ------------------------------------------------------------*/
 #define APP_CODE_OFFSET      0x2A000 /* This define is updated automatically from ROT_BOOT project */
 #define APP_CODE_SIZE        0x16000 /* This define is updated automatically from ROT_BOOT project */
