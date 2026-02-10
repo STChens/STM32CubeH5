@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include "main.h"
 #include "low_level_flash.h"
+#include "appli_flash_layout.h"
 
 #include "com.h"
 #include "common.h"
@@ -177,7 +178,7 @@ int main(void)
 #endif
   printf("\r\n======================================================================");
   printf("\r\n=              (C) COPYRIGHT 2025 STMicroelectronics                 =");
-  printf("\r\n=                                                                    =");
+  printf("\r\n=               Built on %s %s                        =", __DATE__, __TIME__);
   printf("\r\n=                          User App #%c                               =", *pUserAppId);
   printf("\r\n======================================================================");
   printf("\r\n\r\n");
@@ -269,6 +270,7 @@ static void SystemClock_Config(void)
 void FW_APP_PrintMainMenu(void)
 {
   printf("\r\n=================== Main Menu ============================\r\n\n");
+  printf("  Show App memory layout -------------------------------- 0\r\n\n");
   printf("  Start Loader ------------------------------------------ 1\r\n\n");
 #if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
   printf("  Display Data content ---------------------------------- 2\r\n\n");
@@ -303,6 +305,20 @@ void FW_APP_Run(void)
     {
       switch (key)
       {
+        case '0' :
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
+          printf("  [ Data   ] primary   slot start  : %08x\r\n", FLASH_BASE + DATA_IMAGE_PRIMARY_PARTITION_OFFSET );
+          printf("  [ Data   ] primary   slot size   : %x\r\n", FLASH_AREA_4_SIZE );
+#endif
+          printf("  [ App FW ] primary   slot start  : %08x\r\n", FLASH_BASE + IMAGE_PRIMARY_PARTITION_OFFSET );
+          printf("  [ App FW ] primary   slot size   : %x\r\n", FLASH_AREA_0_SIZE );
+          printf("  [ App FW ] secondary slot start  : %08x\r\n", FLASH_BASE + IMAGE_SECONDARY_PARTITION_OFFSET );
+          printf("  [ App FW ] secondary slot size   : %x\r\n", FLASH_AREA_2_SIZE );
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1)
+          printf("  [ Data   ] secondary slot start  : %08x\r\n", FLASH_BASE + DATA_IMAGE_SECONDARY_PARTITION_OFFSET );
+          printf("  [ Data   ] secondary slot size   : %x\r\n", FLASH_AREA_6_SIZE );          
+#endif
+          break;
         case '1' :
           LOADER_Run();          
           break;

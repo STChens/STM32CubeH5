@@ -41,13 +41,27 @@ void LOADER_Run(void);
   * @retval None.
   */
 void LOADER_Run(void)
-{
-  printf("\r\n  Jump to OEMiROT_Loader\r\n");
+{  
+#if (LOADER_CODE_START == 0)
+  uint32_t boot_address = *(uint32_t *)(BOOTLOADER_BASE_NS + 4U);
+  __set_MSP((*(uint32_t *)BOOTLOADER_BASE_NS));
+  SCB->VTOR = BOOTLOADER_BASE_NS;
   
+  printf("\r\n  Jump to system bootloader.\r\n");
+  printf("  Disconnect UART console before connecting using STM32CubeProgrammer!\r\n"); 
+#if (IMAGE_SECONDARY_PARTITION_OFFSET > 0x0)  
+  printf("  Download the FW image binary to address 0x%08x\r\n", FLASH_BASE + IMAGE_SECONDARY_PARTITION_OFFSET);
+#endif
+#if (MCUBOOT_DATA_IMAGE_NUMBER == 1) && (DATA_IMAGE_SECONDARY_PARTITION_OFFSET > 0x0)
+  printf("  Download the data image binary to address 0x%08x\r\n", FLASH_BASE + DATA_IMAGE_SECONDARY_PARTITION_OFFSET);
+#endif  
+#else  
   uint32_t boot_address = *(uint32_t *)(LOADER_ADDRESS + 4U);
-
   __set_MSP((*(uint32_t *)LOADER_ADDRESS));
   SCB->VTOR = LOADER_ADDRESS;
+  
+  printf("\r\n  Jump to OEMiROT_Loader\r\n");  
+#endif
   
     __asm volatile("movs r0, %0\n"
                "movs r1, #0\n" /*clear registers before jumping to non-secure*/
