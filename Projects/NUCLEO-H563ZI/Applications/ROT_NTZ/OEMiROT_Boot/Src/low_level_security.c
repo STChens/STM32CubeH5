@@ -504,7 +504,7 @@ void LL_SECU_CheckStaticProtections(void)
 
 #ifdef  OEMIROT_WRP_PROTECT_ENABLE
   uint32_t val;
-  /* Check flash write protection */
+  /* Check flash write protection for BL2 area */
   start = FLASH_AREA_BL2_OFFSET / PAGE_SIZE;
   end = (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - 1) / PAGE_SIZE;
   val = 0;
@@ -521,6 +521,24 @@ void LL_SECU_CheckStaticProtections(void)
     Error_Handler();
   }
 
+#if defined(MCUBOOT_EXT_LOADER) && (LOADER_CODE_SIZE > 0)
+  /* Check flash write protection for BL2 area */
+  start = (FLASH_AREA_LOADER_OFFSET - FLASH_B_SIZE) / PAGE_SIZE;
+  end = (FLASH_AREA_LOADER_OFFSET - FLASH_B_SIZE + LOADER_CODE_SIZE - 1) / PAGE_SIZE;
+  val = 0;
+  for (i = (start/4); i <= (end/4); i++)
+  {
+    val |= (1 << i);
+  }
+  if ((flash_option_bytes_bank2.WRPState != OB_WRPSTATE_ENABLE)
+      || (flash_option_bytes_bank2.WRPSector != val))
+  {
+    BOOT_LOG_INF("BANK 2 flash write protection group 0x%x: OB 0x%x",
+                 (int)val, (int)flash_option_bytes_bank2.WRPSector);
+    BOOT_LOG_ERR("Unexpected value for write protection ");
+    Error_Handler();
+  }
+#endif /* defined(MCUBOOT_EXT_LOADER) && (LOADER_CODE_SIZE > 0) */
 #endif /* OEMIROT_WRP_PROTECT_ENABLE */
 
 #ifdef  OEMIROT_HDP_PROTECT_ENABLE
