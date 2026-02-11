@@ -141,11 +141,11 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b SCRATCH_
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b DOWNLOAD_APP_CODE_REGION_START -m RE_AREA_2_OFFSET %map_properties% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b DOWNLOAD_APP_CODE_REGION_START -m RE_IMAGE_FLASH_APP_UPDATE %map_properties% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b DOWNLOAD_APP_DATA_REGION_START -m RE_AREA_6_OFFSET %map_properties% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b DOWNLOAD_APP_DATA_REGION_START -m RE_IMAGE_FLASH_DATA_UPDATE %map_properties% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
