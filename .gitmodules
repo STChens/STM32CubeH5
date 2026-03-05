@@ -48,7 +48,7 @@
 	branch = main
 [submodule "Middlewares/Third_Party/mcuboot"]
 	path = Middlewares/Third_Party/mcuboot
-	url = https://github.com/STMicroelectronics/stm32-mw-mcuboot
+	url = https://github.com/STChens/stm32-mw-mcuboot.git
 	branch = main
 [submodule "Middlewares/Third_Party/mbed-crypto"]
 	path = Middlewares/Third_Party/mbed-crypto
