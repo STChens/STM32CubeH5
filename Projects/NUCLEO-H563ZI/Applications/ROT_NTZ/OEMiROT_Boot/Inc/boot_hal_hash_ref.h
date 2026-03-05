@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #define SHA256_LEN   (0x20U)
+#define SHA384_LEN   (0x30U)
 
 extern uint8_t ImageValidEnable;
 extern uint8_t ImageValidHashUpdate;

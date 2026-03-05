@@ -36,7 +36,7 @@
 #include "low_level_obkeys.h"
 #include "bootutil_priv.h"
 #ifdef MCUBOOT_EXT_LOADER
-#include "bootutil/crypto/sha256.h"
+#include "bootutil/crypto/sha.h"
 #define BUTTON_PORT                       GPIOC
 #define BUTTON_CLK_ENABLE                 __HAL_RCC_GPIOC_CLK_ENABLE()
 #define BUTTON_PIN                        GPIO_PIN_13
@@ -75,7 +75,11 @@ uint8_t ImageValidEnable = 0;
 #if defined(MCUBOOT_USE_HASH_REF)
 #define BL2_HASH_REF_ADDR     (FLASH_HASH_REF_AREA_OFFSET)
 uint8_t ImageValidHashUpdate = 0;
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
 uint8_t ImageValidHashRef[MCUBOOT_IMAGE_NUMBER * SHA256_LEN] = {0};
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+uint8_t ImageValidHashRef[MCUBOOT_IMAGE_NUMBER * SHA384_LEN] = {0};
+#endif
 #endif /* MCUBOOT_USE_HASH_REF */
 
 #if defined(FLOW_CONTROL)
@@ -341,8 +345,11 @@ int boot_hash_ref_store(void)
   }
 
   /* update hash references */
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )    
   memcpy(&OBK_hdpl1_data.Image0SHA256[0], ImageValidHashRef, (SHA256_LENGTH * MCUBOOT_IMAGE_NUMBER));
-
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+  memcpy(&OBK_hdpl1_data.Image0SHA384[0], ImageValidHashRef, (SHA384_LENGTH * MCUBOOT_IMAGE_NUMBER));
+#endif
   /* Update all OBK hdpl1 data with associated hash references */
   if (OBK_UpdateHdpl1Data(&OBK_hdpl1_data) != HAL_OK)
   {
@@ -367,8 +374,11 @@ int boot_hash_ref_load(void)
   }
 
   /* update hash references */
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
   memcpy(ImageValidHashRef, &OBK_hdpl1_data.Image0SHA256[0], (SHA256_LENGTH * MCUBOOT_IMAGE_NUMBER));
-
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+  memcpy(ImageValidHashRef, &OBK_hdpl1_data.Image0SHA384[0], (SHA384_LENGTH * MCUBOOT_IMAGE_NUMBER));
+#endif
   return 0;
 }
 
@@ -382,7 +392,11 @@ int boot_hash_ref_load(void)
 int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 {
   /* Check size */
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )  
   if (size != SHA256_LEN)
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+    if (size != SHA384_LEN)
+#endif
   {
     return BOOT_EFLASH;
   }
@@ -394,8 +408,11 @@ int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
   }
 
   /* Set hash reference */
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )  
   memcpy(ImageValidHashRef + (image_index * SHA256_LEN), hash_ref, SHA256_LEN);
-
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+  memcpy(ImageValidHashRef + (image_index * SHA384_LEN), hash_ref, SHA384_LEN);
+#endif
   /* Memorize that hash references will have to be updated in flash (later) */
   ImageValidHashUpdate++;
 
@@ -412,7 +429,11 @@ int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 int boot_hash_ref_get(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 {
   /* Check size */
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
   if (size != SHA256_LEN)
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+  if (size != SHA384_LEN)
+#endif      
   {
     return BOOT_EFLASH;
   }
@@ -424,8 +445,11 @@ int boot_hash_ref_get(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
   }
 
   /* Get hash reference */
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
   memcpy(hash_ref, ImageValidHashRef + (image_index * SHA256_LEN), SHA256_LEN);
-
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+  memcpy(hash_ref, ImageValidHashRef + (image_index * SHA384_LEN), SHA384_LEN);
+#endif
   return 0;
 }
 #endif /* MCUBOOT_USE_HASH_REF */

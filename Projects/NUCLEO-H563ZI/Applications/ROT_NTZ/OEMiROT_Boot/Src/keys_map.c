@@ -121,6 +121,35 @@ const struct bootutil_key bootutil_keys[] = {
     },
 #endif
 };
+#elif defined(MCUBOOT_SIGN_EC384)
+const unsigned int ecdsa_pub_key_len = 120;
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2) || (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
+const unsigned int ecdsa_pub_key_len_1 = 120;
+#endif
+const struct bootutil_key bootutil_keys[] = {
+    {
+    	.key = OBK_Hdpl1_Cfg.Hdpl3SecureAuthenticationPubKey,
+    	.len = &ecdsa_pub_key_len,
+    },
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2)
+    {
+        .key = OBK_Hdpl1_Cfg.Hdpl3SecureAuthenticationPubKey,
+        .len = &ecdsa_pub_key_len_1,
+    },
+#endif
+#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
+    {
+        .key = OBK_Hdpl1_Cfg.Hdpl3SecureAuthenticationPubKey,
+        .len = &ecdsa_pub_key_len,
+    },
+#endif
+#if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
+    {
+        .key = OBK_Hdpl1_Cfg.Hdpl3NonSecureAuthenticationPubKey,
+        .len = &ecdsa_pub_key_len_1,
+    },
+#endif
+};
 #else
 #error "No public key available for given signing algorithm."
 #endif

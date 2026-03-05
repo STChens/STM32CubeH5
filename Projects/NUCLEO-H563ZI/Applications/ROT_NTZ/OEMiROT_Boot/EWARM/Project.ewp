@@ -219,6 +219,7 @@
                     <state>NDEBUG</state>
                     <state>MCUBOOT_TARGET_CONFIG=&lt;flash_layout.h&gt;</state>
                     <state>MBEDTLS_CONFIG_FILE=&lt;mbedtls_config.h&gt;</state>
+                    <state>__MBEDTLS_CONFIG_FILE=&lt;config-boot.h&gt;</state>
                     <state>MCUBOOT_DOUBLE_SIGN_VERIF</state>
                     <state>FLOW_CONTROL</state>
                     <state>BL2</state>
@@ -1122,6 +1123,9 @@
                 <name>$PROJ_DIR$\..\Src\sha256_alt.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\sha512_alt.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\startup_stm32h5xx.c</name>
             </file>
             <file>
@@ -1272,7 +1276,31 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\platform_util.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_client.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_driver_wrappers.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_ecp.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_hash.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_slot_management.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_util.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\sha256.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\sha512.c</name>
             </file>
         </group>
         <group>
@@ -1309,6 +1337,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ec256.c</name>
+                <excluded>
+                    <configuration>NUCLEO-H563ZI_OEMiROT_Boot</configuration>
+                </excluded>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ecdsa.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_validate.c</name>

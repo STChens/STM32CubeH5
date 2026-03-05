@@ -23,6 +23,7 @@
 #ifndef MBEDTLS_CONFIG_BOOT_H
 #define MBEDTLS_CONFIG_BOOT_H
 
+
 /* System support */
 #define MBEDTLS_PLATFORM_C
 #define MBEDTLS_PLATFORM_MEMORY
@@ -30,9 +31,12 @@
 #define MBEDTLS_HAVE_ASM
 
 /* Entropy */
-#define MBEDTLS_ENTROPY_C
+//#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
 #define MBEDTLS_NO_PLATFORM_ENTROPY
+#define MBEDTLS_ENTROPY_C
+//#define MBEDTLS_NO_PLATFORM_ENTROPY
 #define MBEDTLS_HMAC_DRBG_C
+//#define MBEDTLS_CTR_DRBG_C
 #define MBEDTLS_ENTROPY_HARDWARE_ALT
 
 /* STD functions */
@@ -51,12 +55,20 @@
 #define MBEDTLS_ASN1_WRITE_C
 #define MBEDTLS_BIGNUM_C
 #define MBEDTLS_MD_C
+#define MBEDTLS_OID_C
 #define MBEDTLS_SHA256_C
 #define MBEDTLS_SHA256_ALT
+#define MBEDTLS_SHA512_ALT
 #define MBEDTLS_CIPHER_MODE_CTR
 #define MBEDTLS_AES_C
+#define MBEDTLS_CIPHER_C
+/* Save RAM by adjusting to our exact needs */
+//#define MBEDTLS_ECP_MAX_BITS             2048
 
 /* mbedtls >3.6 compatibility */
+#define MBEDTLS_MPI_MAX_SIZE              384
 #define MBEDTLS_ALLOW_PRIVATE_ACCESS
 
+#define MBEDTLS_PSA_CRYPTO_C
+#define MBEDTLS_PSA_ASSUME_EXCLUSIVE_BUFFERS
 #endif /* MBEDTLS_CONFIG_BOOT_H */

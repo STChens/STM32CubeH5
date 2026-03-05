@@ -43,6 +43,7 @@ struct arm_obk_flash_dev_t
 #define SBS_EXT_EPOCHSELCR_EPOCH_SEL_S_EPOCH    (1U << SBS_EPOCHSELCR_EPOCH_SEL_Pos)
 #define MAX_SIZE_CFG                         OBK_HDPL1_CFG_SIZE
 #define ST_SHA256_TIMEOUT                       (3U)
+#define ST_SHA384_TIMEOUT                       (3U)
 
 /* config for OBK flash driver */
 #define OBK_FLASH0_TOTAL_SIZE                   (0x2000U)
@@ -308,6 +309,8 @@ static uint32_t MemoryCompare(uint8_t *pAdd1, uint8_t *pAdd2, uint32_t Size)
   return result;
 }
 
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
+
 /**
   * @brief  Compute SHA256
   * @param  pBuffer: pointer to the input buffer to be hashed
@@ -449,6 +452,132 @@ void OBK_VerifyHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
     Error_Handler();
   }
 }
+
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+
+static HAL_StatusTypeDef Compute_SHA384(uint8_t *pBuffer, uint32_t Length, uint8_t *pSHA384)
+{
+  /* Enable HASH clock */
+  __HAL_RCC_HASH_CLK_ENABLE();
+
+  hhash.Instance = HASH;
+  /* HASH Configuration */
+  if (HAL_HASH_DeInit(&hhash) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+  hhash.Init.DataType = HASH_BYTE_SWAP;
+  hhash.Init.Algorithm = HASH_ALGOSELECTION_SHA384;
+  if (HAL_HASH_Init(&hhash) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+
+  /* HASH computation */
+  if (HAL_HASH_Start(&hhash, pBuffer, Length, pSHA384, ST_SHA384_TIMEOUT) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+  return HAL_OK;
+}
+/*
+  * @brief  Read data in OBkeys HDPL1
+  * @param  pOBK_Hdpl1Data: pointer on HDPL1 data
+  * @retval None
+  */
+HAL_StatusTypeDef OBK_ReadHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
+{
+  uint8_t sha384[SHA384_LENGTH] = { 0U };
+  uint32_t Address = (uint32_t) pOBK_Hdpl1Data;
+
+  /* Read configuration in OBKeys */
+  if (OBK_Read(OBK_HDPL1_DATA_OFFSET, (void *) pOBK_Hdpl1Data, sizeof(OBK_Hdpl1Data)) != ARM_DRIVER_OK)
+  {
+    return HAL_ERROR;
+  }
+
+  /* Verif SHA256 on the whole Hdpl 1 data except first 48 bytes of SHA384 */
+  if (Compute_SHA384((uint8_t *) (Address + SHA384_LENGTH), sizeof(OBK_Hdpl1Data) - SHA384_LENGTH, sha384) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
+  if (MemoryCompare(pOBK_Hdpl1Data->SHA384, sha384, SHA384_LENGTH) != 0U)
+  {
+    BOOT_LOG_ERR("Wrong OBK HDPL1 data");
+    return HAL_ERROR;
+  }
+  return HAL_OK;
+}
+  * @brief  Update data in OBkeys Hdpl1 1
+  * @param  pOBK_Hdpl1Data: pointer on Hdpl 1 data
+  * @retval ARM_DRIVER error status
+  */
+HAL_StatusTypeDef OBK_UpdateHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
+{
+  uint8_t sha384[SHA384_LENGTH] = { 0U };
+  uint32_t Address = (uint32_t) pOBK_Hdpl1Data;
+
+  /* Verif SHA256 on the whole Hdpl 1 data except first 32 bytes of SHA256 */
+  if (Compute_SHA384((uint8_t *) (Address + SHA384_LENGTH), sizeof(OBK_Hdpl1Data) - SHA384_LENGTH, sha384) != HAL_OK)
+  {
+    BOOT_LOG_ERR("Wrong OBK HDPL1 data");
+    return HAL_ERROR;
+  }
+  (void) memcpy(&pOBK_Hdpl1Data->SHA384[0], &sha384[0], SHA384_LENGTH);
+
+  /* Write configuration in OBKeys */
+  if (OBK_Write(OBK_HDPL1_DATA_OFFSET, (void *) pOBK_Hdpl1Data, sizeof(OBK_Hdpl1Data)) != ARM_DRIVER_OK)
+  {
+    return HAL_ERROR;
+  }
+  * @brief  Read configuration in OBkeys Hdpl 1
+  * @param  pOBK_Hdpl1Cfg : pointer on Hdpl 1 configuration
+  * @retval None
+  */
+void OBK_ReadHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
+{
+  uint8_t sha384[SHA384_LENGTH] = { 0U };
+  uint32_t Address = (uint32_t) pOBK_Hdpl1Cfg;
+
+  /* Read configuration in OBKeys */
+  if (OBK_Flash_ReadEncrypted(OBK_HDPL1_CFG_OFFSET,(void *) pOBK_Hdpl1Cfg,  sizeof(OBK_Hdpl1Config)) != ARM_DRIVER_OK)
+  {
+    Error_Handler();
+  }
+
+  /* Verif SHA384 on the whole Hdpl 1 config except first 48 bytes of SHA384 */
+  if (Compute_SHA384((uint8_t *) (Address + SHA384_LENGTH), sizeof(OBK_Hdpl1Config) - SHA384_LENGTH, sha384) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (MemoryCompare(&pOBK_Hdpl1Cfg->SHA384[0], &sha384[0], SHA384_LENGTH) != 0U)
+  {
+    BOOT_LOG_ERR("read: Wrong OBK HDPL1 cfg");
+    Error_Handler();
+  }
+}
+
+  * @brief  Verify configuration in OBkeys Hdpl1 1
+  * @param  pOBK_Hdpl1Cfg : pointer on Hdpl 1 configuration
+  * @retval None
+  */
+void OBK_VerifyHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
+{
+  uint8_t sha384[SHA384_LENGTH] = { 0U };
+  uint32_t Address = (uint32_t) pOBK_Hdpl1Cfg;
+
+  /* Verif SHA256 on the whole Hdpl 1 config except first 32 bytes of SHA256 */
+  if (Compute_SHA384((uint8_t *) (Address + SHA384_LENGTH), sizeof(OBK_Hdpl1Config) - SHA384_LENGTH, sha384) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (MemoryCompare(&pOBK_Hdpl1Cfg->SHA384[0], &sha384[0], SHA384_LENGTH) != 0U)
+  {
+    BOOT_LOG_ERR("verify: Wrong OBK HDPL1 cfg");
+    Error_Handler();
+  }
+}
+#endif
 
 /**
   * @brief  Get counter

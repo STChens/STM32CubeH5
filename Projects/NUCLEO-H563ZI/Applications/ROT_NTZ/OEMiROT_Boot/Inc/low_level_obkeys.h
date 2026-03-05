@@ -43,11 +43,16 @@ extern "C" {
 
 #define EC256_PRIV_KEY_LENGTH     (70U)
 #define EC256_PUB_KEY_LENGTH      (91U)
+#define EC256_PRIV_KEY_LENGTH     (70U)
+#define EC384_PUB_KEY_LENGTH      (120U)
+#define SHA384_LENGTH             (48U)
 #define SHA256_LENGTH             (32U)
 
 #if   (CRYPTO_SCHEME == CRYPTO_SCHEME_EC256)
 #define AUTH_PUB_KEY_LENGTH       EC256_PUB_KEY_LENGTH
 #define ENC_PRIV_KEY_LENGTH       EC256_PRIV_KEY_LENGTH
+#elif (CRYPTO_SCHEME == CRYPTO_SCHEME_EC384)
+#define AUTH_PUB_KEY_LENGTH EC384_PUB_KEY_LENGTH
 #else
 #error "undefined crypto scheme"
 #endif

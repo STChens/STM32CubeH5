@@ -40,22 +40,35 @@ extern "C" {
 /* Available crypto schemes (do not change values, as used in appli postbuild script) */
 #define CRYPTO_SCHEME_EC256      0x2 /* ECDSA-256 signature,
                                         AES-CTR-128 encryption with key ECIES-P256 encrypted */
+#define CRYPTO_SCHEME_EC384      0x3 /* ECDSA-256 signature,
+                                        AES-CTR-128 encryption with key ECIES-P256 encrypted */
 
 /* Crypto scheme selection : begin */
 #define CRYPTO_SCHEME            CRYPTO_SCHEME_EC256  /* Select one of available crypto schemes */
+//#define CRYPTO_SCHEME 			 CRYPTO_SCHEME_EC384
 /* Crypto scheme selection : end */
 
 
 /* ECC config */
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+#define NUM_ECC_BYTES 48
+#define MCUBOOT_SIGN_EC384
+#define MCUBOOT_ENCRYPT_EC256
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
 #define NUM_ECC_BYTES 32
 #define MCUBOOT_SIGN_EC256
 #define MCUBOOT_ENCRYPT_EC256
+#else
+#error "CRYPTO_SCHEME must be CRYPTO_SCHEME_EC256 or CRYPTO_SCHEME_EC384!"
+#endif
+#define PSA_KEY_ID_NULL                         ((psa_key_id_t)0)   // not overly happy with this being here
+#define MCUBOOT_USE_PSA_CRYPTO
 
 #define MCUBOOT_VALIDATE_PRIMARY_SLOT
 #define MCUBOOT_USE_FLASH_AREA_GET_SECTORS
 
 #define MCUBOOT_HW_ROLLBACK_PROT
-#define MCUBOOT_ENC_IMAGES           /* Defined: Image encryption enabled. */
+//#define MCUBOOT_ENC_IMAGES           /* Defined: Image encryption enabled. */
                                      /* Undefined: Image encryption disabled. */
 #define MCUBOOT_BOOTSTRAP            /* Allow initial state with images in secondary slots only (empty primary slots) */
 

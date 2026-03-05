@@ -1461,6 +1461,9 @@
                 <name>$PROJ_DIR$\..\Src\sha256_alt.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\sha512_alt.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\startup_stm32h5xx.c</name>
             </file>
             <file>
@@ -1611,8 +1614,35 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\platform_util.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_client.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_driver_wrappers.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_ecp.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_hash.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_slot_management.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_util.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\sha256.c</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\sha512.c</name>
+            </file>
+            <configuration>
+                <name>NUCLEO-H563ZI_OEMiROT_Boot</name>
+            </configuration>
         </group>
         <group>
             <name>mcuboot</name>
@@ -1650,6 +1680,9 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ec256.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ecdsa.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_validate.c</name>
             </file>
             <file>
@@ -1673,6 +1706,9 @@
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\platform\ext\common\uart_stdout.c</name>
             </file>
+            <configuration>
+                <name>NUCLEO-H563ZI_OEMiROT_Boot</name>
+            </configuration>
         </group>
     </group>
 </project>
