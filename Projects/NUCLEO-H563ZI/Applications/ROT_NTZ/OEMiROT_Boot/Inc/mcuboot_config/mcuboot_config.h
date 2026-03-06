@@ -45,7 +45,7 @@ extern "C" {
 
 /* Crypto scheme selection : begin */
 #define CRYPTO_SCHEME            CRYPTO_SCHEME_EC256  /* Select one of available crypto schemes */
-//#define CRYPTO_SCHEME 			 CRYPTO_SCHEME_EC384
+//#define CRYPTO_SCHEME 	           CRYPTO_SCHEME_EC384
 /* Crypto scheme selection : end */
 
 
@@ -68,7 +68,8 @@ extern "C" {
 #define MCUBOOT_USE_FLASH_AREA_GET_SECTORS
 
 #define MCUBOOT_HW_ROLLBACK_PROT
-//#define MCUBOOT_ENC_IMAGES           /* Defined: Image encryption enabled. */
+#define MCUBOOT_ENC_IMAGES
+//FIXME #define MCUBOOT_ENC_IMAGES           /* Defined: Image encryption enabled. */
                                      /* Undefined: Image encryption disabled. */
 #define MCUBOOT_BOOTSTRAP            /* Allow initial state with images in secondary slots only (empty primary slots) */
 

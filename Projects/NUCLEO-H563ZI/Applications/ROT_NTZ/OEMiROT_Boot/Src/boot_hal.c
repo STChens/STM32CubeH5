@@ -345,11 +345,7 @@ int boot_hash_ref_store(void)
   }
 
   /* update hash references */
-#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )    
-  memcpy(&OBK_hdpl1_data.Image0SHA256[0], ImageValidHashRef, (SHA256_LENGTH * MCUBOOT_IMAGE_NUMBER));
-#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
-  memcpy(&OBK_hdpl1_data.Image0SHA384[0], ImageValidHashRef, (SHA384_LENGTH * MCUBOOT_IMAGE_NUMBER));
-#endif
+  memcpy(&OBK_hdpl1_data.Image0SHA[0], ImageValidHashRef, (IMG_SHA_LENGTH * MCUBOOT_IMAGE_NUMBER));
   /* Update all OBK hdpl1 data with associated hash references */
   if (OBK_UpdateHdpl1Data(&OBK_hdpl1_data) != HAL_OK)
   {
@@ -374,11 +370,7 @@ int boot_hash_ref_load(void)
   }
 
   /* update hash references */
-#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
-  memcpy(ImageValidHashRef, &OBK_hdpl1_data.Image0SHA256[0], (SHA256_LENGTH * MCUBOOT_IMAGE_NUMBER));
-#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
-  memcpy(ImageValidHashRef, &OBK_hdpl1_data.Image0SHA384[0], (SHA384_LENGTH * MCUBOOT_IMAGE_NUMBER));
-#endif
+  memcpy(ImageValidHashRef, &OBK_hdpl1_data.Image0SHA[0], (IMG_SHA_LENGTH * MCUBOOT_IMAGE_NUMBER));
   return 0;
 }
 
@@ -392,11 +384,7 @@ int boot_hash_ref_load(void)
 int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 {
   /* Check size */
-#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )  
-  if (size != SHA256_LEN)
-#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
-    if (size != SHA384_LEN)
-#endif
+  if (size != IMG_SHA_LENGTH)
   {
     return BOOT_EFLASH;
   }
@@ -408,11 +396,7 @@ int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
   }
 
   /* Set hash reference */
-#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )  
-  memcpy(ImageValidHashRef + (image_index * SHA256_LEN), hash_ref, SHA256_LEN);
-#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
-  memcpy(ImageValidHashRef + (image_index * SHA384_LEN), hash_ref, SHA384_LEN);
-#endif
+  memcpy(ImageValidHashRef + (image_index * IMG_SHA_LENGTH), hash_ref, IMG_SHA_LENGTH);
   /* Memorize that hash references will have to be updated in flash (later) */
   ImageValidHashUpdate++;
 
@@ -429,11 +413,7 @@ int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 int boot_hash_ref_get(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 {
   /* Check size */
-#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
-  if (size != SHA256_LEN)
-#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
-  if (size != SHA384_LEN)
-#endif      
+  if (size != IMG_SHA_LENGTH)
   {
     return BOOT_EFLASH;
   }
@@ -445,11 +425,7 @@ int boot_hash_ref_get(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
   }
 
   /* Get hash reference */
-#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
-  memcpy(hash_ref, ImageValidHashRef + (image_index * SHA256_LEN), SHA256_LEN);
-#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
-  memcpy(hash_ref, ImageValidHashRef + (image_index * SHA384_LEN), SHA384_LEN);
-#endif
+  memcpy(hash_ref, ImageValidHashRef + (image_index * IMG_SHA_LENGTH), IMG_SHA_LENGTH);
   return 0;
 }
 #endif /* MCUBOOT_USE_HASH_REF */
