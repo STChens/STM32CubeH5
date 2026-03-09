@@ -33,10 +33,11 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 #define OBK_HDPL1_RES_SIZE        (0x60U) /* Size reserved at start of OBKey Hdpl 1 for RSS DA */
+#define OBK_HDPL1_TOTAL_SIZE        (0x800U) /* Total Size of OBKey Hdpl 1 */
 #define OBK_HDPL1_CFG_OFFSET      (OBK_HDPL1_OFFSET + OBK_HDPL1_RES_SIZE) /* First OBkey Hdpl 1 for immutable config */
 #define OBK_HDPL1_CFG_SIZE        (sizeof(OBK_Hdpl1Config)) /* Size for OBkey Hdpl 1 cfg section */
-#define OBK_HDPL1_DATA_OFFSET     (OBK_HDPL1_CFG_OFFSET + OBK_HDPL1_CFG_SIZE) /* First OBkey Hdpl 1 for data section */
 #define OBK_HDPL1_DATA_SIZE       (sizeof(OBK_Hdpl1Data)) /* Size for OBKey Hdpl 1 data section */
+#define OBK_HDPL1_DATA_OFFSET     (OBK_HDPL1_OFFSET + OBK_HDPL1_TOTAL_SIZE - OBK_HDPL1_DATA_SIZE) /* First OBkey Hdpl 1 for data section */
 
 #define OBK_FLASH_PROG_UNIT       (0x10U)
 #define ALL_OBKEYS                (0x1FFU)             /* Swap all OBkeys */

@@ -58,9 +58,32 @@ echo        From TrustedPackageCreator (OBkey tab in Security panel).
 echo        Select OEMiROT_Config.xml(Default path is \ROT_Provisioning\OEMiROT_NTZ\Config\OEMiROT_Config.xml)
 echo        Warning: Default keys must NOT be used in a product. Make sure to regenerate your own keys!
 echo        Update the configuration (if/as needed) then generate OEMiROT_Config.obk file
+
+::======================================================================================
+::Set OEMiROT_Config xml following ECC signing key length and generate OEMiROT Config.obk
+::======================================================================================
+set oemirot_config_xml_form="%projectdir%\Config\OEMiROT_Config%ecc_signing_key_len%.xml"
+set oemirot_config_xml_to="%projectdir%\Config\OEMiROT_Config.xml"
+echo
+echo        "Copy %oemirot_config_xml_form% %oemirot_config_xml_to%"
+copy %oemirot_config_xml_form% %oemirot_config_xml_to% > %provisioning_log%
+if !errorlevel! neq 0 goto :step_error
+echo        "Geneate OEMiROT_Config.obk from %oemirot_config_xml_to%" 
+%stm32tpccli% -obk %oemirot_config_xml_to% >> %provisioning_log%
+if !errorlevel! neq 0 goto :step_error
+
+::======================================================================================
+::Use the right xml according to ECC signing key length to generate OEMiRoT_Data.obk
+::======================================================================================
+set oemirot_data_xml="%projectdir%\Config\OEMiROT_Data%ecc_signing_key_len%.xml"
+echo        "Geneate OEMiROT_Data.obk from %oemirot_data_xml%"
+%stm32tpccli% -obk %oemirot_data_xml% >> %provisioning_log%
+if !errorlevel! neq 0 goto :step_error
+
 echo        Press any key to continue...
 echo.
 if [%1] neq [AUTO] pause >nul
+
 :: =============================================== Steps to create the DA_Config.obk file ===================================================
 echo    * DA_Config.obk generation:
 echo        Warning: Default keys must NOT be used in a product. Make sure to regenerate your own keys!
@@ -99,7 +122,7 @@ echo        Press any key to continue...
 echo.
 if [%1] neq [AUTO] pause >nul
 
-%stm32tpccli% -pb %app_data_xml% > %provisioning_log%
+%stm32tpccli% -pb %app_data_xml% >> %provisioning_log%
 if !errorlevel! neq 0 goto :step_error
 %stm32tpccli% -pb %app_data_init_xml% >> %provisioning_log%
 if !errorlevel! neq 0 goto :step_error

@@ -1093,6 +1093,15 @@
                 <name>$PROJ_DIR$\..\Src\boot_hal.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\ecdsa_alt.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\ecp_alt.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\ecp_curves_alt.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\keys_map.c</name>
             </file>
             <file>
@@ -1453,6 +1462,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_icache.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_pka.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_pwr.c</name>

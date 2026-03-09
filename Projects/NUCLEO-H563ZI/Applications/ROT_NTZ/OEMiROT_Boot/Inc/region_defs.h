@@ -19,7 +19,7 @@
 #include "flash_layout.h"
 
 #define BL2_HEAP_SIZE           0x0000000
-#define BL2_MSP_STACK_SIZE      0x0002000
+#define BL2_MSP_STACK_SIZE      0x0004000
 
 /* GTZC specific Alignment */
 #define GTZC_RAM_ALIGN 512

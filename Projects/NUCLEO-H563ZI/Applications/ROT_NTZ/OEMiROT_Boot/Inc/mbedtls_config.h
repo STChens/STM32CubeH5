@@ -46,6 +46,7 @@
 /* Crypto modules */
 #define MBEDTLS_ECP_C
 #define MBEDTLS_ECP_DP_SECP256R1_ENABLED
+#define MBEDTLS_ECP_DP_SECP384R1_ENABLED
 #define MBEDTLS_ECP_NIST_OPTIM
 #define MBEDTLS_ECDH_C
 #define MBEDTLS_ECDSA_C
@@ -55,11 +56,29 @@
 #define MBEDTLS_MD_C
 #define MBEDTLS_OID_C
 #define MBEDTLS_SHA256_C
-#define MBEDTLS_SHA256_ALT
-#define MBEDTLS_SHA512_ALT
+
+#define MBEDTLS_SHA384_C
+#define MBEDTLS_SHA512_C
+
 #define MBEDTLS_CIPHER_MODE_CTR
 #define MBEDTLS_AES_C
 #define MBEDTLS_CIPHER_C
+
+/* HW accelerators */
+#define MBEDTLS_SHA256_ALT
+#define MBEDTLS_SHA512_ALT
+#define MBEDTLS_ECDSA_VERIFY_ALT
+#define MBEDTLS_ECP_ALT
+#if defined MBEDTLS_ECP_ALT
+#undef MBEDTLS_ECP_NIST_OPTIM
+#endif
+#if defined(BL2_HW_ACCEL_ENABLE)
+#define MBEDTLS_AES_ALT
+#define MBEDTLS_ECDSA_VERIFY_ALT
+#define MBEDTLS_ECP_ALT
+#define MBEDTLS_RSA_ALT
+#endif /* BL2_HW_ACCEL_ENABLE */
+
 /* Save RAM by adjusting to our exact needs */
 //#define MBEDTLS_ECP_MAX_BITS             2048
 
@@ -69,4 +88,5 @@
 
 #define MBEDTLS_PSA_CRYPTO_C
 #define MBEDTLS_PSA_ASSUME_EXCLUSIVE_BUFFERS
+
 #endif /* MBEDTLS_CONFIG_BOOT_H */
