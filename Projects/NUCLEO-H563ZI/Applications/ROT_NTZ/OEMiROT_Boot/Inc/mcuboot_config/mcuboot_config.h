@@ -52,10 +52,12 @@ extern "C" {
 /* ECC config */
 #if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
 #define NUM_ECC_BYTES 48
+#define NUM_ENC_ECC_BYTES 32
 #define MCUBOOT_SIGN_EC384
 #define MCUBOOT_ENCRYPT_EC256
 #elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
 #define NUM_ECC_BYTES 32
+#define NUM_ENC_ECC_BYTES 32
 #define MCUBOOT_SIGN_EC256
 #define MCUBOOT_ENCRYPT_EC256
 #else
@@ -72,7 +74,7 @@ extern "C" {
                                      /* Undefined: Image encryption disabled. */
   
 #if CRYPTO_SCHEME == CRYPTO_SCHEME_EC384
-#undef MCUBOOT_ENC_IMAGES // FIXME disable image encryption first for ECC384
+// #undef MCUBOOT_ENC_IMAGES // FIXME disable image encryption first for ECC384
 #endif
   
 #define MCUBOOT_BOOTSTRAP            /* Allow initial state with images in secondary slots only (empty primary slots) */

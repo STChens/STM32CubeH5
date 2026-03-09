@@ -67,8 +67,8 @@
 /* HW accelerators */
 #define MBEDTLS_SHA256_ALT
 #define MBEDTLS_SHA512_ALT
-#define MBEDTLS_ECDSA_VERIFY_ALT
-#define MBEDTLS_ECP_ALT
+//#define MBEDTLS_ECDSA_VERIFY_ALT
+//#define MBEDTLS_ECP_ALT
 #if defined MBEDTLS_ECP_ALT
 #undef MBEDTLS_ECP_NIST_OPTIM
 #endif
