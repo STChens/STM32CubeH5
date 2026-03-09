@@ -73,10 +73,6 @@ extern "C" {
 #define MCUBOOT_ENC_IMAGES           /* Defined: Image encryption enabled. */
                                      /* Undefined: Image encryption disabled. */
   
-#if CRYPTO_SCHEME == CRYPTO_SCHEME_EC384
-// #undef MCUBOOT_ENC_IMAGES // FIXME disable image encryption first for ECC384
-#endif
-  
 #define MCUBOOT_BOOTSTRAP            /* Allow initial state with images in secondary slots only (empty primary slots) */
 
 /*
