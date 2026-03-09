@@ -27,3 +27,6 @@ set PROJECT_GENERATED_BY_CUBEMX=false
 set cube_fw_path=%~dp0..\..\..\
 set oemirot_appli_sign=rot_app_init_sign.hex
 set rot_provisioning_path="%~dp0"
+::set ecc_signing_key_len=256
+set ecc_signing_key_len=384
+

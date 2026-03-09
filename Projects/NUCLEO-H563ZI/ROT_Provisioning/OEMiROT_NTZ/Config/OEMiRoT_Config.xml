@@ -18,24 +18,6 @@
 	<Hash>
 	</Hash>
 	<File>
-		<Name>Authentication key</Name>
-		<Value>./../Keys/OEMiRoT_Authentication.pem</Value>
-		<Align>4</Align>
-		<KeyType>ecdsa-p256</KeyType>
-		<Type>Public</Type>
-		<Default>./../Keys/OEMiRoT_Authentication_S.pem</Default>
-		<Tooltip>Select the key used to authenticate secure firmware and data. When this key is regenerated, both firmware and data images must be processed with Imgtool</Tooltip>
-	</File>
-	<File>
-		<Name>Authentication non secure key</Name>
-		<Value>./../Keys/OEMiRoT_Authentication_2.pem</Value>
-		<Align>4</Align>
-		<KeyType>ecdsa-p256</KeyType>
-		<Type>Public</Type>
-		<Default>./../Keys/OEMiRoT_Authentication_NS.pem</Default>
-		<Tooltip>Select the key used to authenticate non secure firmware and data. When this key is regenerated, both firmware and data images must be processed with Imgtool</Tooltip>
-	</File>
-	<File>
 		<Name>Encryption key</Name>
 		<Value>./../Keys/OEMiRoT_Encryption.pem</Value>
 		<Align>4</Align>
@@ -43,6 +25,15 @@
 		<Type></Type>
 		<Default>./../Keys/OEMiRoT_Encryption.pem</Default>
 		<Tooltip>Select the key used to encrypt firmware and data images</Tooltip>
+	</File>
+	<File>
+		<Name>Authentication key</Name>
+		<Value>./../Keys/OEMiRoT_Authentication384_0.pem</Value>
+		<Align>4</Align>
+		<KeyType>ecdsa-p384</KeyType>
+		<Type>public</Type>
+		<Default>./../Keys/OEMiRoT_Authentication384_0.pem</Default>
+		<Tooltip>Select the key used to authenticate secure firmware and data. When this key is regenerated, both firmware and data images must be processed with Imgtool</Tooltip>
 	</File>
 	<Output>
 		<Name>Output File</Name>
