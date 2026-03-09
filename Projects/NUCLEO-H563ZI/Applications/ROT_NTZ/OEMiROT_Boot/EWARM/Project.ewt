@@ -1655,9 +1655,6 @@
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\sha512.c</name>
             </file>
-            <configuration>
-                <name>NUCLEO-H563ZI_OEMiROT_Boot</name>
-            </configuration>
         </group>
         <group>
             <name>mcuboot</name>
@@ -1692,9 +1689,6 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ec.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ec256.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ecdsa.c</name>
             </file>
             <file>
@@ -1721,9 +1715,6 @@
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\platform\ext\common\uart_stdout.c</name>
             </file>
-            <configuration>
-                <name>NUCLEO-H563ZI_OEMiROT_Boot</name>
-            </configuration>
         </group>
     </group>
 </project>

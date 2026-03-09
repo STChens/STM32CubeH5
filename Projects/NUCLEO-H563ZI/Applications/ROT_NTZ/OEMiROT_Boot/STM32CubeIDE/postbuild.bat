@@ -51,6 +51,15 @@ set "img_config=%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\img_config.
 set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
 
 ::======================================================================================
+::Set OEMiROT_Config xml following ECC signing key length and generate OEMiROT Config.obk
+::======================================================================================
+set oemirot_config_xml_form="%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\Config\OEMiROT_Config%ecc_signing_key_len%.xml"
+set oemirot_config_xml_to="%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\Config\OEMiROT_Config.xml"
+echo
+echo        "Copy %oemirot_config_xml_form% %oemirot_config_xml_to%"
+copy %oemirot_config_xml_form% %oemirot_config_xml_to% 
+
+::======================================================================================
 ::image xml configuration files
 ::======================================================================================
 set app_code_xml="%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\Images\%project%_Code_Image.xml"  

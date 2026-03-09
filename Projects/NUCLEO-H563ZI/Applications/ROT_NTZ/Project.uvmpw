@@ -5,7 +5,7 @@
 
   <Header>### uVision Project, (C) Keil Software</Header>
 
-  <WorkspaceName>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\Applications\ROT_NTZ\Project.uvmpw</WorkspaceName>
+  <WorkspaceName>C:\ST\Cube\Cube1\h5_hash_test\Projects\NUCLEO-H563ZI\Applications\ROT_NTZ\Project.uvmpw</WorkspaceName>
 
   <project>
     <PathAndName>.\OEMiROT_Boot\MDK-ARM\Project.uvprojx</PathAndName>

@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>STM32H563xx,USE_HAL_DRIVER,NDEBUG,MCUBOOT_TARGET_CONFIG=&lt;flash_layout.h&gt;,MBEDTLS_CONFIG_FILE=&lt;mbedtls_config.h&gt;,MCUBOOT_DOUBLE_SIGN_VERIF,FLOW_CONTROL,BL2,DEFAULT_UART_BAUDRATE=115200,OEMIROT_DEV_MODE,BOOT_MAX_ALIGN=16</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../../../../../../Drivers/CMSIS/Include;../../../../../../Drivers/CMSIS/Device/ST/STM32H5xx/Include;../../../../../../Drivers/STM32H5xx_HAL_Driver/Inc;../../../../../../Middlewares/Third_Party/mbed-crypto/include;../../../../../../Middlewares/Third_Party/mbed-crypto/include/psa;../../../../../../Middlewares/Third_Party/mcuboot;../../../../../../Middlewares/Third_Party/mcuboot/platform/include;../../../../../../Middlewares/Third_Party/mcuboot/platform/ext/common;../../../../../../Middlewares/Third_Party/mcuboot/platform/ext/driver;../../../../../../Middlewares/Third_Party/mcuboot/bl2/include;../../../../../../Middlewares/Third_Party/mcuboot/bl2/ext/mcuboot;../../../../../../Middlewares/Third_Party/mcuboot/bl2/ext/mcuboot/include;../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/include;../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/src;../../../../../../Middlewares/Third_Party/mcuboot/ext/tinycrypt/lib/include</IncludePath>
+              <IncludePath>../Inc;../../../../../../Drivers/CMSIS/Include;../../../../../../Drivers/CMSIS/Device/ST/STM32H5xx/Include;../../../../../../Drivers/STM32H5xx_HAL_Driver/Inc;../../../../../../Middlewares/Third_Party/mbed-crypto/include;../../../../../../Middlewares/Third_Party/mcuboot;../../../../../../Middlewares/Third_Party/mcuboot/platform/include;../../../../../../Middlewares/Third_Party/mcuboot/platform/ext/common;../../../../../../Middlewares/Third_Party/mcuboot/platform/ext/driver;../../../../../../Middlewares/Third_Party/mcuboot/bl2/include;../../../../../../Middlewares/Third_Party/mcuboot/bl2/ext/mcuboot;../../../../../../Middlewares/Third_Party/mcuboot/bl2/ext/mcuboot/include;../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/include;../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/src;../../../../../../Middlewares/Third_Party/mcuboot/ext/tinycrypt/lib/include;..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\include\psa</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -541,11 +541,6 @@
               <FilePath>../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/src/image_ec.c</FilePath>
             </File>
             <File>
-              <FileName>image_ec256.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/src/image_ec256.c</FilePath>
-            </File>
-            <File>
               <FileName>image_validate.c</FileName>
               <FileType>1</FileType>
               <FilePath>../../../../../../Middlewares/Third_Party/mcuboot/boot/bootutil/src/image_validate.c</FilePath>
@@ -614,6 +609,11 @@
               <FileName>uart_stdout.c</FileName>
               <FileType>1</FileType>
               <FilePath>../../../../../../Middlewares/Third_Party/mcuboot/platform/ext/common/uart_stdout.c</FilePath>
+            </File>
+            <File>
+              <FileName>image_ecdsa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ecdsa.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -720,6 +720,56 @@
               <FileType>1</FileType>
               <FilePath>../../../../../../Middlewares/Third_Party/mbed-crypto/library/constant_time.c</FilePath>
             </File>
+            <File>
+              <FileName>psa_crypto.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_client.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_client.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_ecp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_ecp.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_hash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_hash.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_slot_management.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_slot_management.c</FilePath>
+            </File>
+            <File>
+              <FileName>sha512.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\sha512.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_util.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_util.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_mac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_mac.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_cipher.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_cipher.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_driver_wrappers_no_static.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_driver_wrappers_no_static.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -799,6 +849,26 @@
               <FileName>low_level_security.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\low_level_security.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecdsa_alt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\ecdsa_alt.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecp_alt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\ecp_alt.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecp_curves_alt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\ecp_curves_alt.c</FilePath>
+            </File>
+            <File>
+              <FileName>sha512_alt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\sha512_alt.c</FilePath>
             </File>
           </Files>
         </Group>
