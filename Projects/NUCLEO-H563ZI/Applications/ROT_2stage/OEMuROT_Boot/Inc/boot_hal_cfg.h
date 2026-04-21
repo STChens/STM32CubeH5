@@ -56,7 +56,7 @@
 #define NO_TAMPER            (0)                /*!< No tamper activated */
 #define INTERNAL_TAMPER_ONLY (1)                /*!< Only Internal tamper activated */
 #define ALL_TAMPER           (2)                /*!< Internal and External tamper activated */
-#define OEMIROT_TAMPER_ENABLE INTERNAL_TAMPER_ONLY            /*!< TAMPER configuration flag  */
+#define OEMIROT_TAMPER_ENABLE NO_TAMPER //INTERNAL_TAMPER_ONLY            /*!< TAMPER configuration flag  */
 
 #define OEMIROT_OB_BOOT_LOCK OB_BOOT_LOCK_ENABLE /*!< BOOT Lock expected value  */
 
@@ -66,7 +66,7 @@
 
 /* Run time protections */
 #define OEMIROT_FLASH_PRIVONLY_ENABLE  /*!< Flash Command in Privileged only  */
-#define OEMIROT_MPU_PROTECTION    /*!< OEMiROT_Boot uses MPU to prevent execution outside of OEMiROT_Boot code  */
+//#define OEMIROT_MPU_PROTECTION    /*!< OEMiROT_Boot uses MPU to prevent execution outside of OEMiROT_Boot code  */
 
 /* Fast wake-up from low power */
 #define OEMIROT_FAST_WAKE_UP         /*!< Enable fast wake-up from low power: bypass images control */

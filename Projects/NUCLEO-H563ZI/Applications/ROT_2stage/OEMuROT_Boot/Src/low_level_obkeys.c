@@ -151,7 +151,7 @@ static int32_t OBK_Flash_ReadEncrypted(uint32_t Offset, void *pData, uint32_t Le
   memcpy(p_destination, p_source, Length);
   if (DoubleECC_Error_Counter != 0U)
   {
-    BOOT_LOG_ERR("Double ECC error detected: FLASH_ECCDETR=0x%x", (int)FLASH->ECCDETR);
+    BOOT_LOG_ERR(BRIGHT_RED"Double ECC error detected: FLASH_ECCDETR=0x%x"RESET_COLOR, (int)FLASH->ECCDETR);
     memset(p_destination, 0x00, Length);
   }
 
@@ -237,7 +237,7 @@ static int32_t OBK_Read(uint32_t Offset, void *pData, uint32_t Length)
   memcpy(p_destination, p_source, Length);
   if (DoubleECC_Error_Counter != 0U)
   {
-    BOOT_LOG_ERR("Double ECC error detected: FLASH_ECCDETR=0x%x", (int)FLASH->ECCDETR);
+    BOOT_LOG_ERR(BRIGHT_RED"Double ECC error detected: FLASH_ECCDETR=0x%x"RESET_COLOR, (int)FLASH->ECCDETR);
     memset(p_destination, 0x00, Length);
   }
 
@@ -377,7 +377,7 @@ void OBK_ReadHdpl2Config(OBK_Hdpl2Config *pOBK_Hdpl2Cfg)
   }
   if (MemoryCompare(&pOBK_Hdpl2Cfg->SHA256[0], &sha256[0], SHA256_LENGTH) != 0U)
   {
-    BOOT_LOG_ERR("read: Wrong OBK HDPL2 cfg");
+    BOOT_LOG_ERR(BRIGHT_RED"read: Wrong OBK HDPL2 cfg"RESET_COLOR);
     Error_Handler();
   }
 }
@@ -404,7 +404,7 @@ HAL_StatusTypeDef OBK_ReadHdpl2Data(OBK_Hdpl2Data *pOBK_Hdpl2Data)
   }
   if (MemoryCompare(pOBK_Hdpl2Data->SHA256, sha256, SHA256_LENGTH) != 0U)
   {
-    BOOT_LOG_ERR("Wrong OBK HDPL2 data");
+    BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL2 data"RESET_COLOR);
     return HAL_ERROR;
   }
   return HAL_OK;
@@ -454,7 +454,7 @@ void OBK_VerifyHdpl2Config(OBK_Hdpl2Config *pOBK_Hdpl2Cfg)
   }
   if (MemoryCompare(&pOBK_Hdpl2Cfg->SHA256[0], &sha256[0], SHA256_LENGTH) != 0U)
   {
-    BOOT_LOG_ERR("verify: Wrong OBK HDPL2 cfg");
+    BOOT_LOG_ERR(BRIGHT_RED"verify: Wrong OBK HDPL2 cfg"RESET_COLOR);
     Error_Handler();
   }
 }
@@ -482,7 +482,7 @@ HAL_StatusTypeDef OBK_ReadHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
   }
   if (MemoryCompare(pOBK_Hdpl1Data->SHA256, sha256, SHA256_LENGTH) != 0U)
   {
-    BOOT_LOG_ERR("Wrong OBK HDPL1 data");
+    BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL1 data"RESET_COLOR);
     return HAL_ERROR;
   }
   return HAL_OK;
@@ -501,7 +501,7 @@ HAL_StatusTypeDef OBK_UpdateHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
   /* Verif SHA256 on the whole Hdpl 1 data except first 32 bytes of SHA256 */
   if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl1Data) - SHA256_LENGTH, sha256) != HAL_OK)
   {
-    BOOT_LOG_ERR("Wrong OBK HDPL1 data");
+    BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL1 data"RESET_COLOR);
     return HAL_ERROR;
   }
   (void) memcpy(&pOBK_Hdpl1Data->SHA256[0], &sha256[0], SHA256_LENGTH);
@@ -541,7 +541,7 @@ void OBK_ReadHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
   }
   if (MemoryCompare(&pOBK_Hdpl1Cfg->SHA256[0], &sha256[0], SHA256_LENGTH) != 0U)
   {
-    BOOT_LOG_ERR("read: Wrong OBK HDPL1 cfg");
+    BOOT_LOG_ERR(BRIGHT_RED"read: Wrong OBK HDPL1 cfg"RESET_COLOR);
     Error_Handler();
   }
 }
@@ -563,7 +563,7 @@ void OBK_VerifyHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
   }
   if (MemoryCompare(&pOBK_Hdpl1Cfg->SHA256[0], &sha256[0], SHA256_LENGTH) != 0U)
   {
-    BOOT_LOG_ERR("verify: Wrong OBK HDPL1 cfg");
+    BOOT_LOG_ERR(BRIGHT_RED"verify: Wrong OBK HDPL1 cfg"RESET_COLOR);
     Error_Handler();
   }
 }

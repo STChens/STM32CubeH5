@@ -30,8 +30,8 @@ extern "C" {
   
 /* Private includes ----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define APP_CODE_OFFSET      0x2A000 /* This define is updated automatically from ROT_BOOT project */
-#define APP_CODE_SIZE        0xC6000 /* This define is updated automatically from ROT_BOOT project */
+#define APP_CODE_OFFSET      0x3C000 /* This define is updated automatically from ROT_BOOT project */
+#define APP_CODE_SIZE        0xDE000 /* This define is updated automatically from ROT_BOOT project */
 #define IMAGE_HEADER_SIZE  (0x400)  /* mcuboot headre size */
 #define APP_CODE_START       (FLASH_BASE + APP_CODE_OFFSET + IMAGE_HEADER_SIZE)
 

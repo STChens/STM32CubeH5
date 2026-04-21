@@ -224,7 +224,7 @@ fih_int boot_platform_wakeup(void)
 void boot_platform_quit(struct boot_arm_vector_table *vector)
 {
     static struct boot_arm_vector_table *vt;
-    uint32_t rsslib_sec_jump_HDP_lvl3;
+    uint32_t rsslib_sec_jump_HDP_lvl2;
 #if defined(MCUBOOT_DOUBLE_SIGN_VERIF)
     uint32_t image_index;
 
@@ -251,7 +251,7 @@ void boot_platform_quit(struct boot_arm_vector_table *vector)
 #endif /* MCUBOOT_DOUBLE_SIGN_VERIF */
 
     /* Init RSS jump function descriptor */
-    rsslib_sec_jump_HDP_lvl3 = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3);
+    rsslib_sec_jump_HDP_lvl2 = (uint32_t)(Rss_lib_p->S.JumpHDPLvl2);
 
 #if defined(MCUBOOT_USE_HASH_REF)
     /* Store new hash references in flash for next boot */
@@ -297,7 +297,7 @@ void boot_platform_quit(struct boot_arm_vector_table *vector)
     /*  change stack limit  */
     __set_MSPLIM(0);
 
-    boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl3, (uint32_t) vt, 1U);
+    boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl2, (uint32_t) vt, 1U);
     /* Avoid compiler to pop registers after having changed MSP */
 #if !defined(__ICCARM__)
     __builtin_unreachable();

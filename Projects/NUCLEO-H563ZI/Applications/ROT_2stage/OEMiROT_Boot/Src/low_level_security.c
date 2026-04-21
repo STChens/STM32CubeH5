@@ -742,15 +742,24 @@ void LL_SECU_CheckStaticProtections(void)
   {
     end = PAGE_MAX_NUMBER_IN_BANK;
   }
+  
   if ((start != flash_option_bytes_bank1.WMSecStartSector)
+#if defined OEMiROT_OEMUROT_ENABLE
+      || (end > flash_option_bytes_bank1.WMSecEndSector))
+#else
       || (end != flash_option_bytes_bank1.WMSecEndSector))
+#endif    
   {
     BOOT_LOG_INF("BANK 1 secure flash [%d, %d] : OB [%d, %d]",
                  (int)start, (int)end, (int)flash_option_bytes_bank1.WMSecStartSector, (int)flash_option_bytes_bank1.WMSecEndSector);
     BOOT_LOG_ERR("Unexpected value for secure flash protection");
     Error_Handler();
   }
-
+  /*
+   * We don't check the SECWM for banck 2. 
+   * Leave this check to OEMuROT 
+   */
+#if !defined OEMiROT_OEMUROT_ENABLE
   /* Check bank2 secure flash protection */
   start = 0;
   end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
@@ -774,6 +783,7 @@ void LL_SECU_CheckStaticProtections(void)
     BOOT_LOG_ERR("Unexpected value for secure flash protection");
     Error_Handler();
   }
+#endif  
 
 #ifdef  OEMIROT_WRP_PROTECT_ENABLE
   uint32_t val;

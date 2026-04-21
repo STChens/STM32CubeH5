@@ -2,7 +2,7 @@
 <project>
     <fileVersion>3</fileVersion>
     <configuration>
-        <name>NUCLEO-H563ZI_OEMiROT_Appli</name>
+        <name>NUCLEO-H563ZI_OEMuROT_Appli</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>

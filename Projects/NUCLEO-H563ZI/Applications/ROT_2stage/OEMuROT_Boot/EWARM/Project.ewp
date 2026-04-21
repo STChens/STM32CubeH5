@@ -2,7 +2,7 @@
 <project>
     <fileVersion>3</fileVersion>
     <configuration>
-        <name>NUCLEO-H563ZI_OEMiROT_Boot</name>
+        <name>NUCLEO-H563ZI_OEMuROT_Boot</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
@@ -16,7 +16,7 @@
                 <debug>1</debug>
                 <option>
                     <name>BrowseInfoPath</name>
-                    <state>NUCLEO-H563ZI_OEMiROT_Boot\BrowseInfo</state>
+                    <state>NUCLEO-H563ZI_OEMuROT_Boot\BrowseInfo</state>
                 </option>
                 <option>
                     <name>TrustZone</name>
@@ -201,7 +201,7 @@
                 </option>
                 <option>
                     <name>BuildFilesPath</name>
-                    <state>NUCLEO-H563ZI_OEMiROT_Boot</state>
+                    <state>NUCLEO-H563ZI_OEMuROT_Boot</state>
                 </option>
             </data>
         </settings>
@@ -663,7 +663,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>$PROJ_DIR$/../Binary/OEMiROT_Boot.bin</state>
+                    <state>$PROJ_DIR$/../Binary/OEMuROT_Boot.bin</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -690,7 +690,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild>$PROJ_DIR$\prebuild.cmd "$PROJ_DIR$"</prebuild>
-                <postbuild>cmd /C "cmd /C $PROJ_DIR$\postbuild.bat"</postbuild>
+                <postbuild>cmd /C "cmd /C $PROJ_DIR$\sign.bat" &amp;&amp; cmd /C "cmd /C $PROJ_DIR$\postbuild.bat"</postbuild>
             </data>
         </settings>
         <settings>
@@ -1239,9 +1239,6 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\constant_time.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\hmac_drbg.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\ecdh.c</name>
             </file>
             <file>
@@ -1258,6 +1255,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\hkdf.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\hmac_drbg.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\md.c</name>

@@ -26,7 +26,7 @@
 
 /* Flash layout configuration : begin ****************************************/
 
-/*#define OEMUROT_ENABLE*/         /* Defined: the project is used for STiROT_OEMuROT boot path */
+#define OEMUROT_ENABLE         /* Defined: the project is used for OEMiROT_OEMuROT boot path */
                                    /* Undefined: the project is used for OEMiROT boot path */
 #define MCUBOOT_OVERWRITE_ONLY     /* Defined: the FW installation uses overwrite method.
                                       UnDefined: The FW installation uses swap mode. */
@@ -35,7 +35,7 @@
                                                To enter it, press user button at reset.
                                       Undefined: Do not use system bootloader. */
 
-#define MCUBOOT_APP_IMAGE_NUMBER 2 /* 1: S and NS application binaries are assembled in one single image.
+#define MCUBOOT_APP_IMAGE_NUMBER 1 /* 1: S and NS application binaries are assembled in one single image.
                                       2: Two separated images for S and NS application binaries. */
 
 #define MCUBOOT_S_DATA_IMAGE_NUMBER 0   /* 1: S data image for S application.
@@ -105,13 +105,13 @@
  */
 
 /* area for BL2 code protected by hdp */
-#define FLASH_AREA_BL2_OFFSET           (0x0000)
-#define FLASH_AREA_BL2_SIZE             (0x18000)
+#define FLASH_AREA_BL2_OFFSET           (0x18000) // This must be aligned with OEMiROT size
+#define FLASH_AREA_BL2_SIZE             (0x12000)
 
 /* scratch area */
 #if defined(FLASH_AREA_SCRATCH_ID)
 #define FLASH_AREA_SCRATCH_DEVICE_ID    (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
-#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_SIZE)
+#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE + FLASH_AREA_BL2_SIZE)
 #if defined(MCUBOOT_OVERWRITE_ONLY)
 #define FLASH_AREA_SCRATCH_SIZE         (0x0000) /* Not used in MCUBOOT_OVERWRITE_ONLY mode */
 #else
@@ -131,9 +131,11 @@
 #endif /* not OEMUROT_ENABLE */
 
 /* control area for BL2 code */
+#if !defined(OEMUROT_ENABLE)
 #if ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
 #error "HDP area must be aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
 #endif /* ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
+#endif
 
 /* control area under WRP group protection */
 #if !defined(OEMUROT_ENABLE)
@@ -146,12 +148,34 @@
 #endif /* not OEMUROT_ENABLE */
 
 /* BL2 partitions size */
-#define FLASH_S_PARTITION_SIZE          (0x06000) /* 24 KB for S partition */
-#if defined(DEVICE_1M_FLASH_ENABLE)
-#define FLASH_NS_PARTITION_SIZE         (0x40000) /* 256 KB for NS partition */
+/* ==============================================
+ *       NS App partitio size (0 for S only App)
+ * ==============================================
+ */
+#define FLASH_NS_PARTITION_SIZE         (0) /* 0 for FULL SECURE */
+
+// Check NS code and data partition config
+#if ( FLASH_NS_PARTITION_SIZE == 0) && (MCUBOOT_APP_IMAGE_NUMBER == 2)
+#error "(MCUBOOT_APP_IMAGE_NUMBER must be 1 if App NS partition size is 0!" 
+#endif
+#if ( FLASH_NS_PARTITION_SIZE == 0) && (MCUBOOT_NS_DATA_IMAGE_NUMBER != 0)
+#error "(MCUBOOT_NS_DATA_IMAGE_NUMBER must be 0 if App NS partition size is 0!" 
+#endif
+
+/* ==============================================
+ *       S App partitio size  
+ * ==============================================
+ */
+#if !defined(MCUBOOT_OVERWRITE_ONLY)
+#define FLASH_S_PARTITION_SIZE          (0xD4000) /* 848 KB for S partition */
 #else
-#define FLASH_NS_PARTITION_SIZE         (0xA0000) /* 640 KB for NS partition */
-#endif /* DEVICE_1M_FLASH_ENABLE */
+#define FLASH_S_PARTITION_SIZE          (0xDE000) /* 880 KB for S partition */
+#endif /* MCUBOOT_OVERWRITE_ONLY */
+
+/* ==============================================
+ *       Totcal App partitio size  
+ * ==============================================
+ */
 #define FLASH_PARTITION_SIZE            (FLASH_S_PARTITION_SIZE+FLASH_NS_PARTITION_SIZE)
 
 #if (MCUBOOT_APP_IMAGE_NUMBER == 2)
@@ -162,11 +186,21 @@
 #else
 #define FLASH_MAX_APP_PARTITION_SIZE    FLASH_PARTITION_SIZE
 #endif /* (MCUBOOT_APP_IMAGE_NUMBER == 2) */
+
+/* ==============================================
+ *       S data partitio size  
+ * ==============================================
+ */
 #if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
 #define FLASH_S_DATA_PARTITION_SIZE     (FLASH_AREA_IMAGE_SECTOR_SIZE)
 #else
 #define FLASH_S_DATA_PARTITION_SIZE     (0x0)
 #endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+
+/* ==============================================
+ *       NS data partitio size  
+ * ==============================================
+ */
 #if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
 #define FLASH_NS_DATA_PARTITION_SIZE    (FLASH_AREA_IMAGE_SECTOR_SIZE)
 #else
@@ -178,15 +212,66 @@
                                          FLASH_S_DATA_PARTITION_SIZE : \
                                          FLASH_NS_DATA_PARTITION_SIZE)
 #define FLASH_MAX_PARTITION_SIZE        ((FLASH_MAX_APP_PARTITION_SIZE >   \
-                                         FLASH_MAX_DATA_PARTITION_SIZE) ? \
-                                         FLASH_MAX_APP_PARTITION_SIZE : \
-                                         FLASH_MAX_DATA_PARTITION_SIZE)
+                                         FLASH_MAX_DATA_PARTITION_SIZE) ?  \
+                                         ((FLASH_MAX_APP_PARTITION_SIZE >  \
+                                           FLASH_AREA_SCRATCH_SIZE) ?      \
+                                           FLASH_MAX_APP_PARTITION_SIZE :  \
+                                           FLASH_AREA_SCRATCH_SIZE) :      \
+                                         ((FLASH_MAX_DATA_PARTITION_SIZE > \
+                                           FLASH_AREA_SCRATCH_SIZE) ?      \
+                                           FLASH_MAX_DATA_PARTITION_SIZE : \
+                                           FLASH_AREA_SCRATCH_SIZE))
 
 /* BL2 flash areas */
-#define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_SCRATCH_SIZE+FLASH_AREA_BL2_SIZE)
+/* =========================================================
+ *  The fullowing is the flash areas managed by OEMuROT 
+ *  The FLASH AREA starts from the end of scratch slot,
+ *  which is after OEMiROT, OEMuROT active and download slot
+ *   +-------------------------+
+ *   |    OEMiROT              |
+ *   +-------------------------+
+ *   |    OEMuROT (primary)    |
+ *   +-------------------------+
+ *   |    OEMiROT (secondary)  |
+ *   +-------------------------+
+ *   |    Scratch slot         |
+ *   +-------------------------+ <---- FLASH_AREA_BEGIN_OFFSET
+ *   |                         |
+ *   |    FLASH AREAS          |
+ *   |         ...             |
+ *   +-------------------------+   
+ * =========================================================
+ */
+#define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_BL2_OFFSET + \
+                                          FLASH_AREA_BL2_SIZE + \
+                                          FLASH_AREA_BL2_SIZE + \
+                                          FLASH_AREA_SCRATCH_SIZE)
 #define FLASH_AREAS_DEVICE_ID           (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
 
+/* =========================================================
+ *  Flash layout for Secure Only App
+ *  Only S code areas
+ *  S data area might be added if needed
+ *  No NS code areas or NS data areas
+ *   +-----------+------------+-----------------------+--------------------+
+ *   | Area ID   | Size       |   Slot                |    Comment         |
+ *   +-----------+------------+-----------------------+--------------------+
+ *   |      4    |     0      |   S Data (primary)    |    not used        |
+ *   +-----------+------------+-----------------------+--------------------+
+ *   |      0    | 0xDE000    |   App (primary)       |    active slot     |
+ *   +-----------+------------+-----------------------+--------------------+
+ *   |      2    | 0xDE000    |   App (secondary)     |    download slot   |
+ *   +-----------+------------+-----------------------+--------------------+
+ *   |      6    |     0      |   S Data (secondary)  |    not used        |
+ *   +-----------+------------+-----------------------+--------------------+
+ * =========================================================
+ */
+
 /* Secure data image primary slot */
+/* ==============================================
+ *       S data Active Slot (PRIMARY) (AREA 4)
+ * ==============================================
+ */
 #if defined (FLASH_AREA_4_ID)
 #define FLASH_AREA_4_DEVICE_ID          (FLASH_AREAS_DEVICE_ID)
 #define FLASH_AREA_4_OFFSET             (FLASH_AREA_BEGIN_OFFSET)
@@ -201,6 +286,10 @@
 #endif /* FLASH_AREA_4_ID */
 
 /* Secure app image primary slot */
+/* ==============================================
+ *       S App Active Slot (PRIMARY) (AREA 0)
+ * ==============================================
+ */
 #if defined(FLASH_AREA_0_ID)
 #define FLASH_AREA_0_DEVICE_ID          (FLASH_AREAS_DEVICE_ID)
 #define FLASH_AREA_0_OFFSET             (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE)
@@ -219,6 +308,10 @@
 #endif /* FLASH_AREA_0_ID */
 
 /* Non-secure app image primary slot */
+/* ==============================================
+ *       NS App Active Slot (PRIMARY) (AREA 1)
+ * ==============================================
+ */
 #if defined(FLASH_AREA_1_ID)
 #define FLASH_AREA_1_DEVICE_ID          (FLASH_AREAS_DEVICE_ID)
 #define FLASH_AREA_1_OFFSET             (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
@@ -234,6 +327,10 @@
 #endif /* FLASH_AREA_1_ID */
 
 /* Non-secure data image primary slot */
+/* ==============================================
+ *       NS data Downlaod Slot (SECONDARY) (AREA 5)
+ * ==============================================
+ */
 #if defined(FLASH_AREA_5_ID)
 #define FLASH_AREA_5_DEVICE_ID          (FLASH_AREAS_DEVICE_ID)
 #define FLASH_AREA_5_OFFSET             (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
@@ -249,6 +346,10 @@
 #endif /* FLASH_AREA_5_ID */
 
 /* Secure app image secondary slot */
+/* ==============================================
+ *       S App Download Slot (SECONDARY) (AREA 2)
+ * ==============================================
+ */
 #if defined(FLASH_AREA_2_ID)
 #define FLASH_AREA_2_DEVICE_ID          (FLASH_AREAS_DEVICE_ID)
 #define FLASH_AREA_2_OFFSET             (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
@@ -269,6 +370,10 @@
 #endif /* FLASH_AREA_2_ID */
 
 /* Non-secure app image secondary slot */
+/* ==============================================
+ *       NS App Download Slot (PRIMARY) (AREA 3)
+ * ==============================================
+ */
 #if defined(FLASH_AREA_3_ID)
 #define FLASH_AREA_3_DEVICE_ID          (FLASH_AREAS_DEVICE_ID)
 #define FLASH_AREA_3_OFFSET             (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
@@ -285,6 +390,10 @@
 #endif /* FLASH_AREA_3_ID */
 
 /* Secure data image secondary slot */
+/* ==============================================
+ *       S data Download Slot (SECONDARY) (AREA 6)
+ * ==============================================
+ */
 #if defined(FLASH_AREA_6_ID)
 #define FLASH_AREA_6_DEVICE_ID          (FLASH_AREAS_DEVICE_ID)
 #define FLASH_AREA_6_OFFSET             (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
@@ -302,6 +411,10 @@
 #endif /* FLASH_AREA_6_ID */
 
 /* Non-Secure data image secondary slot */
+/* ==============================================
+ *       NS data Download Slot (SECONDARY) (AREA 7)
+ * ==============================================
+ */
 #if defined(FLASH_AREA_7_ID)
 #define FLASH_AREA_7_DEVICE_ID          (FLASH_AREAS_DEVICE_ID)
 #define FLASH_AREA_7_OFFSET             (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
@@ -319,6 +432,10 @@
 #endif /* FLASH_AREA_7_ID */
 
 /* flash areas end offset */
+/* ==============================================
+ *       FLASH AREA END
+ * ==============================================
+ */
 #define FLASH_AREA_END_OFFSET           (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
                                          FLASH_AREA_0_SIZE + FLASH_AREA_1_SIZE + \
                                          FLASH_AREA_5_SIZE + FLASH_AREA_2_SIZE + \

@@ -36,10 +36,11 @@
 
 
 
-
  
 
  
+
+                                    
 
 
 
@@ -76,7 +77,78 @@
  
 
  
+
  
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
  
 
@@ -84,28 +156,55 @@
 
 
 
-
- 
-
- 
- 
-
- 
  
 
  
 
- 
+
 
  
  
 
  
 
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+
+
  
  
 
  
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+
 
  
  
@@ -185,7 +284,7 @@
 
 define memory mem with size = 4G;
 
-define region BL2_CODE_region        = mem:[from ((((0x0C000000)) + ((0x0000)))) size ((0x18000))];
+define region BL2_CODE_region        = mem:[from ((((0x0C000000)) + ((0x18000) + (0x400)))) size ((0x12000))];
 define region BL2_RAM_region         = mem:[from ((0x30040000)) size ((0x10000))];
 
 initialize by copy  with packing = none {  readwrite };
@@ -195,7 +294,7 @@ define block ER_CODE  with fixed order, alignment = 8 {
        readonly section .BL2_Error_Code,
        };
 
-place at address ((((((0x0C000000)) + ((0x0000)))))) { readonly section .intvec };
+place at address ((((((0x0C000000)) + ((0x18000) + (0x400)))))) { readonly section .intvec };
 place in BL2_CODE_region {block ER_CODE};
 
 define block ER_DATA_NOINIT   with  alignment = 32 { section .noinit};

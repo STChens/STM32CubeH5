@@ -2,7 +2,7 @@
 <project>
     <fileVersion>3</fileVersion>
     <configuration>
-        <name>NUCLEO-H563ZI_OEMiROT_Appli</name>
+        <name>NUCLEO-H563ZI_OEMuROT_Appli</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
@@ -22,7 +22,7 @@
                     <enableFalsePositives>0</enableFalsePositives>
                     <messagesLimitEnabled>1</messagesLimitEnabled>
                     <messagesLimit>100</messagesLimit>
-                    <outputDir>NUCLEO-H563ZI_OEMiROT_Appli\C-STAT</outputDir>
+                    <outputDir>NUCLEO-H563ZI_OEMuROT_Appli\C-STAT</outputDir>
                 </cstatargs>
                 <cstat_settings>
                     <cstat_version>2.3.2</cstat_version>

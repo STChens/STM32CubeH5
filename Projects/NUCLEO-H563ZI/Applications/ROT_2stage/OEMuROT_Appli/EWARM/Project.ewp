@@ -2,7 +2,7 @@
 <project>
     <fileVersion>3</fileVersion>
     <configuration>
-        <name>NUCLEO-H563ZI_OEMiROT_Appli</name>
+        <name>NUCLEO-H563ZI_OEMuROT_Appli</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
@@ -16,7 +16,7 @@
                 <debug>1</debug>
                 <option>
                     <name>BrowseInfoPath</name>
-                    <state>NUCLEO-H563ZI_OEMiROT_Appli\BrowseInfo</state>
+                    <state>NUCLEO-H563ZI_OEMuROT_Appli\BrowseInfo</state>
                 </option>
                 <option>
                     <name>TrustZone</name>
@@ -201,7 +201,7 @@
                 </option>
                 <option>
                     <name>BuildFilesPath</name>
-                    <state>NUCLEO-H563ZI_OEMiROT_Appli</state>
+                    <state>NUCLEO-H563ZI_OEMuROT_Appli</state>
                 </option>
             </data>
         </settings>
