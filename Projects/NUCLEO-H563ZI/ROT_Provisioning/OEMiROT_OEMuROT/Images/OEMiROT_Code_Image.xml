@@ -87,7 +87,7 @@
 	</Param>	
 	<Param>
 		<Name>Version</Name>
-		<Value>1.0.1</Value>
+		<Value>1.0.0</Value>
 		<Type>Data</Type>
 		<Command>-v</Command>
 		<Tooltip>Version of the firmware binary. Format is x.y.z</Tooltip>
