@@ -40,7 +40,7 @@ set bin_path_xml_field="..\..\..\Applications\ROT_2stage\OEMuROT_Boot\Binary"
 set fw_in_bin_xml_field="Firmware binary input file"
 set fw_out_bin_xml_field="Image output file"
 set s_app_bin_xml_field="%bin_path_xml_field%\OEMuROT_Boot.bin"
-set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\OEMuROT_Boot_sign.hex"
+set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.hex"
 set s_app_init_sign_hex_xml_field="%bin_path_xml_field%\OEMuROT_Boot_init_sign.hex"
 
 ::Make sure we have a Binary sub-folder in UserApp folder

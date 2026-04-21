@@ -370,11 +370,12 @@ void OBK_ReadHdpl2Config(OBK_Hdpl2Config *pOBK_Hdpl2Cfg)
     Error_Handler();
   }
 
-  /* Verif SHA256 on the area being signed by mcuboot image  */
-  if (Compute_SHA256((uint8_t *) (Address), (uint32_t) &((OBK_Hdpl2Config*)0)->Non_Protected_TLV[0], sha256) != HAL_OK)
+  /* Verif SHA256 on the whole Hdpl 2 config except first 32 bytes of SHA256 */
+  if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl2Config) - SHA256_LENGTH, sha256) != HAL_OK)
   {
     Error_Handler();
-  }
+  } 
+  
   if (MemoryCompare(&pOBK_Hdpl2Cfg->SHA256[0], &sha256[0], SHA256_LENGTH) != 0U)
   {
     BOOT_LOG_ERR(BRIGHT_RED"read: Wrong OBK HDPL2 cfg"RESET_COLOR);
@@ -404,7 +405,7 @@ HAL_StatusTypeDef OBK_ReadHdpl2Data(OBK_Hdpl2Data *pOBK_Hdpl2Data)
   }
   if (MemoryCompare(pOBK_Hdpl2Data->SHA256, sha256, SHA256_LENGTH) != 0U)
   {
-    BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL2 data"RESET_COLOR);
+    BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL2 data [%s:%d]"RESET_COLOR, __FUNCTION__, __LINE__);
     return HAL_ERROR;
   }
   return HAL_OK;
@@ -424,15 +425,16 @@ HAL_StatusTypeDef OBK_UpdateHdpl2Data(OBK_Hdpl2Data *pOBK_Hdpl2Data)
   /* Verif SHA256 on the whole Hdpl 2 data except first 32 bytes of SHA256 */
   if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl2Data) - SHA256_LENGTH, sha256) != HAL_OK)
   {
+    BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL2 data [%s:%d]"RESET_COLOR, __FUNCTION__, __LINE__);
     return HAL_ERROR;
   }
   (void) memcpy(&pOBK_Hdpl2Data->SHA256[0], &sha256[0], SHA256_LENGTH);
 
-  /* Read configuration in OBKeys */
+  /* Write configuration in OBKeys */
   if (OBK_Write(OBK_HDPL2_DATA_OFFSET, (void *) pOBK_Hdpl2Data, sizeof(OBK_Hdpl2Data)) != ARM_DRIVER_OK)
   {
     return HAL_ERROR;
-  }
+  }  
 
   return HAL_OK;
 }
@@ -447,11 +449,12 @@ void OBK_VerifyHdpl2Config(OBK_Hdpl2Config *pOBK_Hdpl2Cfg)
   uint8_t sha256[SHA256_LENGTH] = { 0U };
   uint32_t Address = (uint32_t) pOBK_Hdpl2Cfg;
 
-  /* Verif SHA256 on the area being signed by mcuboot image  */
-  if (Compute_SHA256((uint8_t *) (Address), (uint32_t) &((OBK_Hdpl2Config*)0)->Non_Protected_TLV[0], sha256) != HAL_OK)
+  /* Verif SHA256 on the whole Hdpl 2 config except first 32 bytes of SHA256 */
+  if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl2Config) - SHA256_LENGTH, sha256) != HAL_OK)
   {
     Error_Handler();
   }
+  
   if (MemoryCompare(&pOBK_Hdpl2Cfg->SHA256[0], &sha256[0], SHA256_LENGTH) != 0U)
   {
     BOOT_LOG_ERR(BRIGHT_RED"verify: Wrong OBK HDPL2 cfg"RESET_COLOR);

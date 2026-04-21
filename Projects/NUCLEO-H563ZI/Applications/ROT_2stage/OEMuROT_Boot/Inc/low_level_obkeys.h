@@ -72,15 +72,16 @@ extern "C" {
 
 #if  defined(OEMUROT_ENABLE)
 /* Hdpl 2 updatable section : to be aligned on FLASH_PROG_UNIT (16 bytes) */
-typedef struct __attribute__((__packed__))
+typedef struct
 {
-  uint8_t  Header[32];
-  uint8_t  Hdpl3SecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
-  uint8_t  Hdpl3NonSecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
-  uint8_t  Hdpl3EncryptionPrivKey[ENC_PRIV_KEY_LENGTH];
-  uint8_t  Protected_TLV[12];
-  uint8_t  Non_Protected_TLV[8];
-  uint8_t  SHA256[SHA256_LENGTH];
+  uint8_t  SHA256[SHA256_LENGTH];           /* Mandatory to be first in the structure */
+  __attribute__((__aligned__(4))) uint8_t Hdpl3SecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
+  uint8_t  Reserved1[RESERVED1];            /* Alignment on 4 bytes */
+  __attribute__((__aligned__(4))) uint8_t Hdpl3NonSecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
+  uint8_t  Reserved2[RESERVED2];            /* Alignment on 4 bytes */
+  __attribute__((__aligned__(4))) uint8_t Hdpl3EncryptionPrivKey[ENC_PRIV_KEY_LENGTH];
+  uint8_t  Reserved3[RESERVED3];            /* Alignment on 4 bytes */
+  uint8_t  Reserved4[RESERVED4];            /* Alignment on 16 bytes */
 } OBK_Hdpl2Config;
 
 /* Hdpl 2 data section : to be aligned on FLASH_PROG_UNIT (16 bytes)

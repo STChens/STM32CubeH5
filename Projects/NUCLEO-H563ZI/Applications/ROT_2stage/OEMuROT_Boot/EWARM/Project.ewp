@@ -681,7 +681,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>0</hasPrio>
+                <hasPrio>112</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -690,7 +690,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild>$PROJ_DIR$\prebuild.cmd "$PROJ_DIR$"</prebuild>
-                <postbuild>cmd /C "cmd /C $PROJ_DIR$\sign.bat" &amp;&amp; cmd /C "cmd /C $PROJ_DIR$\postbuild.bat"</postbuild>
+                <postbuild>cmd /C "cmd /C $PROJ_DIR$\sign.bat OEMuROT" &amp;&amp; cmd /C "cmd /C $PROJ_DIR$\postbuild.bat"</postbuild>
             </data>
         </settings>
         <settings>

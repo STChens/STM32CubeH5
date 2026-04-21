@@ -309,7 +309,12 @@ const struct sau_cfg_t region_sau_init_cfg[] = {
     1,
     ((uint32_t)FLASH_BASE_NS + NS_IMAGE_PRIMARY_PARTITION_OFFSET),
     ((uint32_t)FLASH_BASE_NS + FLASH_AREA_END_OFFSET - 1),
+#if !defined OEMiROT_OEMUROT_ENABLE
     OEMIROT_FALSE,
+#else
+    OEMIROT_TRUE, // We keep this area as Secure if the next code is OEMuROT
+#endif  
+    
 #ifdef FLOW_CONTROL
     FLOW_STEP_SAU_I_EN_R1,
     FLOW_CTRL_SAU_I_EN_R1,
