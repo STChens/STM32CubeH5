@@ -1,8 +1,8 @@
-## <b>ROT_Provisioning STiROT_OEMuROT Description</b>
+## <b>ROT_Provisioning OEMiROT_OEMuROT Description</b>
 
-This section provides an overview of the available scripts for STiROT_OEMuROT boot path.
+This section provides an overview of the available scripts for OEMiROT_OEMuROT boot path.
 
-STiROT stands for "ST Immutable Root of Trust".<br>
+OEMiROT stands for "OEM Immutable Root of Trust".<br>
 OEMuROT stands for "OEM Updatable Root of Trust".<br>
 The 2 boot stages provides two services:
 
@@ -18,17 +18,17 @@ STiRoT, OEMuROT, boot path, Root Of Trust, Security, mcuboot
 
 <b>Sub-directories</b>
 
-- STiROT_OEMuROT/Binary                               Output binaries and generated images.
-- STiROT_OEMuROT/Config                               STiRoT and OEMuROT configuration files.
-- STiROT_OEMuROT/Image                                Image configuration files.
-- STiROT_OEMuROT/Keys                                 Keys for firmware image authentication and encryption.
+- OEMiROT_OEMuROT/Binary                               Output binaries and generated images.
+- OEMiROT_OEMuROT/Config                               STiRoT and OEMuROT configuration files.
+- OEMiROT_OEMuROT/Image                                Image configuration files.
+- OEMiROT_OEMuROT/Keys                                 Keys for firmware image authentication and encryption.
 
 <b>Scripts</b>
 
-- STiROT_OEMuROT/ob_flash_programming.bat/.sh         Programs option bytes and firmware image on the device.
-- STiROT_OEMuROT/obkey_provisioning.bat/.sh           Programs OBKeys on the device.
-- STiROT_OEMuROT/provisioning.bat/.sh                 Performs device provisioning process.
-- STiROT_OEMuROT/img_config.bat/.sh                   Configures the image number.
+- OEMiROT_OEMuROT/ob_flash_programming.bat/.sh         Programs option bytes and firmware image on the device.
+- OEMiROT_OEMuROT/obkey_provisioning.bat/.sh           Programs OBKeys on the device.
+- OEMiROT_OEMuROT/provisioning.bat/.sh                 Performs device provisioning process.
+- OEMiROT_OEMuROT/img_config.bat/.sh                   Configures the image number.
 
 ### <b>Hardware and Software environment</b>
 

@@ -87,6 +87,9 @@ echo        Select OEMiROT_Config.xml(Default path is \ROT_Provisioning\OEMiROT_
 echo        Warning: Default keys must NOT be used in a product. Make sure to regenerate your own keys!
 echo        Update the configuration (if/as needed) then generate OEMiROT_Config.obk file
 echo        Press any key to continue...
+
+%stm32tpccli% -obk Config\OEMiRoT_Config.xml >> %current_log_file%
+if !errorlevel! neq 0 goto :error_config
 if [%1] neq [AUTO] pause >nul
 
 :: =============================================== Steps to create the DA_Config.obk file ==============================================
@@ -106,13 +109,13 @@ if [%1] neq [AUTO] pause >nul
 echo;
 echo    * OEMuRoT_Config.obk generation:
 echo        From TrustedPackageCreator (OBkey tab in Security panel)
-echo        Select OEMuRoT_Config_Keys.xml(Default path is \ROT_Provisioning\OEMiROT_OEMuROT\Config\OEMuRoT_Config_Keys.xml)
+echo        Select OEMuRoT_Config.xml(Default path is \ROT_Provisioning\OEMiROT_OEMuROT\Config\OEMuRoT_Config.xml)
 echo        Warning: Default keys must NOT be used in a product. Make sure to regenerate your own keys!
 echo        Update the configuration (if/as needed) then generate OEMuRoT_Config.obk file
 echo        Press any key to continue...
 if [%1] neq [AUTO] pause >nul
 
-%stm32tpccli% -obk Config\OEMuRoT_Config_Keys.xml >> %current_log_file%
+%stm32tpccli% -obk Config\OEMuRoT_Config.xml >> %current_log_file%
 if !errorlevel! neq 0 goto :error_config
 
 :cubemx1
@@ -126,10 +129,7 @@ if "%isGeneratedByCubeMX%" == "true" (
     echo.
     if [%1] neq [AUTO] pause >nul
 )
-%stm32tpccli% -pb Config\OEMuRoT_Settings_1.xml >> %current_log_file%
-if !errorlevel! neq 0 goto :error_config
-%stm32tpccli% -obk Config\OEMuRoT_Settings_2.xml >> %current_log_file%
-if !errorlevel! neq 0 goto :error_config
+
 echo        Successful OEMuRoT_Config.obk file generation
 
 :: Configure OEMIROT_Boot project as OEMUROT
@@ -252,6 +252,8 @@ set current_log_file="./*.log files "
 echo;
 goto product_state_choice
 
+:: Start to record the programming cli commands
+echo "stm32programmercli commands for provisioning" > %cubeprog_log%
 
 :: ========================================= Product State configuration and Provisioning steps ==========================================
 :: Connect BOOT0 pin to VDD (SW1)
@@ -270,6 +272,7 @@ set "action=Setting the product state PROVISIONING"
 echo    * %action%
 set "command=%stm32programmercli% %connect_no_reset% -ob PRODUCT_STATE=0x17"
 echo %command% >> %provisioning_log%
+echo %command% >> %cubeprog_log%
 echo;
 %command% > %provisioning_log%
 if !errorlevel! neq 0 goto :step_error
@@ -282,6 +285,7 @@ set "action=Setting the final product state !product_state! "
 echo    * %action%
 set "command=%stm32programmercli% %connect_no_reset% -ob PRODUCT_STATE=%ps_value%"
 echo %command% >> %provisioning_log%
+echo %command% >> %cubeprog_log%
 %command% >> %provisioning_log%
 echo.
 :: In the final product state, the connection with the board is lost and the return value of the command cannot be verified

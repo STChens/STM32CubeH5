@@ -39,9 +39,9 @@ set remove_protect=-ob SECWM1_STRT=1 SECWM1_END=0 WRPSGn1=0xffffffff WRPSGn2=0xf
 set erase_all=-e all
 
 IF "%isGeneratedByCubeMX%" == "true" (
-set appli_dir=%oemirot_appli_path_project%
+set appli_dir=%oemirot_oemurot_boot_path_app_project%
 ) else (
-set appli_dir=../../%oemirot_appli_path_project%
+set appli_dir=..\..\%oemirot_oemurot_boot_path_app_project%
 )
 
 :: =============================================== Hardening ===============================================================================
@@ -55,7 +55,6 @@ set "action=Set TZEN = 1"
 echo %action%
 :: Trust zone enabled is mandatory to execute OEMiROT
 set "cmd=%stm32programmercli% %connect_no_reset% -ob TZEN=0xB4"
-REM echo %cmd% >> %cubeprog_log%
 echo %cmd% >> %cubeprog_log%
 %cmd%
 IF !errorlevel! NEQ 0 goto :error
@@ -135,21 +134,13 @@ echo app_image_number=%app_image_number%
 echo app_full_secure=%app_full_secure%
 IF  "%app_image_number%" == "1" (
     IF  "%app_full_secure%" == "1" (
-        echo "program app full secure"    
-        echo  %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%s_code_image% -v >> %cubeprog_log%
+        echo %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%s_code_image% -v >> %cubeprog_log%
         %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%s_code_image% -v
         IF !errorlevel! NEQ 0 goto :error
-        
-        echo "Appli Full Secure Written"
     ) else (
-        set "action=Write One image Appli"
-        echo %action%
-        set "cmd=%stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%one_code_image% -v"
-        echo %cmd% >> %cubeprog_log%
-        %cmd%
+        echo %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%one_code_image% -v >> %cubeprog_log%
+        %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%one_code_image% -v
         IF !errorlevel! NEQ 0 goto :error
-
-        echo "TZ Appli Written"
     )
 )
 

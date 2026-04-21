@@ -136,12 +136,12 @@
 		<Value>..\..\..\Applications\ROT_2stage\OEMuROT_Appli\Binary\rot_tz_s_app.bin</Value>
 		<Type>File</Type>
 		<Tooltip>Select the firmware binary file to be processed for the image generation</Tooltip>
-		<Default>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_s_app.bin</Default>
+		<Default>../../../Applications/ROT_2stage/OEMuROT_Appli_TrustZone/Binary/rot_tz_s_app.bin</Default>
 	</Param>
 	<Output>
 		<Name>Image output file</Name>
 		<Value>..\..\..\Applications\ROT_2stage\OEMuROT_Appli\Binary\rot_tz_s_app_enc_sign.hex</Value>
-		<Default>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_s_app_enc_sign.hex</Default>
+		<Default>../../../Applications/ROT_2state/OEMuROT_Appli_TrustZone/Binary/rot_tz_s_app_enc_sign.hex</Default>
 	</Output>
   </McubootFormat>
 </Root>

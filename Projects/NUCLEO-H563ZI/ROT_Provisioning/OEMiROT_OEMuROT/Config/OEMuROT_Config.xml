@@ -3,12 +3,24 @@
 <Obdata>
 	<Info>
 		<Title>OEMuRoT configuration</Title>
-		<GlobalAlign>1</GlobalAlign>
+		<ObDestAddress>0x0FFD0900</ObDestAddress>
+		<DoEncryption>0</DoEncryption>
+		<GlobalAlign>16</GlobalAlign>
+		<FlashStart>0x0C000000</FlashStart>
+		<FlashSize>0x200000</FlashSize>
+		<FlashSectorSize>0x2000</FlashSectorSize>
+		<OBKStart>0xFFD0900</OBKStart>
+		<OBKSize>0x2F0</OBKSize>
+		<OBKSectorSize>0x10</OBKSectorSize>
+		<AuthOBKStart>0xFFD0900</AuthOBKStart>
+		<AuthOBKSize>0x2F0</AuthOBKSize>
 	</Info>
+	<Hash>
+	</Hash>
 	<File>
 		<Name>Authentication secure key</Name>
 		<Value>./../Keys/OEMuRoT_Authentication_S.pem</Value>
-		<Align>1</Align>
+		<Align>4</Align>
 		<KeyType>ecdsa-p256</KeyType>
 		<Type>Public</Type>
 		<Default>./../Keys/OEMuRoT_Authentication_S.pem</Default>
@@ -17,7 +29,7 @@
 	<File>
 		<Name>Authentication non secure key</Name>
 		<Value>./../Keys/OEMuRoT_Authentication_NS.pem</Value>
-		<Align>1</Align>
+		<Align>4</Align>
 		<KeyType>ecdsa-p256</KeyType>
 		<Type>Public</Type>
 		<Default>./../Keys/OEMuRoT_Authentication_NS.pem</Default>
@@ -26,7 +38,7 @@
 	<File>
 		<Name>Encryption key</Name>
 		<Value>./../Keys/OEMuRoT_Encryption.pem</Value>
-		<Align>1</Align>
+		<Align>4</Align>
 		<KeyType>ecdsa-p256</KeyType>
 		<Type></Type>
 		<Default>./../Keys/OEMuRoT_Encryption.pem</Default>
@@ -34,9 +46,9 @@
 	</File>
 	<Output>
 		<Name>Output File</Name>
-		<Value>./../Binary/OEMuRoT_Config_intermediate.bin</Value>
-		<Default>OEMuRoT_Config_intermediate.bin</Default>
-		<Tooltip>Select the output file containing the image</Tooltip>
-	</Output>	
+		<Value>./../Binary/OEMuRoT_Config.obk</Value>
+		<Default>./../Binary/OEMuRoT_Config.obk</Default>
+		<Tooltip>Select the output file .obk including OEMuROT configuration</Tooltip>
+	</Output>
 </Obdata>
 </Root>
