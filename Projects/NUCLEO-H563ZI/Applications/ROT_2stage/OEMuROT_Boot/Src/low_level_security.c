@@ -1471,7 +1471,11 @@ static void mpu_init_cfg(void)
 #ifdef OEMIROT_MPU_PROTECTION
   struct mpu_armv8m_dev_t dev_mpu_s = { MPU_BASE };
   int32_t i;
-
+  
+#ifdef OEMiROT_OEMUROT_ENABLE
+  // We disable MPU first, and then start to configure MPU  
+  mpu_armv8m_disable(&dev_mpu_s);
+#endif
   /* configuration stage */
   if (uFlowStage == FLOW_STAGE_CFG)
   {
