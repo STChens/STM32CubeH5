@@ -392,6 +392,7 @@ HAL_StatusTypeDef OBK_ReadHdpl2Data(OBK_Hdpl2Data *pOBK_Hdpl2Data)
   uint8_t sha256[SHA256_LENGTH] = { 0U };
   uint32_t Address = (uint32_t) pOBK_Hdpl2Data;
 
+  BOOT_LOG_DBG("%s:%d\r\n", __FUNCTION__, __LINE__);
   /* Read configuration in OBKeys */
   if (OBK_Read(OBK_HDPL2_DATA_OFFSET, (void *) pOBK_Hdpl2Data, sizeof(OBK_Hdpl2Data)) != ARM_DRIVER_OK)
   {
@@ -401,11 +402,17 @@ HAL_StatusTypeDef OBK_ReadHdpl2Data(OBK_Hdpl2Data *pOBK_Hdpl2Data)
   /* Verif SHA256 on the whole Hdpl 2 data except first 32 bytes of SHA256 */
   if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl2Data) - SHA256_LENGTH, sha256) != HAL_OK)
   {
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_DEBUG
+    while(1){};
+#endif
     return HAL_ERROR;
   }
   if (MemoryCompare(pOBK_Hdpl2Data->SHA256, sha256, SHA256_LENGTH) != 0U)
   {
     BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL2 data [%s:%d]"RESET_COLOR, __FUNCTION__, __LINE__);
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_DEBUG
+    while(1){};
+#endif
     return HAL_ERROR;
   }
   return HAL_OK;
@@ -421,11 +428,14 @@ HAL_StatusTypeDef OBK_UpdateHdpl2Data(OBK_Hdpl2Data *pOBK_Hdpl2Data)
 {
   uint8_t sha256[SHA256_LENGTH] = { 0U };
   uint32_t Address = (uint32_t) pOBK_Hdpl2Data;
+  
+  BOOT_LOG_DBG("%s:%d\r\n", __FUNCTION__, __LINE__);
 
   /* Verif SHA256 on the whole Hdpl 2 data except first 32 bytes of SHA256 */
   if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl2Data) - SHA256_LENGTH, sha256) != HAL_OK)
   {
     BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL2 data [%s:%d]"RESET_COLOR, __FUNCTION__, __LINE__);
+    while(1){};
     return HAL_ERROR;
   }
   (void) memcpy(&pOBK_Hdpl2Data->SHA256[0], &sha256[0], SHA256_LENGTH);
@@ -504,7 +514,7 @@ HAL_StatusTypeDef OBK_UpdateHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
   /* Verif SHA256 on the whole Hdpl 1 data except first 32 bytes of SHA256 */
   if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl1Data) - SHA256_LENGTH, sha256) != HAL_OK)
   {
-    BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL1 data"RESET_COLOR);
+    BOOT_LOG_ERR(BRIGHT_RED"Wrong OBK HDPL1 data"RESET_COLOR);    
     return HAL_ERROR;
   }
   (void) memcpy(&pOBK_Hdpl1Data->SHA256[0], &sha256[0], SHA256_LENGTH);

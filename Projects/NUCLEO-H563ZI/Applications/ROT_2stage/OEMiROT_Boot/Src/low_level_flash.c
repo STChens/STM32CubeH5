@@ -497,6 +497,11 @@ static int32_t Flash_EraseSector(uint32_t addr)
 #else
   EraseInit.TypeErase = FLASH_TYPEERASE_SECTORS;
 #endif
+  
+  // In case of OEMiROT + OEMuROT, we always do flash erase with secure mode
+#if defined OEMiROT_OEMUROT_ENABLE
+  EraseInit.TypeErase = FLASH_TYPEERASE_SECTORS;  
+#endif
   /*  fix me assume dual bank, reading DBANK in OPTR in Flash init is better */
   /*  flash size in  DB256K in OPTR */
   EraseInit.Banks = bank_number(&ARM_FLASH0_DEV, addr);
