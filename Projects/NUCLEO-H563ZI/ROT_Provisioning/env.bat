@@ -25,6 +25,7 @@ set oemirot_boot_path_project=Applications/ROT/OEMiROT_Boot
 :: ==============================================================================
 set oemirot_oemurot_boot_path_stage1_project=Applications/ROT_2stage/OEMiROT_Boot
 set oemirot_oemurot_boot_path_stage2_project=Applications/ROT_2stage/OEMuROT_Boot
+set oemirot_oemurot_boot_path_loader_project=Applications/ROT_2stage/OEMiROT_Loader
 set oemirot_oemurot_boot_path_app_project=Applications/ROT_2stage/OEMuROT_Appli
 
 :: ==============================================================================

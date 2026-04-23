@@ -13,7 +13,7 @@ set sec2_end=0xC
 set wrpgrp1=0xfffffff8
 set wrpgrp2=0xFFFFFFFF
 set hdp1_start=0
-set hdp1_end=0xb
+set hdp1_end=0x8
 set hdp2_start=0x7F
 set hdp2_end=0x0
 set boot_lck=0xB4
@@ -30,6 +30,7 @@ set s_data_image=s_data_init_sign.hex
 set ns_data_image=ns_data_init_sign.hex
 set oemurot_image=OEMuROT_Boot_init_sign.hex
 set oemirot_image=OEMiROT_Boot.bin
+set loader_image=OEMiROT_Loader.hex
 
 set connect_no_reset=-c port=SWD speed=fast ap=1 mode=Hotplug
 set connect_reset=-c port=SWD speed=fast ap=1 mode=UR
@@ -113,7 +114,7 @@ IF !errorlevel! NEQ 0 goto :error
 
 echo "Application images programming in download slots"
 
-IF  "%app_image_number%" == "2" (
+IF  NOT "%app_image_number%" == "2" ( goto :app_image_num_not_2 )
     set "action=Write Appli Secure"
     echo %action%
     set "cmd=%stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%s_code_image% -v"
@@ -128,48 +129,51 @@ IF  "%app_image_number%" == "2" (
     %cmd%
     IF !errorlevel! NEQ 0 goto :error
     echo "TZ Appli NonSecure Written"
-)
+:app_image_num_not_2
 
 echo app_image_number=%app_image_number%
 echo app_full_secure=%app_full_secure%
-IF  "%app_image_number%" == "1" (
-    IF  "%app_full_secure%" == "1" (
-        echo %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%s_code_image% -v >> %cubeprog_log%
-        %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%s_code_image% -v
+IF NOT  "%app_image_number%" == "1" ( goto :app_image_num_not_1 )
+    IF NOT  "%app_full_secure%" == "1" ( goto :app_full_secure_not_1 )
+        set "cmd=%stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%s_code_image% -v"
+        echo %cmd% >> %cubeprog_log%
+        %cmd%
         IF !errorlevel! NEQ 0 goto :error
-    ) else (
-        echo %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%one_code_image% -v >> %cubeprog_log%
-        %stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%one_code_image% -v
+        goto :app_image_num_not_1
+    :app_full_secure_not_1
+        set "cmd=%stm32programmercli% %connect_no_reset% -d %appli_dir%\Binary\%one_code_image% -v"
+        echo %cmd% >> %cubeprog_log%
+        %cmd%
         IF !errorlevel! NEQ 0 goto :error
     )
-)
+:app_image_num_not_1
 
-IF  "%s_data_image_number%" == "1" (
+IF  NOT "%s_data_image_number%" == "1" ( goto :s_data_image_number_not_1 )
     set "action=Write Secure Data"
     echo %action%
     IF not exist %rot_provisioning_path%\OEMiROT_OEMuROT\Binary\s_data_enc_sign.hex (
-    @echo [31mError: s_data_enc_sign.hex does not exist! use TPC to generate it[0m
-    goto :error
-)
+        @echo [31mError: s_data_enc_sign.hex does not exist! use TPC to generate it[0m
+        goto :error
+    )
 set "cmd=%stm32programmercli% %connect_no_reset% -d %rot_provisioning_path%\OEMiROT_OEMuROT\Binary\%s_data_image% -v"
 echo %cmd% >> %cubeprog_log%
 %cmd%
 IF !errorlevel! NEQ 0 goto :error
-)
+:s_data_image_number_not_1
 
 
-IF  "%ns_data_image_number%" == "1" (
+IF  NOT "%ns_data_image_number%" == "1" ( goto :ns_data_image_number_not_1)
 set "action=Write non Secure Data"
 echo %action%
 IF not exist %rot_provisioning_path%\OEMiROT_OEMuROT\Binary\ns_data_enc_sign.hex (
-@echo [31mError: ns_data_enc_sign.hex does not exist! use TPC to generate it[0m
-goto :error
-)
+    @echo [31mError: ns_data_enc_sign.hex does not exist! use TPC to generate it[0m
+    goto :error
+    )
 set "cmd=%stm32programmercli% %connect_no_reset% -d %rot_provisioning_path%\OEMiROT_OEMuROT\Binary\%ns_data_image% -v"
 echo %cmd% >> %cubeprog_log%
 %cmd%
 IF !errorlevel! NEQ 0 goto :error
-)
+:ns_data_image_number_not_1
 
 set "action=Write OEMiROT_Boot"
 echo %action%
@@ -178,6 +182,16 @@ echo %cmd% >> %cubeprog_log%
 %cmd%
 IF !errorlevel! NEQ 0 goto :error
 echo "OEMuROT_Boot Written"
+
+IF NOT "%loader_image_number%" == "1" ( goto :loader_image_number_not_1 )
+    set "action=Write OEMiROT_Boot"
+    echo %action%
+    set "cmd=%stm32programmercli% %connect_no_reset% -d %cube_fw_path%\Projects\NUCLEO-H563ZI\%oemirot_oemurot_boot_path_loader_project%\Binary\%loader_image% -v "
+    echo %cmd% >> %cubeprog_log%   
+    %cmd% 
+    IF !errorlevel! NEQ 0 goto :error
+    echo "OEMuROT_Boot Written"
+:loader_image_number_not_1
 
 set "action=Write OEMuROT_Boot"
 echo %action%
