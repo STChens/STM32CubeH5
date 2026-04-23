@@ -116,11 +116,11 @@
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck1</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OCImagesPath1</name>
-                    <state>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\Applications\ROT_2stage\OEMiROT_Loader\EWARM\NUCLEO-H563ZI_S\Exe\Project.out</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck2</name>
@@ -156,7 +156,7 @@
                 </option>
                 <option>
                     <name>OCImagesUse1</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OCImagesUse2</name>
