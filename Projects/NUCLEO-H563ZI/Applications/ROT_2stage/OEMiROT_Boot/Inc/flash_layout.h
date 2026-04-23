@@ -26,6 +26,8 @@
 
 /* Flash layout configuration : begin ****************************************/
 #define OEMiROT_OEMUROT_ENABLE         /* Defined: the project is used for OEMiROT_OEMuROT boot path */
+#define STANDALONE_LOADER     /* Defined: standalone Loader will be used instead of system bootloader, 
+                                 for this flag to take effect, MCUBOOT_EXT_LOADER must be defined */
 
 #define MCUBOOT_OVERWRITE_ONLY     /* Defined: the FW installation uses overwrite method.
                                       UnDefined: The FW installation uses swap mode. */
@@ -65,7 +67,6 @@
  * sw binary. Each FLASH_AREA_IMAGE contains two partitions. See Flash layout
  * above.
  */
-#define LOADER_FLASH_DEV_NAME             Driver_FLASH0
 
 /* Flash layout info for BL2 bootloader */
 #define FLASH_AREA_IMAGE_SECTOR_SIZE    (0x2000)     /* 8 KB */
@@ -96,8 +97,21 @@
 #define FLASH_AREA_BL2_OFFSET           (0x0000)
 #define FLASH_AREA_BL2_SIZE             (0x18000)
 
+/*--------------------------------
+ * 1.1. Loader (Loader code area)
+ *--------------------------------
+ */
+#if defined (MCUBOOT_EXT_LOADER)
+#define FLASH_AREA_LOADER_SIZE             (0x6000)
+/* HDP area end at this address, exclude Loader code area */
+#define FLASH_BL2_HDP_END               (FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE-FLASH_AREA_LOADER_SIZE-1)
+#else
+#define FLASH_AREA_LOADER_SIZE             (0x0)
 /* HDP area end at this address */
 #define FLASH_BL2_HDP_END               (FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE-1)
+#endif
+
+#define FLASH_AREA_LOADER_OFFSET           (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - FLASH_AREA_LOADER_SIZE)
 
 /* control area under WRP group protection */
 #if (FLASH_AREA_BL2_OFFSET % FLASH_AREA_WRP_GROUP_SIZE) != 0

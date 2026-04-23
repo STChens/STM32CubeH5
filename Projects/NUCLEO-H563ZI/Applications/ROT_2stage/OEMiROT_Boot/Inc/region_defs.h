@@ -106,7 +106,11 @@
 #ifdef BL2
 /* Bootloader region protected by hdp */
 #define BL2_CODE_START                      (S_ROM_ALIAS(FLASH_AREA_BL2_OFFSET))
+#if defined (MCUBOOT_EXT_LOADER)
+#define BL2_CODE_SIZE                       (FLASH_AREA_BL2_SIZE-FLASH_AREA_LOADER_SIZE)
+#else
 #define BL2_CODE_SIZE                       (FLASH_AREA_BL2_SIZE)
+#endif
 #define BL2_CODE_LIMIT                      (BL2_CODE_START + BL2_CODE_SIZE - 1)
 
 /* Bootloader boot address */
@@ -125,6 +129,9 @@
 #define BL2_SRAM_AREA_END                   (_SRAM3_BASE_S + _SRAM3_SIZE_MAX - 1)
 #endif /* BL2 */
 
+/* Ext loader address */
+#define LOADER_CODE_START                   (S_ROM_ALIAS(FLASH_AREA_LOADER_OFFSET))
+#define LOADER_CODE_SIZE                    (FLASH_AREA_LOADER_SIZE)
 
 /* Additional Check to detect flash download slot overlap or overflow */
 #define FLASH_AREA_END_OFFSET_MAX (FLASH_TOTAL_SIZE)

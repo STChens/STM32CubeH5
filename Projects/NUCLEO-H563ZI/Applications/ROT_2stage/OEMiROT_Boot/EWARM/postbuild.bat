@@ -55,12 +55,15 @@ set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 :postbuild
 set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
 set "oemurot_dir=../../../../%oemirot_oemurot_boot_path_stage2_project%"
+set "loader_dir=../../../../%oemirot_oemurot_boot_path_loader_project%"
 set "ob_flash_programming_script=%projectdir%\..\..\..\..\ROT_Provisioning\OEMiROT_OEMuROT\ob_flash_programming.bat"
 
 
-set "provisioning=%projectdir%\..\..\..\..\ROT_Provisioning\OEMiROT_OEMuROT\img_config.bat"
+set "img_config=%projectdir%\..\..\..\..\ROT_Provisioning\OEMiROT_OEMuROT\img_config.bat"
 set oemurot_flash_layout="%oemurot_dir%\Inc\flash_layout.h"
 set oemurot_sign_script="%oemurot_dir%\EWARM\sign.bat"
+set loader_flash_layout="%loader_dir%\Inc\appli_flash_layout.h"
+set loader_icf_file="%loader_dir%\EWARM\stm32h563xx_flash.icf"
 set "map_properties=%projectdir%\..\..\OEMiROT_Boot\map.properties"
 
 ::======================================================================================
@@ -198,15 +201,51 @@ set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAG
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-:: updaet oemurot flash_layout file 
-:: OEMuROT FLASH_AREA_BL2_OFFSET shall be after OEMiROT (FLASH_AREA_BL2_SIZE)
-::set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_OFFSET -n FLASH_AREA_SCRATCH_OFFSET %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
-::%command%
-::IF !errorlevel! NEQ 0 goto :error
+:: update loader linker file  
+set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_FLASH_LOADER_START -n LOADER_CODE_START %loader_icf_file% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
 
-::set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_BL2_SIZE -n FLASH_AREA_BL2_OFFSET %oemurot_flash_layout% --vb  >> %current_log_file% 2>&1"
-::%command%
-::IF !errorlevel! NEQ 0 goto :error
+set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_FLASH_LOADER_SIZE -n LOADER_CODE_SIZE %loader_icf_file% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: update loader flash layout file  (OEMuROT primary and secondary slot areas)
+:: RE_AREA_0_OFFSET ==> OEMuROT_IMAGE_PRIMARY_PARTITION_OFFSET
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n OEMuROT_IMAGE_PRIMARY_PARTITION_OFFSET %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+:: RE_AREA_2_OFFSET ==> OEMuROT_IMAGE_SECONDARY_PARTITION_OFFSET
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_2_OFFSET -n OEMuROT_IMAGE_SECONDARY_PARTITION_OFFSET %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+:: RE_AREA_0_SIZE ==> OEMuROT_IMAGE_PARTITION_SIZE
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_SIZE -n OEMuROT_IMAGE_PARTITION_SIZE %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: update oemurot flash_layout file 
+:: OEMuROT FLASH_AREA_BL2_OFFSET shall be after OEMiROT (FLASH_AREA_BL2_SIZE)
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_OFFSET -n FLASH_AREA_SCRATCH_OFFSET %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n FLASH_AREA_SCRATCH_SIZE %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_BL2_SIZE -n FLASH_AREA_BL2_OFFSET %oemurot_flash_layout% --vb  >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_LOADER_SIZE -n FLASH_AREA_LOADER_SIZE %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: update img_config script for loader image number
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b loader_image_number -m RE_LOADER_IMG_NUMBER --decimal %img_config% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
 
 ECHO comd : %command%
 

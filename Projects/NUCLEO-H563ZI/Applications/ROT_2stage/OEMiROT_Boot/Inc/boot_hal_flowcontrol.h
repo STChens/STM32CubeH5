@@ -286,7 +286,7 @@ extern "C" {
 #define FLOW_STEP_NVIC_L_CH         0x00000000U        /*!< No effect on control flow */
 #endif /* MCUBOOT_EXT_LOADER && GENERATOR_TZ_AVAILABLE */
 
-#if defined(MCUBOOT_EXT_LOADER)
+#if defined(MCUBOOT_EXT_LOADER) && !defined (STANDALONE_LOADER)
 #define FLOW_STEP_HDPEXT_L_EN_B1    0x000d8b31U        /*!< Step HDPB1 Extend Loader enable value */
 #define FLOW_STEP_HDPEXT_L_CH_B1    0x000e5689U        /*!< Step HDPB1 Extend Loader check value */
 #define FLOW_STEP_HDPEXT_L_EN_B2    0x000e85a4U        /*!< Step HDPB2 Extend Loader enable value */

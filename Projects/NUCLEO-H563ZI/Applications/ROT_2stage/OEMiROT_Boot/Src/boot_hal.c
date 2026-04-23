@@ -105,6 +105,7 @@ void getDescriptorAdd(void);
   * @}
   */
 #if defined(MCUBOOT_EXT_LOADER)
+#if defined (STANDALONE_LOADER)
 /**
   * @brief This function manage the jump to boot loader application.
   * @note
@@ -112,13 +113,13 @@ void getDescriptorAdd(void);
   */
 void boot_platform_noimage(void)
 {
-  uint32_t rsslib_sec_jump_HDP_lvl3ns;
+  uint32_t rsslib_sec_jump_HDP_lvl3;
 
   BOOT_LOG_INF("Jumping to bootloader");
-  BOOT_LOG_INF("Disconnect COM port if used by bootloader");
+  //BOOT_LOG_INF("Disconnect COM port if used by bootloader");
 
   /* Init RSS jump function descriptor */
-  rsslib_sec_jump_HDP_lvl3ns = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3NS);
+  rsslib_sec_jump_HDP_lvl3 = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3);
 
   /* Check Flow control */
   FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_2);
@@ -141,6 +142,41 @@ void boot_platform_noimage(void)
 
   /* Jump into BL through RSS */
   /* last parameter (0U) not used in RSSLIB_Sec_JumpHDPL3NS(BOOTLOADER_BASE_NS); */
+  //boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl2, (uint32_t) BOOTLOADER_BASE_NS, 0U);
+
+  // clear MSP limit 
+  __set_MSPLIM(0);  
+  boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl3, (uint32_t) (LOADER_CODE_START), 0U);
+
+  /* Avoid compiler to pop registers after having changed MSP */
+#if !defined(__ICCARM__)
+  __builtin_unreachable();
+#else
+    while (1);
+#endif /* defined(__ICCARM__) */
+}
+#else
+void boot_platform_noimage(void)
+{
+  uint32_t rsslib_sec_jump_HDP_lvl3ns;
+
+  BOOT_LOG_INF("Jumping to bootloader");
+  BOOT_LOG_INF("Disconnect COM port if used by bootloader");
+
+  /* Init RSS jump function descriptor */
+  rsslib_sec_jump_HDP_lvl3ns = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3NS);
+
+  /* Check Flow control */
+  FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_2);
+  uFlowStage = FLOW_STAGE_CFG;
+
+  /* Update run time protections for application execution */
+
+  /* Check Flow control */
+  FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_4_L);
+
+  /* Jump into BL through RSS */
+  /* last parameter (0U) not used in RSSLIB_Sec_JumpHDPL3NS(BOOTLOADER_BASE_NS); */
   boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl3ns, (uint32_t) BOOTLOADER_BASE_NS, 0U);
 
   /* Avoid compiler to pop registers after having changed MSP */
@@ -150,6 +186,8 @@ void boot_platform_noimage(void)
     while (1);
 #endif /* defined(__ICCARM__) */
 }
+
+#endif
 #endif /* MCUBOOT_EXT_LOADER */
 
 #if defined(OEMIROT_FAST_WAKE_UP)
