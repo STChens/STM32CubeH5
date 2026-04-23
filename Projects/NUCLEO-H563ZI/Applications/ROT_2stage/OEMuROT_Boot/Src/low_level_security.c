@@ -553,8 +553,7 @@ static const struct sau_cfg_t region_sau_load_cfg[] =
 #define GTZC_MPCBB_ALL_NPRIV (0x00000000UL)
 /* MPU configuration
    ================= */
-static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
-{
+#if !defined (STANDALONE_LOADER)
   /* Region 7: Extend read access to STM32 descriptors and bootloader vector table */
   {
     7,
@@ -572,6 +571,27 @@ static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
 #endif /* FLOW_CONTROL */
   },
 };
+#else   
+static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
+{
+  /* Region 7: Extend execute access to loader on user flash */
+  {
+    7,
+    LOADER_CODE_START,
+    LOADER_CODE_START + LOADER_CODE_SIZE - 1,
+    MPU_ARMV8M_MAIR_ATTR_DATANOCACHE_IDX,
+    MPU_ARMV8M_XN_EXEC_OK,
+    MPU_ARMV8M_AP_RO_PRIV_ONLY,
+    MPU_ARMV8M_SH_NONE,
+#ifdef FLOW_CONTROL
+    FLOW_STEP_MPU_L_EN_R7,
+    FLOW_CTRL_MPU_L_EN_R7,
+    FLOW_STEP_MPU_L_CH_R7,
+    FLOW_CTRL_MPU_L_CH_R7,
+#endif /* FLOW_CONTROL */
+  },
+};
+#endif
 #endif /* MCUBOOT_EXT_LOADER */
 
 /**
@@ -633,7 +653,10 @@ void LL_SECU_UpdateLoaderRunTimeProtections(void)
   nvic_loader_cfg();
 
   /* extend HDPL2 HDP in user flash except DWL area */
+#if !defined (STANDALONE_LOADER)  
+  /* We don't hide HDPL2 for secure loader  */
   hdpext_loader_cfg();
+#endif
 
 }
 #endif /* MCUBOOT_EXT_LOADER */
@@ -913,12 +936,18 @@ static void gpio_loader_cfg(void)
     __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOD_CLK_ENABLE();
 
+#if !defined (STANDALONE_LOADER)          
     /* Required GPIO configured non secure */
     GPIOA_S->SECCFGR = ~GPIOA_MASK_SECCFG;
     GPIOB_S->SECCFGR = ~GPIOB_MASK_SECCFG;
     GPIOC_S->SECCFGR = ~GPIOC_MASK_SECCFG;
     GPIOD_S->SECCFGR = ~GPIOD_MASK_SECCFG;
-
+#else
+    GPIOA_S->SECCFGR = GPIOA_MASK_SECCFG;
+    GPIOB_S->SECCFGR = GPIOB_MASK_SECCFG;
+    GPIOC_S->SECCFGR = GPIOC_MASK_SECCFG;
+    GPIOD_S->SECCFGR = GPIOD_MASK_SECCFG;    
+#endif
     /* Execution stopped if flow control failed */
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_GPIO_L_EN, FLOW_CTRL_GPIO_L_EN);
   }
@@ -926,6 +955,7 @@ static void gpio_loader_cfg(void)
   else
   {
     /* Verify required GPIO configured non secure */
+#if !defined (STANDALONE_LOADER)          
     uint32_t gpioa_seccfgr = GPIOA_S->SECCFGR;
     uint32_t gpiob_seccfgr = GPIOB_S->SECCFGR;
     uint32_t gpioc_seccfgr = GPIOC_S->SECCFGR;
@@ -938,6 +968,7 @@ static void gpio_loader_cfg(void)
       Error_Handler();
     }
     else
+#endif      
     {
       /* Execution stopped if flow control failed */
       FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_GPIO_L_CH, FLOW_CTRL_GPIO_L_CH);
@@ -955,6 +986,7 @@ static void nvic_loader_cfg(void)
   /* configuration stage */
   if (uFlowStage == FLOW_STAGE_CFG)
   {
+#if !defined (STANDALONE_LOADER)          
     /* Enable HardFault/busFault and NMI exception in ns.
      * It is up to BL to drive non-secure faults
      * Do not enter in secure on non-secure fault
@@ -968,11 +1000,13 @@ static void nvic_loader_cfg(void)
     NVIC->ITNS[1U] = RSS_NVIC_INIT_ITNS1_VAL;
     NVIC->ITNS[2U] = RSS_NVIC_INIT_ITNS2_VAL;
     NVIC->ITNS[3U] = RSS_NVIC_INIT_ITNS3_VAL;
+#endif    
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_NVIC_L_EN, FLOW_CTRL_NVIC_L_EN);
   }
   /* verification stage */
   else
   {
+#if !defined (STANDALONE_LOADER)          
     uint32_t itns0 = NVIC->ITNS[0U];
     uint32_t itns1 = NVIC->ITNS[1U];
     uint32_t itns2 = NVIC->ITNS[2U];
@@ -988,6 +1022,7 @@ static void nvic_loader_cfg(void)
       Error_Handler();
     }
     else
+#endif
     {
       FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_NVIC_L_CH, FLOW_CTRL_NVIC_L_CH);
     }
@@ -1222,6 +1257,7 @@ static void sau_init_cfg(void)
 static void sau_loader_cfg(void)
 {
   uint32_t i = 0U;
+#if !defined (STANDALONE_LOADER)          
   uint32_t rnr = 0U;
   uint32_t rbar = 0U;
   uint32_t rlar = 0U;
@@ -1229,6 +1265,7 @@ static void sau_loader_cfg(void)
   uint32_t rbar_reg = 0U;
   uint32_t rlar_reg = 0U;
   uint32_t ctrl_reg = 0U;
+#endif
   /* Secure coding  : volatile variable usage to force compiler to reload SBS->CSLCKR register address */
   __IO uint32_t read_reg = (uint32_t) &SBS->CSLCKR;
 
@@ -1240,12 +1277,13 @@ static void sau_loader_cfg(void)
 
     for (i = 0; i < ARRAY_SIZE(region_sau_load_cfg); i++)
     {
+#if !defined (STANDALONE_LOADER)          
       SAU->RNR = region_sau_load_cfg[i].RNR;
       SAU->RBAR = region_sau_load_cfg[i].RBAR & SAU_RBAR_BADDR_Msk;
       SAU->RLAR = (region_sau_load_cfg[i].RLAR & SAU_RLAR_LADDR_Msk) |
                   (region_sau_load_cfg[i].nsc ? SAU_RLAR_NSC_Msk : 0U) |
                   SAU_RLAR_ENABLE_Msk;
-
+#endif
       /* Execution stopped if flow control failed */
       FLOW_CONTROL_STEP(uFlowProtectValue, region_sau_load_cfg[i].flow_step_enable,
                                            region_sau_load_cfg[i].flow_ctrl_enable);
@@ -1257,9 +1295,10 @@ static void sau_loader_cfg(void)
     /* Flush and refill pipeline with updated permissions */
     __ISB();
 
+#if !defined (STANDALONE_LOADER)          
     /* Enable SAU */
     TZ_SAU_Enable();
-
+#endif
     /* Execution stopped if flow control failed */
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_SAU_L_EN, FLOW_CTRL_SAU_L_EN);
   }
@@ -1268,6 +1307,7 @@ static void sau_loader_cfg(void)
   {
     for (i = 0; i < ARRAY_SIZE(region_sau_load_cfg); i++)
     {
+#if !defined (STANDALONE_LOADER)          
       SAU->RNR = region_sau_load_cfg[i].RNR;
 
       rnr = region_sau_load_cfg[i].RNR;
@@ -1284,18 +1324,20 @@ static void sau_loader_cfg(void)
       {
         Error_Handler();
       }
-
+#endif
       /* Execution stopped if flow control failed */
       FLOW_CONTROL_STEP(uFlowProtectValue, region_sau_load_cfg[i].flow_step_check,
                                            region_sau_load_cfg[i].flow_ctrl_check);
     }
 
+#if !defined (STANDALONE_LOADER)          
     ctrl_reg = SAU->CTRL;
     if ((ctrl_reg & SAU_CTRL_ENABLE_Msk) != SAU_CTRL_ENABLE_Msk)
     {
       Error_Handler();
     }
     else
+#endif
     {
       /* Execution stopped if flow control failed */
       FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_SAU_L_CH, FLOW_CTRL_SAU_L_CH);
@@ -1376,6 +1418,7 @@ static void gtzc_loader_cfg(void)
   {
     __HAL_RCC_GTZC1_CLK_ENABLE();
 
+#if !defined (STANDALONE_LOADER)
     /* All bocks of SRAM1 configured non secure / privileged (default value)  */
     for (i = 0; i < GTZC_MPCBB1_NB_VCTR; i++)
     {
@@ -1391,10 +1434,27 @@ static void gtzc_loader_cfg(void)
       GTZC_MPCBB3_S->SECCFGR[i] = GTZC_MPCBB_ALL_NSEC;
       GTZC_MPCBB3_S->PRIVCFGR[i] = GTZC_MPCBB_ALL_NPRIV;
     }
+#else    
+    /* All bocks of SRAM1 configured secure / privileged (default value)  */
+    for (i = 0; i < GTZC_MPCBB1_NB_VCTR; i++)
+    {
+      /*SRAM1 -> MPCBB1*/
+      GTZC_MPCBB1_S->SECCFGR[i] = 0;
+      GTZC_MPCBB1_S->PRIVCFGR[i] = 0;
+    }
 
+    /* All bocks of SRAM3 configured secure / privileged (default value)  */
+    for (i = 0; i < GTZC_MPCBB3_NB_VCTR; i++)
+    {
+      /*SRAM3 -> MPCBB3*/
+      GTZC_MPCBB3_S->SECCFGR[i] = 0;
+      GTZC_MPCBB3_S->PRIVCFGR[i] = 0;
+    }    
+#endif
     /* Execution stopped if flow control failed */
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_GTZC_L_EN_MPCBB1, FLOW_CTRL_GTZC_L_EN_MPCBB1);
 
+#if !defined (STANDALONE_LOADER)
     /* Required peripherals configured non secure / non privileged */
     GTZC_TZSC1_S->PRIVCFGR1 = ~TZSC_MASK_R1;
     GTZC_TZSC1_S->PRIVCFGR2 = ~TZSC_MASK_R2;
@@ -1403,7 +1463,16 @@ static void gtzc_loader_cfg(void)
     GTZC_TZSC1_S->SECCFGR1 = ~TZSC_MASK_R1;
     GTZC_TZSC1_S->SECCFGR2 = ~TZSC_MASK_R2;
     GTZC_TZSC1_S->SECCFGR3 = ~TZSC_MASK_R3;
+#else
+    /* Required peripherals configured secure / privileged */
+    GTZC_TZSC1_S->PRIVCFGR1 = TZSC_MASK_R1;
+    GTZC_TZSC1_S->PRIVCFGR2 = TZSC_MASK_R2;
+    GTZC_TZSC1_S->PRIVCFGR3 = TZSC_MASK_R3;
 
+    GTZC_TZSC1_S->SECCFGR1 = TZSC_MASK_R1;
+    GTZC_TZSC1_S->SECCFGR2 = TZSC_MASK_R2;
+    GTZC_TZSC1_S->SECCFGR3 = TZSC_MASK_R3;    
+#endif
     /* Execution stopped if flow control failed */
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_GTZC_L_EN_TZSC, FLOW_CTRL_GTZC_L_EN_TZSC);
   }
@@ -1415,7 +1484,11 @@ static void gtzc_loader_cfg(void)
     {
       uint32_t privcfgr = GTZC_MPCBB1->PRIVCFGR[i];
       uint32_t seccfgr = GTZC_MPCBB1_S->SECCFGR[i];
+#if !defined (STANDALONE_LOADER)          
       if ((seccfgr != GTZC_MPCBB_ALL_NSEC) || (privcfgr != GTZC_MPCBB_ALL_NPRIV))
+#else
+      if ((seccfgr != 0) || (privcfgr != 0))
+#endif
       {
         Error_Handler();
       }
@@ -1434,12 +1507,21 @@ static void gtzc_loader_cfg(void)
     uint32_t privcfgr2 = GTZC_TZSC1_S->PRIVCFGR2;
     uint32_t seccfgr3 = GTZC_TZSC1_S->SECCFGR3;
     uint32_t privcfgr3 = GTZC_TZSC1_S->PRIVCFGR3;
+#if !defined (STANDALONE_LOADER)          
     if (((seccfgr1 | ~TZSC_MASK_R1) != ~TZSC_MASK_R1) ||
         ((privcfgr1 | ~TZSC_MASK_R1) != ~TZSC_MASK_R1) ||
         ((seccfgr2 | ~TZSC_MASK_R2) != ~TZSC_MASK_R2) ||
           ((privcfgr2 | ~TZSC_MASK_R2) != ~TZSC_MASK_R2) ||
         ((seccfgr3 | ~TZSC_MASK_R3) != ~TZSC_MASK_R3) ||
         ((privcfgr3 | ~TZSC_MASK_R3) != ~TZSC_MASK_R3))
+#else
+    if (((seccfgr1 & TZSC_MASK_R1) != TZSC_MASK_R1) ||
+        ((privcfgr1 & TZSC_MASK_R1) != TZSC_MASK_R1) ||
+        ((seccfgr2 & TZSC_MASK_R2) != TZSC_MASK_R2) ||
+          ((privcfgr2 & TZSC_MASK_R2) != TZSC_MASK_R2) ||
+        ((seccfgr3 & TZSC_MASK_R3) != TZSC_MASK_R3) ||
+        ((privcfgr3 & TZSC_MASK_R3) != TZSC_MASK_R3))
+#endif
     {
       Error_Handler();
     }
@@ -1471,11 +1553,7 @@ static void mpu_init_cfg(void)
 #ifdef OEMIROT_MPU_PROTECTION
   struct mpu_armv8m_dev_t dev_mpu_s = { MPU_BASE };
   int32_t i;
-  
-#ifdef OEMiROT_OEMUROT_ENABLE
-  // We disable MPU first, and then start to configure MPU  
-  mpu_armv8m_disable(&dev_mpu_s);
-#endif
+
   /* configuration stage */
   if (uFlowStage == FLOW_STAGE_CFG)
   {
@@ -1688,13 +1766,17 @@ static void mpu_loader_cfg(void)
     }
 
     /* Lock MPU config */
+#if !defined (STANDALONE_LOADER)    
     __HAL_RCC_SBS_CLK_ENABLE();
     SBS->CSLCKR |= SBS_CSLCKR_LOCKSMPU;
+#endif
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_MPU_L_LCK, FLOW_CTRL_MPU_L_LCK);
+#if !defined (STANDALONE_LOADER)        
     if (((* (uint32_t *)read_reg) & SBS_CSLCKR_LOCKSMPU) == 0U)
     {
       Error_Handler();
     }
+#endif
     FLOW_CONTROL_STEP(uFlowProtectValue, FLOW_STEP_MPU_L_LCK_CH, FLOW_CTRL_MPU_L_LCK_CH);
   }
 #endif /* OEMIROT_MPU_PROTECTION */

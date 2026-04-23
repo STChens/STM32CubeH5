@@ -40,6 +40,7 @@ set bin_path_xml_field="..\..\..\Applications\ROT_2stage\OEMuROT_Boot\Binary"
 set fw_in_bin_xml_field="Firmware binary input file"
 set fw_out_bin_xml_field="Image output file"
 set s_app_bin_xml_field="%bin_path_xml_field%\OEMuROT_Boot.bin"
+set s_app_enc_sign_bin_xml_field="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.bin"
 set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.hex"
 set s_app_init_sign_hex_xml_field="%bin_path_xml_field%\OEMuROT_Boot_init_sign.hex"
 
@@ -95,7 +96,14 @@ echo Postbuild %signing% image >> %current_log_file% 2>>&1
 %python%%applicfg% xmlval -v %s_app_bin_xml_field% --string -n %fw_in_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-::update xml file : output file
+::update xml file : output file (bin)
+%python%%applicfg% xmlval -v %s_app_enc_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+%stm32tpccli% -pb %s_code_xml% >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+::update xml file : output file (hex)
 %python%%applicfg% xmlval -v %s_app_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 

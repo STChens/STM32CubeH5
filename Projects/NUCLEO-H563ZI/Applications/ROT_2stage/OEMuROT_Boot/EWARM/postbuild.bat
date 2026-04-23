@@ -74,7 +74,7 @@ IF !errorlevel! NEQ 0 goto :error
 
 ::=================================================================================================
 
-:: Config for booth path
+:: Config for boot path
 set "bootpath=OEMiROT_OEMuROT"
 set "project=OEMuROT"
 set "oemurot_enable=1"
@@ -82,6 +82,12 @@ set "oemurot_enable=1"
 call %auto_rot_update%
 set "img_config=%projectdir%\..\..\..\..\ROT_Provisioning\%bootpath%\img_config.bat"
 set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
+
+::======================================================================================
+::loader files to update
+::======================================================================================
+set "loader_dir=../../../../%oemirot_oemurot_boot_path_loader_project%"
+set loader_flash_layout="%loader_dir%\Inc\appli_flash_layout.h"
 
 ::======================================================================================
 ::image xml configuration files
@@ -228,6 +234,39 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b DOWNLOAD
 IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b DOWNLOAD_NS_DATA_REGION_START -m RE_AREA_7_OFFSET %map_properties% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: ============================================================ Update loader flash layout files =========================================================
+:: update loader flash layout file  (App/Data primary and secondary slot areas)
+:: RE_AREA_0_OFFSET ==> APP_IMAGE_PRIMARY_PARTITION_OFFSET
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n APP_IMAGE_PRIMARY_PARTITION_OFFSET %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+:: RE_AREA_2_OFFSET ==> APP_IMAGE_SECONDARY_PARTITION_OFFSET
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_2_OFFSET -n APP_IMAGE_SECONDARY_PARTITION_OFFSET %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+:: RE_AREA_0_SIZE ==> APP_IMAGE_PARTITION_SIZE
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_SIZE -n APP_IMAGE_PARTITION_SIZE %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: RE_AREA_4_OFFSET ==> DATA_IMAGE_PRIMARY_PARTITION_OFFSET
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_4_OFFSET -n DATA_IMAGE_PRIMARY_PARTITION_OFFSET %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+:: RE_AREA_6_OFFSET ==> DATA_IMAGE_SECONDARY_PARTITION_OFFSET
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_6_OFFSET -n DATA_IMAGE_SECONDARY_PARTITION_OFFSET %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+:: RE_AREA_4_SIZE ==> DATA_IMAGE_PARTITION_SIZE
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_4_SIZE -n DATA_IMAGE_PARTITION_SIZE %loader_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: RE_FLASH_B_SIZE ==> FLASH_B_SIZE
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_B_SIZE -n FLASH_B_SIZE %loader_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -548,6 +587,9 @@ IF !errorlevel! NEQ 0 goto :error
 :: =========================================================== Update %appli_flash_layout% ============================================================
 :: Bypass configuration of appli_flash_layout file if not present
 if not exist %appli_flash_layout% (goto :end)
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_LOADER_START -n LOADER_CODE_START %appli_flash_layout%  --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% setdefine --layout %preprocess_bl2_file% -m RE_OVER_WRITE -n MCUBOOT_OVERWRITE_ONLY -v 1 %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%

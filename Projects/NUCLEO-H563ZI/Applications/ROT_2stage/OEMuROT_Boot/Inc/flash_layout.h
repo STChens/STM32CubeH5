@@ -27,6 +27,9 @@
 /* Flash layout configuration : begin ****************************************/
 
 #define OEMUROT_ENABLE         /* Defined: the project is used for OEMiROT_OEMuROT boot path */
+#define STANDALONE_LOADER     /* Defined: standalone Loader will be used instead of system bootloader, 
+                                 for this flag to take effect, MCUBOOT_EXT_LOADER must be defined */
+
                                    /* Undefined: the project is used for OEMiROT boot path */
 #define MCUBOOT_OVERWRITE_ONLY     /* Defined: the FW installation uses overwrite method.
                                       UnDefined: The FW installation uses swap mode. */
@@ -104,19 +107,28 @@
  * is used as a temporary storage during image swapping.
  */
 
+
 /* area for BL2 code protected by hdp */
-#define FLASH_AREA_BL2_OFFSET           (0x18000) // This must be aligned with OEMiROT size
+#define FLASH_AREA_BL2_OFFSET           0x18000
 #define FLASH_AREA_BL2_SIZE             (0x12000)
+
+/*-------------------------------------------------------------------
+ * Loader (Loader code area) *** must be sync with OEMiROT config
+ *-------------------------------------------------------------------
+ */
+
+#if defined (MCUBOOT_EXT_LOADER) && defined (STANDALONE_LOADER)
+#define FLASH_AREA_LOADER_SIZE            0x6000
+#define FLASH_AREA_LOADER_OFFSET          (FLASH_AREA_BL2_OFFSET-FLASH_AREA_LOADER_SIZE)
+#endif
 
 /* scratch area */
 #if defined(FLASH_AREA_SCRATCH_ID)
 #define FLASH_AREA_SCRATCH_DEVICE_ID    (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
-#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE + FLASH_AREA_BL2_SIZE)
-#if defined(MCUBOOT_OVERWRITE_ONLY)
-#define FLASH_AREA_SCRATCH_SIZE         (0x0000) /* Not used in MCUBOOT_OVERWRITE_ONLY mode */
-#else
-#define FLASH_AREA_SCRATCH_SIZE         (0x10000) /* 64 KB */
-#endif
+//#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE + FLASH_AREA_BL2_SIZE)
+#define FLASH_AREA_SCRATCH_OFFSET       0x3C000
+#define FLASH_AREA_SCRATCH_SIZE         0x0
+
 /* control scratch area */
 #if (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
 #error "FLASH_AREA_SCRATCH_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
