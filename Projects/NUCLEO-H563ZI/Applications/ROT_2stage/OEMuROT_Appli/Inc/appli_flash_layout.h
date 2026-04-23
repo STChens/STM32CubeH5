@@ -32,6 +32,8 @@
 #define MCUBOOT_NS_DATA_IMAGE_NUMBER   0x0      /* 1: NS data image for NS application.
                                                    0: No NS data image. */
 
+#define LOADER_CODE_START              0xC012000
+
 #define FLASH_AREA_0_OFFSET            0x3C000 /* Secure app image primary slot offset */
 
 #define FLASH_AREA_0_SIZE              0xDE000   /* Secure app image primary slot size */

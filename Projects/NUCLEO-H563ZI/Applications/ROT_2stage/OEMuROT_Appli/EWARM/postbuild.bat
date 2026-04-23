@@ -34,6 +34,7 @@ set project=OEMiROT
 set bootpath=OEMiROT
 )
 
+call "%provisioningdir%\%bootpath%\img_config.bat"
 ::=============================================================================================
 ::image binary files
 ::=============================================================================================
@@ -55,8 +56,10 @@ set bin_path_xml_field="..\..\..\Applications\ROT_2stage\OEMuROT_Appli\Binary"
 set fw_in_bin_xml_field="Firmware binary input file"
 set fw_out_bin_xml_field="Image output file"
 set s_app_bin_xml_field="%bin_path_xml_field%\rot_tz_s_app.bin"
+set s_app_enc_sign_bin_xml_field="%bin_path_xml_field%\rot_tz_s_app_enc_sign.bin"
 set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_s_app_enc_sign.hex"
 set s_app_init_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_s_app_init_sign.hex"
+set s_data_enc_sign_bin_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_enc_sign.bin"
 set s_data_enc_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_enc_sign.hex"
 set s_data_init_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_init_sign.hex"
 
@@ -108,11 +111,19 @@ set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 :postbuild
 echo Postbuild %signing% image >> %current_log_file% 2>>&1
 
+::=========================== Code image signing =====================================
 ::update xml file : input file
 %python%%applicfg% xmlval -v %s_app_bin_xml_field% --string -n %fw_in_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-::update xml file : output file
+::update xml file : output file (bin)
+%python%%applicfg% xmlval -v %s_app_enc_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+%stm32tpccli% -pb %s_code_xml% >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+::update xml file : output file (hex)
 %python%%applicfg% xmlval -v %s_app_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
@@ -127,15 +138,31 @@ if !errorlevel! neq 0 goto :error
 %python%%applicfg% xmlval -v %s_app_init_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_code_init_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-::update data xml file : output file
+%stm32tpccli% -pb %s_code_init_xml% >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+::=========================== Data image signing =====================================
+if "%s_data_image_number%" == "0" ( goto :no_s_data )
+::update data xml file : output file (bin)
+%python%%applicfg% xmlval -v %s_data_enc_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %s_data_xml% --vb >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+%stm32tpccli% -pb %s_data_xml% >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+::update data xml file : output file (hex)
 %python%%applicfg% xmlval -v %s_data_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_data_xml% --vb >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+%stm32tpccli% -pb %s_data_xml% >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 %python%%applicfg% xmlval -v %s_data_init_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_data_init_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-%stm32tpccli% -pb %s_code_init_xml% >> %current_log_file% 2>>&1
+%stm32tpccli% -pb %s_data_init_xml% >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
+:no_s_data
 
 exit 0
 
