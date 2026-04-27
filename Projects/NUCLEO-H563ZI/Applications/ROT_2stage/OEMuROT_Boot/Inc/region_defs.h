@@ -107,11 +107,13 @@
 /* Bootloader region protected by hdp */
 #if  defined(OEMUROT_ENABLE)
 #define BL2_CODE_START                      (S_ROM_ALIAS(FLASH_AREA_BL2_OFFSET + BL2_HEADER_SIZE))
+#define BL2_CODE_SIZE                       (FLASH_AREA_BL2_SIZE)
+#define BL2_CODE_LIMIT                      (BL2_CODE_START + BL2_CODE_SIZE - BL2_HEADER_SIZE - 1)
 #else
 #define BL2_CODE_START                      (S_ROM_ALIAS(FLASH_AREA_BL2_OFFSET))
-#endif
 #define BL2_CODE_SIZE                       (FLASH_AREA_BL2_SIZE)
 #define BL2_CODE_LIMIT                      (BL2_CODE_START + BL2_CODE_SIZE - 1)
+#endif
 
 /* Bootloader boot address */
 #define BL2_BOOT_VTOR_ADDR                  (BL2_CODE_START)

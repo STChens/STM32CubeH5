@@ -178,7 +178,7 @@ int main(void)
 #endif
   printf("\r\n======================================================================");
   printf("\r\n=              (C) COPYRIGHT 2025 STMicroelectronics                 =");
-  printf("\r\n=                                                                    =");
+  printf("\r\n=               Built on %s %s                        =", __DATE__, __TIME__);
   printf("\r\n=                          User App #%c                               =", *pUserAppId);
   printf("\r\n======================================================================");
   printf("\r\n\r\n");

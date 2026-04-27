@@ -108,9 +108,13 @@
  */
 
 
-/* area for BL2 code protected by hdp */
+/* area for BL2 -- value updated by OEMiROT postbuild */
 #define FLASH_AREA_BL2_OFFSET           0x18000
-#define FLASH_AREA_BL2_SIZE             (0x12000)
+#define FLASH_AREA_BL2_SIZE             0x18000
+
+/* scratch area used by OEMiROT -- value updated by OEMiROT postbuild */
+#define FLASH_AREA_SCRATCH_OEMIROT_OFFSET       0x18000
+#define FLASH_AREA_SCRATCH_OEMIROT_SIZE         0x0
 
 /*-------------------------------------------------------------------
  * Loader (Loader code area) *** must be sync with OEMiROT config
@@ -118,26 +122,11 @@
  */
 
 #if defined (MCUBOOT_EXT_LOADER) && defined (STANDALONE_LOADER)
-#define FLASH_AREA_LOADER_SIZE            0x6000
-#define FLASH_AREA_LOADER_OFFSET          (FLASH_AREA_BL2_OFFSET-FLASH_AREA_LOADER_SIZE)
+#define FLASH_AREA_LOADER_SIZE            0x6000 /* -- value updated by OEMiROT postbuild */
+#define FLASH_AREA_LOADER_OFFSET          (FLASH_AREA_SCRATCH_OEMIROT_OFFSET - FLASH_AREA_LOADER_SIZE)
 #endif
 
-/* scratch area */
-#if defined(FLASH_AREA_SCRATCH_ID)
-#define FLASH_AREA_SCRATCH_DEVICE_ID    (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
-//#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE + FLASH_AREA_BL2_SIZE)
-#define FLASH_AREA_SCRATCH_OFFSET       0x3C000
-#define FLASH_AREA_SCRATCH_SIZE         0x0
-
-/* control scratch area */
-#if (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
-#error "FLASH_AREA_SCRATCH_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
-#endif /* (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0*/
-#else /* FLASH_AREA_SCRATCH_ID */
-#define FLASH_AREA_SCRATCH_SIZE         (0x0)
-#endif /* FLASH_AREA_SCRATCH_ID */
-
-/* HDP area end at this address */
+/* HDP area end at this address !!! HDP NOT USED IN OEMuROT !!! */
 #if !defined(OEMUROT_ENABLE)
 #define FLASH_BL2_HDP_END               (FLASH_AREA_SCRATCH_OFFSET+FLASH_AREA_SCRATCH_SIZE-1)
 #endif /* not OEMUROT_ENABLE */
@@ -149,7 +138,7 @@
 #endif /* ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
 #endif
 
-/* control area under WRP group protection */
+/* control area under WRP group protection !!! WRP NOT USED in OEMuROT */
 #if !defined(OEMUROT_ENABLE)
 #if (FLASH_AREA_BL2_OFFSET % FLASH_AREA_WRP_GROUP_SIZE) != 0
 #error "FLASH_AREA_BL2_OFFSET not aligned on FLASH_AREA_WRP_GROUP_SIZE"
@@ -159,6 +148,30 @@
 #endif /* ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_WRP_GROUP_SIZE) != 0 */
 #endif /* not OEMUROT_ENABLE */
 
+/*-------------------------------------------------------------------
+ * Scratch slot (scratch area for OEMuROT) 
+ * -- After OEMuROT primary and secondary slots
+ *-------------------------------------------------------------------
+ */
+#if defined(FLASH_AREA_SCRATCH_ID)
+#define FLASH_AREA_SCRATCH_DEVICE_ID    (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
+#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE + FLASH_AREA_BL2_SIZE)
+#if defined(MCUBOOT_PRIMARY_ONLY)
+#define FLASH_AREA_SCRATCH_SIZE         0x0
+#else
+#define FLASH_AREA_SCRATCH_SIZE         0x10000
+#endif
+
+/* control scratch area */
+#if (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_AREA_SCRATCH_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /* (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0*/
+#else /* FLASH_AREA_SCRATCH_ID */
+#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE)
+#define FLASH_AREA_SCRATCH_SIZE         (0x0)
+#endif /* FLASH_AREA_SCRATCH_ID */
+
+   
 /* BL2 partitions size */
 /* ==============================================
  *       NS App partitio size (0 for S only App)
@@ -179,9 +192,11 @@
  * ==============================================
  */
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
-#define FLASH_S_PARTITION_SIZE          (0xD4000) /* 848 KB for S partition */
+/* 0xCE000 (824 KB) max for S partition -- 2M Flash config */
+#define FLASH_S_PARTITION_SIZE          (0x16000) 
 #else
-#define FLASH_S_PARTITION_SIZE          (0xDE000) /* 880 KB for S partition */
+/* 0xDE000 (880 KB) max for S partition -- 2M Flash config */
+#define FLASH_S_PARTITION_SIZE          (0x16000) 
 #endif /* MCUBOOT_OVERWRITE_ONLY */
 
 /* ==============================================
@@ -242,11 +257,13 @@
  *   +-------------------------+
  *   |    OEMiROT              |
  *   +-------------------------+
+ *   |    Scratch slot (iROT)  |
+ *   +-------------------------+
  *   |    OEMuROT (primary)    |
  *   +-------------------------+
  *   |    OEMiROT (secondary)  |
  *   +-------------------------+
- *   |    Scratch slot         |
+ *   |    Scratch slot (uROT)  |
  *   +-------------------------+ <---- FLASH_AREA_BEGIN_OFFSET
  *   |                         |
  *   |    FLASH AREAS          |
@@ -254,10 +271,7 @@
  *   +-------------------------+   
  * =========================================================
  */
-#define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_BL2_OFFSET + \
-                                          FLASH_AREA_BL2_SIZE + \
-                                          FLASH_AREA_BL2_SIZE + \
-                                          FLASH_AREA_SCRATCH_SIZE)
+#define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_SCRATCH_OFFSET + FLASH_AREA_SCRATCH_SIZE) 
 #define FLASH_AREAS_DEVICE_ID           (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
 
 /* =========================================================
@@ -270,9 +284,9 @@
  *   +-----------+------------+-----------------------+--------------------+
  *   |      4    |     0      |   S Data (primary)    |    not used        |
  *   +-----------+------------+-----------------------+--------------------+
- *   |      0    | 0xDE000    |   App (primary)       |    active slot     |
+ *   |      0    | max DE000  |   App (primary)       |    active slot     |
  *   +-----------+------------+-----------------------+--------------------+
- *   |      2    | 0xDE000    |   App (secondary)     |    download slot   |
+ *   |      2    | max DE000  |   App (secondary)     |    download slot   |
  *   +-----------+------------+-----------------------+--------------------+
  *   |      6    |     0      |   S Data (secondary)  |    not used        |
  *   +-----------+------------+-----------------------+--------------------+

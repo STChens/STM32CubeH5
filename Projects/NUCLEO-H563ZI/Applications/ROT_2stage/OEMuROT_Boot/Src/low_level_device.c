@@ -30,6 +30,10 @@ static struct flash_range erase_vect[] =
 };
 static struct flash_range write_vect[] =
 {
+#if (FLASH_AREA_SCRATCH_OEMIROT_SIZE > 0) // This means OEMiROT is using swap mode
+  /* Allow also writing to BL2 trailer to confirm the image */
+  { FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - 32, FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - 16 - 1}, 
+#endif
 #if !defined(MCUBOOT_PRIMARY_ONLY)
 #if !defined(MCUBOOT_OVERWRITE_ONLY)
   { FLASH_AREA_SCRATCH_OFFSET, FLASH_AREA_SCRATCH_OFFSET + FLASH_AREA_SCRATCH_SIZE - 1},
@@ -47,6 +51,10 @@ static struct flash_range secure_vect[] =
   { FLASH_AREA_SCRATCH_OFFSET, FLASH_AREA_SCRATCH_OFFSET + FLASH_AREA_SCRATCH_SIZE - 1},
 #endif /* !MCUBOOT_OVERWRITE_ONLY */
 #endif /* MCUBOOT_PRIMARY_ONLY */
+#if (FLASH_AREA_SCRATCH_OEMIROT_SIZE > 0) // This means OEMiROT is using swap mode
+  /* Allow also writing to BL2 trailer to confirm the image */
+  { FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - 32, FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - 16 - 1}, 
+#endif
   { FLASH_AREA_BEGIN_OFFSET, FLASH_AREA_0_OFFSET + FLASH_S_PARTITION_SIZE - 1}
 };
 #endif

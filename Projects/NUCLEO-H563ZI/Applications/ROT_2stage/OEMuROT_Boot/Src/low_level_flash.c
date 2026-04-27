@@ -404,12 +404,25 @@ static int32_t Flash_ProgramData(uint32_t address,
   /* Check Flash memory boundaries and alignment with minimum write size
     * (program_unit), data size also needs to be a multiple of program_unit.
   */
+#ifdef DEBUG_FLASH_ACCESS
+  BOOT_LOG_INF("write %x n=%x \r\n", (uint32_t) (flash_base + addr), cnt);
+  BOOT_LOG_INF("addr %x cnt %x \r\n", addr, cnt);
+#endif  
   if ((!is_range_valid(&ARM_FLASH0_DEV, addr + cnt - 1)) ||
       (!is_write_aligned(&ARM_FLASH0_DEV, addr))     ||
       (!is_write_aligned(&ARM_FLASH0_DEV, cnt))      ||
       (!is_write_allow(&ARM_FLASH0_DEV, addr, cnt))
      )
   {
+    if (!is_range_valid(&ARM_FLASH0_DEV, addr + cnt - 1))
+      BOOT_LOG_ERR("range not valid \r\n");
+    if(!is_write_aligned(&ARM_FLASH0_DEV, addr))
+      BOOT_LOG_ERR("addr not write aligned \r\n");
+    if(!is_write_aligned(&ARM_FLASH0_DEV, cnt))
+      BOOT_LOG_ERR("cnt not write aligned \r\n");
+    if(!is_write_allow(&ARM_FLASH0_DEV, addr, cnt))
+      BOOT_LOG_ERR("not write allowed \r\n");
+    
     ARM_FLASH0_STATUS.error = DRIVER_STATUS_ERROR;
     return ARM_DRIVER_ERROR_PARAMETER;
   }

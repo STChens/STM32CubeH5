@@ -98,7 +98,7 @@
 #define FLASH_AREA_BL2_SIZE             (0x18000)
 
 /*--------------------------------
- * 1.1. Loader (Loader code area)
+ * 2. Loader (Loader code area)
  *--------------------------------
  */
 #if defined (MCUBOOT_EXT_LOADER)
@@ -126,12 +126,39 @@
 #error "HDP area must be aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
 #endif /* ((FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE) % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
 
+/* scratch area */
+/*------------------------------------------------------------
+ * 3. Scratch slot (if not using OVERWRITE mode)
+ * NOTE: The same area will be used by OEMuROT 
+ *       If swap mode is used, make sure the layout definition 
+ *       for scratch slot is consistant between OEMiROT and
+ *       OEMuROT. 
+ *       i.e. Scratch slot is after OEMiROT (and loader if used)
+ *------------------------------------------------------------
+ */
+#if defined(FLASH_AREA_SCRATCH_ID)
+#define FLASH_AREA_SCRATCH_DEVICE_ID    (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
+#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE)
+#if defined(MCUBOOT_OVERWRITE_ONLY)
+#define FLASH_AREA_SCRATCH_SIZE         (0x0000) /* Not used in MCUBOOT_OVERWRITE_ONLY mode */
+#else
+#define FLASH_AREA_SCRATCH_SIZE         (0x10000) /* 64 KB */
+#endif
+/* control scratch area */
+#if (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
+#error "FLASH_AREA_SCRATCH_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
+#endif /* (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0*/
+#else /* FLASH_AREA_SCRATCH_ID */
+#define FLASH_AREA_SCRATCH_SIZE         (0x0)
+#endif /* FLASH_AREA_SCRATCH_ID */
+
+
 /* BL2 partitions size */
 /*----------------------------------------
- * 2. OEMuROT Code area (primary slot)
+ * 4. OEMuROT Code area (primary slot)
  *----------------------------------------
  */
-#define FLASH_S_PARTITION_SIZE          (0x12000) /* 72KB for OEMuROT */
+#define FLASH_S_PARTITION_SIZE          (0x18000) /* 72KB for OEMuROT */
 #define FLASH_NS_PARTITION_SIZE         (0) /* No NS part for OEMuROT */
 #define FLASH_PARTITION_SIZE            (FLASH_S_PARTITION_SIZE+FLASH_NS_PARTITION_SIZE)
 
@@ -140,7 +167,9 @@
 #define FLASH_MAX_PARTITION_SIZE   OEMuROT_PARTITION_SIZE
 
 /* BL2 flash areas */
-#define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE)
+#define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_BL2_OFFSET + \
+                                         FLASH_AREA_SCRATCH_SIZE + \
+                                         FLASH_AREA_BL2_SIZE)
 #define FLASH_AREAS_DEVICE_ID           (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
 
 /* Secure app (OEMuROT) image primary slot */
@@ -154,7 +183,7 @@
 #endif /*  (FLASH_AREA_0_OFFSET  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
 
 /*------------------------------------------
- * 3. OEMuROT download area (secondary slot)
+ * 5. OEMuROT download area (secondary slot)
  *------------------------------------------
  */
 /* Secure app (OEMuROT) image secondary slot */
@@ -172,33 +201,6 @@
 #error "FLASH_AREA_END_OFFSET  not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
 #endif /*  (FLASH_AREA_END_OFFSET  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0 */
 
-/* scratch area */
-/*------------------------------------------------------------
- * 4. Scratch slot (if not using OVERWRITE mode)
- * NOTE: The same area will be used by OEMuROT 
- *       If swap mode is used, make sure the layout definition 
- *       for scratch slot is consistant between OEMiROT and
- *       OEMuROT. 
- *       i.e. Scratch slot is after OEMuROT download slot
- *------------------------------------------------------------
- */
-#if defined(FLASH_AREA_SCRATCH_ID)
-#define FLASH_AREA_SCRATCH_DEVICE_ID    (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
-#define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_0_SIZE \
-                                          + FLASH_AREA_2_SIZE)
-#if defined(MCUBOOT_OVERWRITE_ONLY)
-#define FLASH_AREA_SCRATCH_SIZE         (0x0000) /* Not used in MCUBOOT_OVERWRITE_ONLY mode */
-#else
-#define FLASH_AREA_SCRATCH_SIZE         (0x10000) /* 64 KB */
-#endif
-/* control scratch area */
-#if (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
-#error "FLASH_AREA_SCRATCH_OFFSET not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"
-#endif /* (FLASH_AREA_SCRATCH_OFFSET % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0*/
-#else /* FLASH_AREA_SCRATCH_ID */
-#define FLASH_AREA_SCRATCH_SIZE         (0x0)
-#endif /* FLASH_AREA_SCRATCH_ID */
-
 /*------------------------------------------------------------
  * Now reach the end of flash area known by OEMiROT 
  * The rest part of the flash is no more concerned by OEMiROT
@@ -206,7 +208,7 @@
  */
 /* flash areas end offset */
 #define FLASH_AREA_END_OFFSET           (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_0_SIZE + \
-                                         FLASH_AREA_2_SIZE + FLASH_AREA_SCRATCH_SIZE)
+                                         FLASH_AREA_2_SIZE)
 /*
  * The maximum number of status entries supported by the bootloader.
  */

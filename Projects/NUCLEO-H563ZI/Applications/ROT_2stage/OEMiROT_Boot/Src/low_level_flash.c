@@ -348,9 +348,15 @@ static int32_t Flash_ReadData(uint32_t addr, void *data, uint32_t cnt)
   if (is_range_secure(&ARM_FLASH0_DEV, addr, cnt))
   {
     memcpy(data, (void *)((uint32_t)addr + FLASH_BASE), cnt);
+#ifdef DEBUG_FLASH_ACCESS
+    BOOT_LOG_INF("Read secure address %x \r\n", (addr + FLASH_BASE));
+#endif
   }
   else
   {
+#ifdef DEBUG_FLASH_ACCESS
+    BOOT_LOG_INF("Read non-secure address %x \r\n", (addr + FLASH_BASE_NS));
+#endif
     memcpy(data, (void *)((uint32_t)addr + FLASH_BASE_NS), cnt);
   }
 #else

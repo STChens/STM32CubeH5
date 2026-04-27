@@ -67,7 +67,11 @@ const struct mpu_armv8m_region_cfg_t region_cfg_init_s[] = {
   {
     0,
     FLASH_BASE_S + FLASH_AREA_BL2_OFFSET,
+#if (FLASH_AREA_SCRATCH_OEMIROT_SIZE > 0)     
+    FLASH_BASE_S + FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - 32 - 1,
+#else
     FLASH_BASE_S + FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - 1,
+#endif
     MPU_ARMV8M_MAIR_ATTR_CODE_IDX,
     MPU_ARMV8M_XN_EXEC_OK,
     MPU_ARMV8M_AP_RO_PRIV_ONLY,

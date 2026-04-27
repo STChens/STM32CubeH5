@@ -225,16 +225,20 @@ set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE
 IF !errorlevel! NEQ 0 goto :error
 
 :: update oemurot flash_layout file 
-:: OEMuROT FLASH_AREA_BL2_OFFSET shall be after OEMiROT (FLASH_AREA_BL2_SIZE)
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_OFFSET -n FLASH_AREA_SCRATCH_OFFSET %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
+:: OEMuROT FLASH_AREA_BL2_OFFSET shall be after OEMiROT (same as OEMiROT RE_AREA_0_OFFSET)
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n FLASH_AREA_BL2_OFFSET %oemurot_flash_layout% --vb  >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n FLASH_AREA_SCRATCH_SIZE %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_SIZE -n FLASH_AREA_BL2_SIZE %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_BL2_SIZE -n FLASH_AREA_BL2_OFFSET %oemurot_flash_layout% --vb  >> %current_log_file% 2>&1"
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_OFFSET -n FLASH_AREA_SCRATCH_OEMIROT_OFFSET %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n FLASH_AREA_SCRATCH_OEMIROT_SIZE %oemurot_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 

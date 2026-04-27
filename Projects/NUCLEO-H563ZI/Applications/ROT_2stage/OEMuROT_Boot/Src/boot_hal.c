@@ -115,8 +115,7 @@ void boot_platform_noimage(void)
   uint32_t rsslib_sec_jump_HDP_lvl3;
 
   BOOT_LOG_INF("Jumping to bootloader");
-  BOOT_LOG_INF("Disconnect COM port if used by bootloader");
-
+  
   /* Init RSS jump function descriptor */
   rsslib_sec_jump_HDP_lvl3 = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3);
 
@@ -134,7 +133,6 @@ void boot_platform_noimage(void)
 
   /* Second function call to resist to basic hardware attacks */
   LL_SECU_UpdateLoaderRunTimeProtections();
-
 
   /* Check Flow control */
   FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_4_L);
@@ -522,6 +520,76 @@ void getDescriptorAdd(void)
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
+#if defined OEMUROT_ENABLE    
+
+#if (FLASH_AREA_SCRATCH_OEMIROT_SIZE > 0) 
+#define TRAILER_MAGIC_SIZE 16
+
+#include "mpu_armv8m_drv.h"
+
+const struct mpu_armv8m_region_cfg_t region_cfg_bl2_trailer[] = {
+  /* Region 11: Allows writing to BL2 trailer */
+  {
+    11,
+    BL2_CODE_LIMIT + 1 - 32,
+    BL2_CODE_LIMIT,
+    MPU_ARMV8M_MAIR_ATTR_DATA_IDX,
+    MPU_ARMV8M_XN_EXEC_NEVER,
+    MPU_ARMV8M_AP_RW_PRIV_ONLY,
+    MPU_ARMV8M_SH_NONE,
+#ifdef FLOW_CONTROL
+    FLOW_STEP_MPU_I_EN_R0,
+    FLOW_CTRL_MPU_I_EN_R0,
+    FLOW_STEP_MPU_I_CH_R0,
+    FLOW_CTRL_MPU_I_CH_R0,
+#endif /* FLOW_CONTROL */
+  },
+};
+#endif
+
+static void check_and_self_validate(void)
+{
+/* If FLASH_AREA_SCRATCH_OEMIROT_SIZE > 0, that means ORMiROT flahs layout
+   is configured with dual slot + swap mode. In that case, confirmation from
+   OEMuROT is required.
+*/  
+#if (FLASH_AREA_SCRATCH_OEMIROT_SIZE > 0) 
+  struct mpu_armv8m_dev_t dev_mpu_s = { MPU_BASE };
+  
+  mpu_armv8m_region_enable(&dev_mpu_s,
+        (struct mpu_armv8m_region_cfg_t *)&region_cfg_bl2_trailer[0]);
+  
+  const uint8_t FlagSetPattern[]={0x1 ,0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff };
+  const uint8_t FlagClearPattern[]={0xff ,0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff , 0xff, 0xff, 0xff };
+  const uint32_t ConfirmAddress = FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - (TRAILER_MAGIC_SIZE + sizeof(FlagSetPattern));
+  uint8_t *pbuf = (uint8_t*)(FLASH_BASE+ConfirmAddress);
+  
+  BOOT_LOG_DBG("OEMuROT  -- check content @%08x", pbuf);
+  BOOT_LOG_DBG("OEMuROT  -- mpu region [%08x - %08x]", BL2_CODE_LIMIT + 1 - 32, BL2_CODE_LIMIT);
+  
+  if ( memcmp(pbuf, FlagClearPattern, sizeof(FlagClearPattern)) == 0 )
+  {
+    /* Need to set the confirm flag */
+    if (Driver_FLASH0.ProgramData(ConfirmAddress, FlagSetPattern, sizeof(FlagSetPattern)) == ARM_DRIVER_OK)
+    {
+  #if defined(__ARMCC_VERSION)
+      BOOT_LOG_INF("OEMuROT  --  Confirm Flag  correctly written @offset %x %x",ConfirmAddress ,FlagSetPattern[0] );
+  #else
+      BOOT_LOG_INF("OEMuROT  --  Confirm Flag  correctly written @offset %lx %x",ConfirmAddress , FlagSetPattern[0] );
+  #endif
+    }
+    else
+    {
+      BOOT_LOG_ERR("OEMuROT  -- Confirm Flag Not Correctlty Written \r\n");
+    }
+  }
+  
+  mpu_armv8m_region_disable(&dev_mpu_s, 11);
+#endif  
+}
+#endif
 
 /**
   * @brief  Platform init
@@ -608,7 +676,40 @@ int32_t boot_platform_init(void)
         Error_Handler();
     }
 #endif
-
+    
+#if defined OEMUROT_ENABLE    
+    check_and_self_validate();
+#endif
+    
+#define DEBUG_FLASH_LAYOUT // Comment out this line to avoid the layout print
+#ifdef DEBUG_FLASH_LAYOUT    
+    BOOT_LOG_INF("BL2 start: %08x", BL2_CODE_START);
+    BOOT_LOG_INF("BL2 size :  %08x", BL2_CODE_SIZE);
+#if defined MCUBOOT_EXT_LOADER && defined STANDALONE_LOADER    
+    BOOT_LOG_INF("Loader start: %08x", LOADER_CODE_START);
+    BOOT_LOG_INF("Loader size :  %08x", LOADER_CODE_SIZE);
+#endif
+    
+    BOOT_LOG_INF("Flash area 0 offset: %08x", FLASH_AREA_0_OFFSET);
+    BOOT_LOG_INF("Flash area 0 size  : %08x", FLASH_AREA_0_SIZE);
+#if !defined (MCUBOOT_PRIMARY_ONLY)    
+    BOOT_LOG_INF("Flash area 2 offset: %08x", FLASH_AREA_2_OFFSET);
+    BOOT_LOG_INF("Flash area 2 size  : %08x", FLASH_AREA_2_SIZE);    
+    
+    BOOT_LOG_INF("scratch area 2 offset: %08x", FLASH_AREA_SCRATCH_OFFSET);
+    BOOT_LOG_INF("scratch area 2 size  : %08x", FLASH_AREA_SCRATCH_SIZE);        
+#endif    
+    
+#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)    
+    BOOT_LOG_INF("Flash area 3 offset: %08x", FLASH_AREA_4_OFFSET);
+    BOOT_LOG_INF("Flash area 3 size  : %08x", FLASH_AREA_4_SIZE);    
+#if !defined (MCUBOOT_PRIMARY_ONLY)    
+    BOOT_LOG_INF("Flash area 5 offset: %08x", FLASH_AREA_6_OFFSET);
+    BOOT_LOG_INF("Flash area 5 size  : %08x", FLASH_AREA_6_SIZE);    
+#endif    
+#endif   
+#endif /* #ifdef DEBUG_FLASH_LAYOUT*/
+    
 #if defined(MCUBOOT_EXT_LOADER)
     /* configure Button pin */
     BUTTON_CLK_ENABLE;
