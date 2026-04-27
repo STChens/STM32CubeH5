@@ -15,6 +15,13 @@
 		<Default></Default>
 	</Param>
 	<Param>
+		<Name>Write Option</Name>
+		<Type>Data</Type>
+		<Command>--overwrite-only</Command>
+		<Hidden>1</Hidden>
+		<Default></Default>
+	</Param>
+	<Param>
 		<Name>Encryption key</Name>
 		<Link>GetPublic</Link>
 		<Type>File</Type>
@@ -68,13 +75,6 @@
 		<Default>0,1.0.0</Default>
 	</Param>
 	<Param>
-		<Name>Write Option</Name>
-		<Type>Data</Type>
-		<Command>--overwrite-only</Command>
-		<Hidden>1</Hidden>
-		<Default></Default>
-	</Param>
-	<Param>
 		<Name>Version</Name>
 		<Value>1.0.0</Value>
 		<Type>Data</Type>
@@ -112,7 +112,7 @@
 	</Param>
 	<Param>
 		<Name>Number of scratch sectors</Name>
-		<Value>0</Value>
+		<Value>1</Value>
 		<Type>Data</Type>
 		<Command>-M</Command>
 		<Hidden>1</Hidden>

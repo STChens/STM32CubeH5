@@ -40,7 +40,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware area size</Name>
-		<Value>0x12000</Value>
+		<Value>0x18000</Value>
 		<Type>Data</Type>
 		<Command>-S</Command>
 		<Hidden>1</Hidden>
