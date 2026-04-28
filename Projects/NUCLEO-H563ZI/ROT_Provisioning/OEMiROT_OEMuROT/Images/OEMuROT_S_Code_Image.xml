@@ -115,7 +115,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware download area offset</Name>
-		<Value>0x806E000</Value>
+		<Value>0x805E000</Value>
 		<Type>Data</Type>
 		<Command>-x</Command>
 		<Hidden>1</Hidden>
@@ -123,7 +123,7 @@
 	</Param>
 	<Param>
 		<Name>Number of scratch sectors</Name>
-		<Value>2</Value>
+		<Value>0</Value>
 		<Type>Data</Type>
 		<Command>-M</Command>
 		<Hidden>1</Hidden>

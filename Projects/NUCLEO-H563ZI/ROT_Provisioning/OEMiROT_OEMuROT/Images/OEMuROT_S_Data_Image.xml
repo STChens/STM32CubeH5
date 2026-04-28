@@ -112,7 +112,7 @@
 	</Param>
 	<Param>
 		<Name>Number of scratch sectors</Name>
-		<Value>1</Value>
+		<Value>0</Value>
 		<Type>Data</Type>
 		<Command>-M</Command>
 		<Hidden>1</Hidden>

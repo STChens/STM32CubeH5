@@ -7,13 +7,13 @@ set rot_provisioning_path=%rot_provisioning_path:"=%
 setlocal EnableDelayedExpansion
 
 set sec1_start=0
-set sec1_end=0x7F
-set sec2_start=0x0
-set sec2_end=0xC
+set sec1_end=0x2E
+set sec2_start=0x7F
+set sec2_end=0x0
 set wrpgrp1=0xfffffff8
 set wrpgrp2=0xFFFFFFFF
 set hdp1_start=0
-set hdp1_end=0x8
+set hdp1_end=0xb
 set hdp2_start=0x7F
 set hdp2_end=0x0
 set boot_lck=0xB4

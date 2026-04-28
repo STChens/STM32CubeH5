@@ -97,7 +97,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware execution area offset</Name>
-		<Value>0x8058000</Value>
+		<Value>0x8048000</Value>
 		<Type>Data</Type>
 		<Command>-x</Command>
 		<Hidden>1</Hidden>
