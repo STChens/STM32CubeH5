@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>NUCLEO-H563ZI_OEMiROT_Appli</TargetName>
+      <TargetName>NUCLEO-H563ZI_OEMuROT_Appli</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6210000::V6.21::ARMCLANG</pCCUsed>
@@ -48,7 +48,7 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>.\NUCLEO-H563ZI_OEMiROT_Appli\Exe\</OutputDirectory>
+          <OutputDirectory>.\NUCLEO-H563ZI_OEMuROT_Appli\Exe\</OutputDirectory>
           <OutputName>Project</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
@@ -544,7 +544,7 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
         <targetInfos>
-          <targetInfo name="NUCLEO-H563ZI_OEMiROT_Appli"/>
+          <targetInfo name="NUCLEO-H563ZI_OEMuROT_Appli"/>
         </targetInfos>
       </component>
     </components>

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#define LOADER_CODE_START 0x81f8000                       /* This definition is updated automatically from OEMiROT_Boot postbuild*/
-#define LOADER_CODE_SIZE 0x8000                          /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+#define LOADER_CODE_START 0xc018000                       /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+#define LOADER_CODE_SIZE 0x0                          /* This definition is updated automatically from OEMiROT_Boot postbuild*/
 #define IMAGE_HEADER_SIZE 0x400                     /* mcuboot header size */
 
 #define CODE_START LOADER_CODE_START

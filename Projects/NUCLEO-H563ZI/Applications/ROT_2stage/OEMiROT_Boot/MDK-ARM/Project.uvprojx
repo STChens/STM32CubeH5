@@ -10,14 +10,14 @@
       <TargetName>NUCLEO-H563ZI_OEMiROT_Boot</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6210000::V6.21::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H563ZITx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H5xx_DFP.1.2.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H5xx_DFP.1.0.0</PackID>
+          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>CLOCK(8000000) FPU3(SFPU) CPUTYPE("Cortex-M33") ELITTLE TZ</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>

@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>NUCLEO-H563ZI_OEMiROT_Appli</TargetName>
+    <TargetName>NUCLEO-H563ZI_OEMuROT_Appli</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
