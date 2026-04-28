@@ -39,6 +39,8 @@
  
 
  
+     
+ 
 
 
 
@@ -201,7 +203,7 @@
 
 define memory mem with size = 4G;
 
-define region BL2_CODE_region        = mem:[from ((((0x0C000000)) + ((0x0000)))) size ((0x18000)-(0x6000))];
+define region BL2_CODE_region        = mem:[from ((((0x0C000000)) + ((0x0000)))) size ((0x18000)-(0x0))];
 define region BL2_RAM_region         = mem:[from ((0x30040000)) size ((0x10000))];
 
 initialize by copy  with packing = none {  readwrite };

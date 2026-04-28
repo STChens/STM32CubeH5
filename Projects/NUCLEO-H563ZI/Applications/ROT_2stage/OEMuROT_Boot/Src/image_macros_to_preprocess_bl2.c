@@ -135,8 +135,14 @@ enum image_attributes
 #endif
   RE_BL2_WRP_END = (FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE-0x1),
   
-  /* are for loader */
+  /* area for loader */
+#if defined (MCUBOOT_EXT_LOADER) && defined (STANDALONE_LOADER)
   RE_FLASH_LOADER_START = LOADER_CODE_START,
+  RE_FLASH_LOADER_SIZE = LOADER_CODE_SIZE,
+#else
+  RE_FLASH_LOADER_START = 0,
+  RE_FLASH_LOADER_SIZE = 0,
+#endif
   
   /* area for updates slot address */
   RE_AREA_0_OFFSET = FLASH_AREA_0_OFFSET,

@@ -26,7 +26,7 @@
 
 /* Flash layout configuration : begin ****************************************/
 #define OEMiROT_OEMUROT_ENABLE         /* Defined: the project is used for OEMiROT_OEMuROT boot path */
-#define STANDALONE_LOADER     /* Defined: standalone Loader will be used instead of system bootloader, 
+/* #define STANDALONE_LOADER */    /* Defined: standalone Loader will be used instead of system bootloader, 
                                  for this flag to take effect, MCUBOOT_EXT_LOADER must be defined */
 
 #define MCUBOOT_OVERWRITE_ONLY     /* Defined: the FW installation uses overwrite method.
@@ -101,8 +101,8 @@
  * 2. Loader (Loader code area)
  *--------------------------------
  */
-#if defined (MCUBOOT_EXT_LOADER)
-#define FLASH_AREA_LOADER_SIZE             (0x6000)
+#if defined (MCUBOOT_EXT_LOADER) && defined (STANDALONE_LOADER)
+#define FLASH_AREA_LOADER_SIZE             (0x8000)
 /* HDP area end at this address, exclude Loader code area */
 #define FLASH_BL2_HDP_END               (FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE-FLASH_AREA_LOADER_SIZE-1)
 #else

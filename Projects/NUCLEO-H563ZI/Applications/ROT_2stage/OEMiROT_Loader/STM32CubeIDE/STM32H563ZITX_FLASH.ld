@@ -31,8 +31,8 @@
 **
 ******************************************************************************
 */
-LOADER_CODE_START = 0x81f8000;          /* This definition is updated automatically from OEMiROT_Boot postbuild */
-LOADER_CODE_SIZE = 0x8000;             /* This definition is updated automatically from OEMiROT_Boot postbuild */
+LOADER_CODE_START = 0xc018000;          /* This definition is updated automatically from OEMiROT_Boot postbuild */
+LOADER_CODE_SIZE = 0x0;             /* This definition is updated automatically from OEMiROT_Boot postbuild */
 
 /* Entry Point */
 ENTRY(Reset_Handler)

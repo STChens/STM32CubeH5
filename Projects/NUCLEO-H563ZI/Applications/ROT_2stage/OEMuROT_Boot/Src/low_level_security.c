@@ -558,6 +558,8 @@ static const struct sau_cfg_t region_sau_load_cfg[] =
 /* MPU configuration
    ================= */
 #if !defined (STANDALONE_LOADER)
+static const struct mpu_armv8m_region_cfg_t region_cfg_loader_s[] =
+{
   /* Region 7: Extend read access to STM32 descriptors and bootloader vector table */
   {
     7,

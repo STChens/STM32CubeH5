@@ -317,21 +317,21 @@ static void FW_Install_DataImage(void)
   */
 static void FW_UPDATE_PrintWelcome(void)
 {
-  printf("\r\n================ New Fw Image ============================\r\n\n");
-  printf("  Reset to trigger Installation ------------------------- 1\r\n\n");
-  printf("  Download OEMuROT Image -------------------------------- 2\r\n\n");
-  printf("  Download App Image ------------------------------------ 3\r\n\n");
+  printf("\r\n================ New Fw Image =================\r\n\n");
+  printf("  Reset to trigger Installation -------------- 1\r\n\n");
+  printf("  Download OEMuROT Image --------------------- 2\r\n\n");
+  printf("  Download App Image ------------------------- 3\r\n\n");
 #if (DATA_IMAGE_PARTITION_SIZE > 0 )
-  printf("  Download Data Image ----------------------------------- 4\r\n\n");
+  printf("  Download Data Image ------------------------ 4\r\n\n");
 #endif /* (DATA_IMAGE_PARTITION_SIZE > 0) */
 #if !defined(MCUBOOT_OVERWRITE_ONLY) 
-  printf("  Re-install App Image ---------------------------------- a\r\n\n");
+  printf("  Re-install App Image ----------------------- a\r\n\n");
 // #if (MCUBOOT_APP_IMAGE_NUMBER == 1)  
-  printf("  Re-install App Image ---------------------------------- b\r\n\n");
+  printf("  Re-install App Image ----------------------- b\r\n\n");
 // #endif
 #endif /* !defined(MCUBOOT_OVERWRITE_ONLY) */
 #if !defined(MCUBOOT_OVERWRITE_ONLY) && (DATA_IMAGE_PARTITION_SIZE > 0 )
-  printf("  Re-install Data Image --------------------------------- c\r\n\n");
+  printf("  Re-install Data Image ---------------------- c\r\n\n");
 #endif /* !defined(MCUBOOT_OVERWRITE_ONLY) && (DATA_IMAGE_PARTITION_SIZE > 0 ) */  
 }
 /**

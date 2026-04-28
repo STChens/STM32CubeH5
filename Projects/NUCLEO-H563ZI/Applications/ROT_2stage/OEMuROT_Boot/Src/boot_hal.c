@@ -138,13 +138,14 @@ void boot_platform_noimage(void)
   FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_4_L);
 
   /* Jump into BL through RSS */
-  /* last parameter (0U) not used in RSSLIB_Sec_JumpHDPL3NS(BOOTLOADER_BASE_NS); */
-  //boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl2, (uint32_t) BOOTLOADER_BASE_NS, 0U);
-
+#if defined(STANDALONE_LOADER)
   // clear MSP limit 
   __set_MSPLIM(0);  
   boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl3, (uint32_t) (LOADER_CODE_START), 0U);
-
+#else
+  /* last parameter (0U) not used in RSSLIB_Sec_JumpHDPL3NS(BOOTLOADER_BASE_NS); */
+  boot_jump_to_RSS((uint32_t)&boot_jump_to_RSS, rsslib_sec_jump_HDP_lvl3, (uint32_t) BOOTLOADER_BASE_NS, 0U);
+#endif
   /* Avoid compiler to pop registers after having changed MSP */
 #if !defined(__ICCARM__)
   __builtin_unreachable();

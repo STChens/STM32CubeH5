@@ -62,7 +62,7 @@ set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 :postbuild
 set "map_properties=%projectdir%\..\map.properties"
 set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
-set "appli_dir=../../../../%oemirot_oemurot_boot_path_app_project%"
+set "appli_dir=%projectdir%/../../../../%oemirot_oemurot_boot_path_app_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
 
@@ -86,7 +86,7 @@ set "ob_flash_programming=%provisioningdir%\%bootpath%\ob_flash_programming.bat"
 ::======================================================================================
 ::loader files to update
 ::======================================================================================
-set "loader_dir=../../../../%oemirot_oemurot_boot_path_loader_project%"
+set "loader_dir=%projectdir%/../../../../%oemirot_oemurot_boot_path_loader_project%"
 set loader_flash_layout="%loader_dir%\Inc\appli_flash_layout.h"
 
 ::======================================================================================
@@ -588,6 +588,10 @@ IF !errorlevel! NEQ 0 goto :error
 :: Bypass configuration of appli_flash_layout file if not present
 if not exist %appli_flash_layout% (goto :end)
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_LOADER_START -n LOADER_CODE_START %appli_flash_layout%  --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_LOADER_SIZE -n LOADER_CODE_SIZE %appli_flash_layout%  --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 

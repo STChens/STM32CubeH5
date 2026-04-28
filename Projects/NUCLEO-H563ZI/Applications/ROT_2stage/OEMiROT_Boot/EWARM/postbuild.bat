@@ -54,8 +54,8 @@ set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 
 :postbuild
 set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
-set "oemurot_dir=../../../../%oemirot_oemurot_boot_path_stage2_project%"
-set "loader_dir=../../../../%oemirot_oemurot_boot_path_loader_project%"
+set "oemurot_dir=%projectdir%/../../../../%oemirot_oemurot_boot_path_stage2_project%"
+set "loader_dir=%projectdir%/../../../../%oemirot_oemurot_boot_path_loader_project%"
 set "ob_flash_programming_script=%projectdir%\..\..\..\..\ROT_Provisioning\OEMiROT_OEMuROT\ob_flash_programming.bat"
 
 
@@ -66,6 +66,8 @@ set loader_flash_layout="%loader_dir%\Inc\appli_flash_layout.h"
 set loader_icf_file="%loader_dir%\EWARM\stm32h563xx_flash.icf"
 set "map_properties=%projectdir%\..\..\OEMiROT_Boot\map.properties"
 
+echo %loader_icf_file% >> %current_log_file% 2>&1
+dir %loader_icf_file% >> %current_log_file% 2>&1
 ::======================================================================================
 ::image xml configuration files
 ::======================================================================================

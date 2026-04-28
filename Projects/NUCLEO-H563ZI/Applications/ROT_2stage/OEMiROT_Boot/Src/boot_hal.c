@@ -611,9 +611,6 @@ int32_t boot_platform_init(void)
     BOOT_LOG_INF("Loader start: %08x", LOADER_CODE_START);
     BOOT_LOG_INF("Loader size :  %08x", LOADER_CODE_SIZE);
 #endif
-    BOOT_LOG_INF("Loader start: %08x", LOADER_CODE_START);
-    BOOT_LOG_INF("Loader size :  %08x", LOADER_CODE_SIZE);
-    
     BOOT_LOG_INF("Flash area 0 offset: %08x", FLASH_AREA_0_OFFSET);
     BOOT_LOG_INF("Flash area 0 size  : %08x", FLASH_AREA_0_SIZE);
 #if !defined (MCUBOOT_PRIMARY_ONLY)    

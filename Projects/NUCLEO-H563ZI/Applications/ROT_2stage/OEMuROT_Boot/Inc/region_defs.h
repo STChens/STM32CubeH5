@@ -132,8 +132,10 @@
 #endif /* BL2 */
 
 /* Ext loader address */
+#if defined (MCUBOOT_EXT_LOADER) && defined (STANDALONE_LOADER)
 #define LOADER_CODE_START                   (S_ROM_ALIAS(FLASH_AREA_LOADER_OFFSET))
 #define LOADER_CODE_SIZE                    (FLASH_AREA_LOADER_SIZE)
+#endif
 
 /* Additional Check to detect flash download slot overlap or overflow */
 #define FLASH_AREA_END_OFFSET_MAX (FLASH_TOTAL_SIZE)
