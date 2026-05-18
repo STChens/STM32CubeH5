@@ -47,7 +47,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware area size</Name>
-		<Value>0x16000</Value>
+		<Value>0xDC000</Value>
 		<Type>Data</Type>
 		<Command>-S</Command>
 		<Hidden>1</Hidden>
@@ -115,7 +115,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware download area offset</Name>
-		<Value>0x805E000</Value>
+		<Value>0x8124000</Value>
 		<Type>Data</Type>
 		<Command>-x</Command>
 		<Hidden>1</Hidden>
