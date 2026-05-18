@@ -37,15 +37,15 @@
 
 #define FLASH_AREA_0_OFFSET            0x48000 /* Secure app image primary slot offset */
 
-#define FLASH_AREA_0_SIZE              0x16000   /* Secure app image primary slot size */
+#define FLASH_AREA_0_SIZE              0xDC000   /* Secure app image primary slot size */
 
 #define FLASH_AREA_1_OFFSET            0x0  /* Non-secure app image primary slot offset */
 
 #define FLASH_AREA_1_SIZE              0x0   /* Non-secure app image primary slot size */
 
-#define FLASH_AREA_2_OFFSET            0x5E000  /* Secure app image secondary slot */
+#define FLASH_AREA_2_OFFSET            0x124000  /* Secure app image secondary slot */
 
-#define FLASH_AREA_2_SIZE              0x16000   /* Secure app image secondary slot size */
+#define FLASH_AREA_2_SIZE              0xDC000   /* Secure app image secondary slot size */
 
 #define FLASH_AREA_3_OFFSET            0x0  /* Non-secure app image secondary slot offset */
 
@@ -67,11 +67,11 @@
 
 #define FLASH_AREA_7_SIZE              0x0   /* Non-secure data image secondary slot size */
 
-#define FLASH_PARTITION_SIZE           0x16000  /* Secure and Non Secure partition size */
+#define FLASH_PARTITION_SIZE           0xDC000  /* Secure and Non Secure partition size */
 
 #define FLASH_NS_PARTITION_SIZE        0x0  /* Non Secure partition size */
 
-#define FLASH_S_PARTITION_SIZE         0x16000   /* secure partition size */
+#define FLASH_S_PARTITION_SIZE         0xDC000   /* secure partition size */
 
 #define FLASH_S_DATA_PARTITION_SIZE    0x0   /* secure data partition size */
 

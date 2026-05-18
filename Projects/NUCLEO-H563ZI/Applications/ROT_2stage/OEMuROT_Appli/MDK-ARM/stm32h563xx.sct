@@ -17,11 +17,12 @@
  */
 
 #define S_CODE_OFFSET 0x48000                       /* This definition is updated automatically from OEMiROT_Boot postbuild*/
-#define S_CODE_SIZE 0x16000                          /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+#define S_CODE_SIZE 0xdc000                          /* This definition is updated automatically from OEMiROT_Boot postbuild*/
 #define IMAGE_HEADER_SIZE 0x400                     /* mcuboot header size */
 
 #define CODE_START 0x0C000000 + S_CODE_OFFSET + IMAGE_HEADER_SIZE
 #define APP_CODE_SIZE S_CODE_SIZE - IMAGE_HEADER_SIZE
+#define APP_ID_START CODE_START + APP_CODE_SIZE - 0x200
 
 /* Only use SRAM2/3 as full secure for our application */
 /* Because when the application jump to the bootloader, the BL uses the SRAM1 ressources */
@@ -33,6 +34,10 @@ LR_CODE CODE_START {
     ER_CODE CODE_START APP_CODE_SIZE {
         *.o (RESET +First)
         .ANY (+RO)
+    }
+	
+	ER_APP_ID APP_ID_START FIXED {
+        *.o (.app_id)       ; put .app_id section to this address
     }
 
     ER_DATA DATA_START DATA_SIZE {

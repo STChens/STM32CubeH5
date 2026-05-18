@@ -3,7 +3,7 @@
 /* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\cortex_v1_0.xml" */
 /*-Specials-*/
 define exported symbol S_CODE_OFFSET =0x48000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
-define exported symbol S_CODE_SIZE = 0x16000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+define exported symbol S_CODE_SIZE = 0xdc000; /* This definition is updated automatically from OEMiROT_Boot postbuild*/
 
 define exported symbol IMAGE_HEADER_SIZE = 0x400; /* mcuboot header size */
 
@@ -32,6 +32,10 @@ initialize by copy { readwrite };
 do not initialize  { section .noinit };
 
 place at address mem:__ICFEDIT_intvec_start__ { readonly section .intvec };
+
+/* put section .app_id */
+define symbol __app_id_start__ = 0x0C000000 + S_CODE_OFFSET + S_CODE_SIZE - 512;
+place at address mem:__app_id_start__ { readonly section .app_id };
 
 place in ROM_region   { readonly };
 place in RAM_region   { readwrite,

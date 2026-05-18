@@ -47,7 +47,8 @@ extern ARM_DRIVER_FLASH FLASH_PRIMARY_SECURE_DEV_NAME;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t *pUserAppId;
-const uint8_t UserAppId = 'A';
+//const uint8_t UserAppId = 'A';
+const uint8_t UserAppId  __attribute__((section(".app_id"))) = 'A';
 uint64_t time;
 uint32_t end;
 
@@ -181,6 +182,8 @@ int main(void)
   printf("\r\n=               Built on %s %s                        =", __DATE__, __TIME__);
   printf("\r\n=                          User App #%c                               =", *pUserAppId);
   printf("\r\n======================================================================");
+  printf("\r\nVTOR: %08x\r\n", SCB->VTOR);
+  printf("\r\nUserAppId address in flash: %08x", pUserAppId);
   printf("\r\n\r\n");
 
   /* User App firmware runs*/

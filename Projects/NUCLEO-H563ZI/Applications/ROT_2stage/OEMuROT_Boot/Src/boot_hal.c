@@ -700,6 +700,7 @@ int32_t boot_platform_init(void)
     BOOT_LOG_INF("scratch area 2 offset: %08x", FLASH_AREA_SCRATCH_OFFSET);
     BOOT_LOG_INF("scratch area 2 size  : %08x", FLASH_AREA_SCRATCH_SIZE);        
 #endif    
+    BOOT_LOG_INF("VTOR_S  : %08x", SCB->VTOR);
     
 #if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)    
     BOOT_LOG_INF("Flash area 3 offset: %08x", FLASH_AREA_4_OFFSET);

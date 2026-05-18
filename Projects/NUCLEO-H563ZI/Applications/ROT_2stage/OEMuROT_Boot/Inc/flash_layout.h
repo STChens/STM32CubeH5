@@ -196,7 +196,7 @@
 #define FLASH_S_PARTITION_SIZE          (0x16000) 
 #else
 /* 0xDE000 (880 KB) max for S partition -- 2M Flash config */
-#define FLASH_S_PARTITION_SIZE          (0x16000) 
+#define FLASH_S_PARTITION_SIZE          (0xDC000)
 #endif /* MCUBOOT_OVERWRITE_ONLY */
 
 /* ==============================================

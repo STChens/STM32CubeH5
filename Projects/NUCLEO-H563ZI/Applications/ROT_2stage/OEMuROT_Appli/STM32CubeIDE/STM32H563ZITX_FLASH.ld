@@ -32,7 +32,7 @@
 ******************************************************************************
 */
 S_CODE_OFFSET = 0x48000;          /* This definition is updated automatically from OEMiROT_Boot postbuild */
-S_CODE_SIZE = 0x16000;             /* This definition is updated automatically from OEMiROT_Boot postbuild */
+S_CODE_SIZE = 0xdc000;             /* This definition is updated automatically from OEMiROT_Boot postbuild */
 IMAGE_HEADER_SIZE = 0x400;        /* mcuboot header size */
 
 /* Entry Point */
@@ -78,6 +78,11 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
+
+  .app_id (0xc000000 + S_CODE_OFFSET + S_CODE_SIZE - IMAGE_HEADER_SIZE - 512) :
+  {
+    KEEP(*(.app_id))
+  } > FLASH
 
   /* Constant data into "FLASH" Rom type memory */
   .rodata :

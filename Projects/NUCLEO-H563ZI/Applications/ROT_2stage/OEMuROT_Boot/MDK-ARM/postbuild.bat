@@ -1,4 +1,5 @@
 @ECHO OFF
+call "sign.bat"
 set "projectdir=%~dp0"
 pushd %projectdir%\..\..\..\..\ROT_Provisioning
 set provisioningdir=%cd%

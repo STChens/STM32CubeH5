@@ -22,6 +22,7 @@
  */
 
 #include "stm32h5xx.h"
+#include "region_defs.h"
 /*----------------------------------------------------------------------------
   Exception / Interrupt Handler Function Prototype
  *----------------------------------------------------------------------------*/
@@ -511,6 +512,8 @@ extern RTC_HandleTypeDef RTCHandle;
 void Reset_Handler(void)
 {
   /** Register access to avoid stack usage */
+  // Set VTOR according to flash layout
+  SCB->VTOR = BL2_CODE_START;
   /* Enable RAMCFG Clock */
   SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_RAMCFGEN);
   (void)READ_BIT(RCC->AHB1ENR, RCC_AHB1ENR_RAMCFGEN); /* Dummy read to ensure clocking */
