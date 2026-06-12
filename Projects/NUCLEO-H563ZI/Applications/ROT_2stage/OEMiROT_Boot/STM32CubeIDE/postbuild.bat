@@ -68,6 +68,8 @@ set "map_properties=%projectdir%\..\..\OEMiROT_Boot\map.properties"
 ::======================================================================================
 ::image xml configuration files
 ::======================================================================================
+set s_code_presign_xml="%projectdir%\..\..\..\..\ROT_Provisioning\OEMiROT_OEMuROT\Images\OEMiROT_Code_Image_presign.xml"
+set s_code_init_presign_xml="%projectdir%\..\..\..\..\ROT_Provisioning\OEMiROT_OEMuROT\Images\OEMiROT_Code_Init_Image_presign.xml"
 set s_code_xml="%projectdir%\..\..\..\..\ROT_Provisioning\OEMiROT_OEMuROT\Images\OEMiROT_Code_Image.xml"
 set s_code_init_xml="%projectdir%\..\..\..\..\ROT_Provisioning\OEMiROT_OEMuROT\Images\OEMiROT_Code_Init_Image.xml"
 set auth_s="Authentication secure key"
@@ -80,6 +82,7 @@ set data_size="Data download slot size"
 set scratch_sector_number="Number of scratch sectors"
 set firmware_execution_offset="Firmware execution area offset"
 
+:: update map.properties
 set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b S_CODE_REGION_START -m RE_ADDRESS_SECURE_START %map_properties% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -120,6 +123,12 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b DOWNLOAD
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b FLASH_SIZE -m RE_FLASH_SIZE %map_properties% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: update ob_flash_programming.bat
+
 set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b bootob -m RE_BL2_BOOT_ADDRESS  -d 0x100 %ob_flash_programming_script% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -148,6 +157,36 @@ set "command=%python%%applicfg% setob --layout %preprocess_bl2_file% -b hdp2_end
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+::======================================================================================
+:: update oemurot signing config xml files
+:: +++++++ xml for s code [enc_sign] image digest generation (presign)
+
+set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_SECURE_UPDATE -c x %s_code_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_SECURE_IMAGE_SIZE -c S %s_code_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_ENCRYPTION -n "Encryption key" -link GetPublic -t File -c -E -h 1 -d "" %s_code_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_OVER_WRITE -n "Write Option" -t Data -c --overwrite-only -h 1 -d "" %s_code_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %s_code_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlval -xml %s_code_xml% -nxml %code_size% -nxml %scratch_sector_number% --decimal -e (((val1+1)/val2)+1) -cond val2 -c M %s_code_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: +++++++ xml for s code [enc_sign] image generation (final)
+
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_SECURE_UPDATE -c x %s_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -164,12 +203,6 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-
-:end
-set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b FLASH_SIZE -m RE_FLASH_SIZE %map_properties% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %s_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -178,7 +211,27 @@ set "command=%python%%applicfg% xmlval -xml %s_code_xml% -nxml %code_size% -nxml
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-::xml for init image generation
+::+++++++ xml for s code [init_sign] image digest generation (presign)
+
+set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_SECURE_IMAGE_SIZE -c S %s_code_init_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %s_code_init_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+:: !! We do not add --confirm option for imgtool command to generate digest
+
+set "command=%python%%applicfg% xmlname -n %firmware_execution_offset%  -c x %s_code_init_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_ADDRESS_SECURE -c x %s_code_init_presign_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+::+++++++ xml for s code [init_sign] image generation (final)
 
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAGE_FLASH_SECURE_IMAGE_SIZE -c S %s_code_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
@@ -200,6 +253,9 @@ set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_IMAG
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+::======================================================================================
+:: update loader project related files
+::======================================================================================
 :: update loader linker file  
 set "command=%python%%applicfg% linker --layout %preprocess_bl2_file% -m RE_FLASH_LOADER_START -n LOADER_CODE_START %loader_ld_file% --vb >> %current_log_file% 2>&1"
 %command%
@@ -250,7 +306,6 @@ set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b loader_i
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-ECHO comd : %command%
 
 exit 0
 
