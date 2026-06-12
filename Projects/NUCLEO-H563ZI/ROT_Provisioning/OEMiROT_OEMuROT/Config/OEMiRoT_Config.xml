@@ -19,11 +19,11 @@
 	</Hash>
 	<File>
 		<Name>Authentication secure key</Name>
-		<Value>./../Keys/OEMiRoT_Authentication_S.pem</Value>
+		<Value>./../Keys/OEMiRoT_Authentication_S_pub.pem</Value>
 		<Align>4</Align>
 		<KeyType>ecdsa-p256</KeyType>
-		<Type>Public</Type>
-		<Default>./../Keys/OEMiRoT_Authentication_S.pem</Default>
+		<Type></Type>
+		<Default>./../Keys/OEMiRoT_Authentication_S_pub.pem</Default>
 		<Tooltip>Select the key used to authenticate secure firmware and data. When this key is regenerated, both firmware and data images must be processed with Imgtool</Tooltip>
 	</File>
 	<File>

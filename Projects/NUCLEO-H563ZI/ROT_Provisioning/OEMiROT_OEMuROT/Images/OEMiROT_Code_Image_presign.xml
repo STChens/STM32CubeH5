@@ -16,12 +16,12 @@
 		<Default></Default>
 	</Param>
 	<Param>
-		<Name>Signature file</Name>
-		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot_enc_sign.sig.b64</Value>
+		<Name>vector-to-sign</Name>
+		<Value>digest</Value>
 		<Type>Data</Type>
-		<Command>--fix-sig</Command>
+		<Command>--vector-to-sign</Command>
 		<Hidden>1</Hidden>
-		<Default>../../../Applications/ROT_2stage/OEMuROT_Boot/Binary/OEMuROT_Boot_init_sign.sig.b64</Default>
+		<Default></Default>
 	</Param>
 	<Param>
 		<Name>Write Option</Name>
@@ -45,13 +45,6 @@
 		<Command>-e</Command>
 		<Hidden>1</Hidden>
 		<Default>little</Default>
-	</Param>
-	<Param>
-		<Name>Padding</Name>
-		<Type>Data</Type>
-		<Command>--pad</Command>
-		<Hidden>1</Hidden>
-		<Default></Default>
 	</Param>
 	<Param>
 		<Name>Firmware area size</Name>
@@ -140,15 +133,15 @@
 	</Param>
 	<Param>
 		<Name>Firmware binary input file</Name>
-		<Value>..\..\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot.bin</Value>
+		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot.bin</Value>
 		<Type>File</Type>
 		<Tooltip>Select the firmware binary file to be processed for the image generation</Tooltip>
 		<Default>../../../Applications/ROT_2stage/OEMuROT_Boot/Binary/OEMuROT_Boot.bin</Default>
 	</Param>
 	<Output>
-		<Name>Image output file</Name>
+		<Name>Digest output file</Name>
 		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot_enc_sign.hex</Value>
-		<Default>../../../Applications/ROT_2stage/OEMuROT_Boot/Binary/OEMuROT_Boot_enc_sign.hex</Default>
+		<Default>../../../Applications/ROT_2stage/OEMuROT_Boot/Binary/OEMuROT_Boot_enc_sign.digest</Default>
 	</Output>
   </McubootFormat>
 </Root>

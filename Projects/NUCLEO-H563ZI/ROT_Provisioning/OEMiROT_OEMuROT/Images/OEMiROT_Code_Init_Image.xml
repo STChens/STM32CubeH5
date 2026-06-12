@@ -10,7 +10,7 @@
 		<Name>Authentication secure key</Name>
 		<Link></Link>
 		<Type>File</Type>
-		<Command>-k</Command>
+		<Command>--fix-sig-pubkey</Command>
 		<Hidden>1</Hidden>
 		<Tooltip>Signature Key used</Tooltip>
 		<Default></Default>
@@ -24,6 +24,14 @@
 		<Hidden>1</Hidden>
 		<Default></Default>
 	</Param>
+	<Param>
+		<Name>Signature file</Name>
+		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot_init_sign.sig.b64</Value>
+		<Type>Data</Type>
+		<Command>--fix-sig</Command>
+		<Hidden>1</Hidden>
+		<Default>../../../Applications/ROT_2stage/OEMuROT_Boot/Binary/OEMuROT_Boot_init_sign.sig.b64</Default>
+	</Param>	
 	<Param>
 		<Name>Clear</Name>
 		<Type>Data</Type>
@@ -121,7 +129,7 @@
 	</Param>
 	<Output>
 		<Name>Image output file</Name>
-		<Value>..\..\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot_init_sign.hex</Value>
+		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot_init_sign.hex</Value>
 		<Default>../../../Applications/ROT_2stage/OEMuROT_Boot/Binary/OEMuROT_Boot_init_sign.hex</Default>
 	</Output>
   </McubootFormat>
