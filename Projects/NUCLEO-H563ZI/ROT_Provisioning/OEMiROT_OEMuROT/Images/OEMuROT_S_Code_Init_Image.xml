@@ -10,11 +10,20 @@
 		<Name>Authentication secure key</Name>
 		<Link></Link>
 		<Type>File</Type>
-		<Command>-k</Command>
+		<Command>--fix-sig-pubkey</Command>
 		<Hidden>1</Hidden>
 		<Tooltip>Signature Key used</Tooltip>
 		<Default></Default>
 	</Param>
+	<Param>
+		<Name>Signature file</Name>
+		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Appli\Binary\rot_tz_s_app_init_sign.sig.b64</Value>
+		<Type>Data</Type>
+		<Command>--fix-sig</Command>
+		<Hidden>1</Hidden>
+		<Default>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_s_app_init_sign.sig.b64</Default>
+	</Param>
+
 	<Param>
 		<Name>Encryption key</Name>
 		<Link>GetPublic</Link>
@@ -121,7 +130,7 @@
 	</Param>
 	<Output>
 		<Name>Image output file</Name>
-		<Value>..\..\..\Applications\ROT_2stage\OEMuROT_Appli\Binary\rot_tz_s_app_init_sign.hex</Value>
+		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Appli\Binary\rot_tz_s_app_init_sign.hex</Value>
 		<Default>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_s_app_init_sign.hex</Default>
 	</Output>
   </McubootFormat>

@@ -140,7 +140,7 @@
 	</Param>
 	<Output>
 		<Name>Digest output file</Name>
-		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot_enc_sign.hex</Value>
+		<Value>C:\ST\Cube\Cube1\STM32CubeH5\Projects\NUCLEO-H563ZI\ROT_Provisioning\..\Applications\ROT_2stage\OEMuROT_Boot\Binary\OEMuROT_Boot_enc_sign.digest</Value>
 		<Default>../../../Applications/ROT_2stage/OEMuROT_Boot/Binary/OEMuROT_Boot_enc_sign.digest</Default>
 	</Output>
   </McubootFormat>
