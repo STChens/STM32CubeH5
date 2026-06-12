@@ -3,7 +3,7 @@
 :: The signing will be split into 3 parts
 :: Part1: Use imgtool to generarte HASH digest (which will be signed using external tool)
 :: Part2: Sign the digest with external tool and do base64 encoding of the signature binary
-:: Part3: Use imgtool to generate the final image using the signature signed by external tool
+:: Part3: Encode signature binary with base64 and use imgtool to generate the final image 
 ::=================================================================================================
 REM Run script for "OEMuROT Signing Part 2"
 ::=================================================================================================
@@ -25,7 +25,7 @@ setlocal EnableDelayedExpansion
 
 :: Environment variable for log file
 set current_log_file="%projectdir%\sign.log"
-echo. > %current_log_file%
+echo. >> %current_log_file%
 
 set project=OEMiROT
 set bootpath=OEMiROT_OEMuROT
@@ -49,7 +49,7 @@ set bin_path_xml_field="%provisioningdir%\..\Applications\ROT_2stage\OEMuROT_Boo
 set fw_in_bin_xml_field="Firmware binary input file"
 set fw_out_bin_xml_field="Image output file"
 set fw_digst_out_bin_xml_field="Digest output file"
-set fw_signature_xml_filed="Signature file"
+set fw_signature_xml_field="Signature file"
 set s_app_bin_xml_field="%bin_path_xml_field%\OEMuROT_Boot.bin"
 set s_app_enc_sign_bin_xml_field="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.bin"
 set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.hex"
@@ -111,6 +111,7 @@ if not "%MAJOR_VER%" == "3" (
 
 :: Environment variable for AppliCfg
 set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
+echo Postbuild %signing% image (step2) >> %current_log_file% 2>>&1
 ::=============================================================================================
 ::Sign digest with openssl
 ::=============================================================================================

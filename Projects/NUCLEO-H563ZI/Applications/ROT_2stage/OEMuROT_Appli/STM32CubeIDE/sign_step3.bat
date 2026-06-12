@@ -1,11 +1,11 @@
 ::=================================================================================================
-:: This set of signing scripts is intended for OEMuROT binary signing using  external tool
+:: This set of signing scripts is intended for App binary signing using  external tool
 :: The signing will be split into 3 parts
 :: Part1: Use imgtool to generarte HASH digest (which will be signed using external tool)
 :: Part2: Sign the digest with external tool and do base64 encoding of the signature binary
 :: Part3: Encode signature binary with base64 and use imgtool to generate the final image 
 ::=================================================================================================
-REM Run script for "OEMuROT Signing Part 3"
+REM Run script for "App Signing Part 1"
 ::=================================================================================================
 @ECHO OFF
 :: arg1 is the binary type (nonsecure, secure)
@@ -27,45 +27,65 @@ setlocal EnableDelayedExpansion
 set current_log_file="%projectdir%\sign.log"
 echo. >> %current_log_file%
 
-set project=OEMiROT
-set bootpath=OEMiROT_OEMuROT
+::=============================================================================================
+::Variables updated by OEMuROT_Boot postbuild
+::=============================================================================================
+:: flag to switch between OEMiROT and OEMuROT
+set oemurot_enable=1
 
+if %oemurot_enable% == 1 (
+set project=OEMuROT
+set bootpath=OEMiROT_OEMuROT
+)
+
+if %oemurot_enable% == 0 (
+set project=OEMiROT
+set bootpath=OEMiROT
+)
+
+call "%provisioningdir%\%bootpath%\img_config.bat"
 ::=============================================================================================
 ::image binary files
 ::=============================================================================================
-set s_code_bin="%projectdir%\..\Binary\OEMuROT_Boot.bin"
+set s_code_bin="%projectdir%\..\Binary\rot_tz_s_app.bin"
 
 ::=============================================================================================
-::image xml configuration files (after-sign configuration)
+::image xml configuration files
 ::=============================================================================================
-set s_code_xml="%provisioningdir%\%bootpath%\Images\%project%_Code_Image.xml"
-set s_code_init_xml="%provisioningdir%\%bootpath%\Images\%project%_Code_Init_Image.xml"
+set s_code_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Code_Image.xml"
+set s_code_init_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Code_Init_Image.xml"
+set s_data_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Data_Image.xml"
+set s_data_init_xml="%provisioningdir%\%bootpath%\Images\%project%_S_Data_Init_Image.xml"
 
 ::=================================================================================================
 :: Variables for image xml configuration(ROT_Provisioning\%bootpath%\Images)
 :: relative path from ROT_Provisioning\%bootpath%\Images directory to retrieve binary files
 ::=================================================================================================
-set bin_path_xml_field="%provisioningdir%\..\Applications\ROT_2stage\OEMuROT_Boot\Binary"
+set bin_path_xml_field="%provisioningdir%\..\Applications\ROT_2stage\OEMuROT_Appli\Binary"
 set fw_in_bin_xml_field="Firmware binary input file"
 set fw_out_bin_xml_field="Image output file"
 set fw_digst_out_bin_xml_field="Digest output file"
 set fw_signature_xml_field="Signature file"
-set s_app_bin_xml_field="%bin_path_xml_field%\OEMuROT_Boot.bin"
-set s_app_enc_sign_bin_xml_field="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.bin"
-set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.hex"
-set s_app_init_sign_hex_xml_field="%bin_path_xml_field%\OEMuROT_Boot_init_sign.hex"
+set s_app_bin_xml_field="%bin_path_xml_field%\rot_tz_s_app.bin"
+set s_app_enc_sign_bin_xml_field="%bin_path_xml_field%\rot_tz_s_app_enc_sign.bin"
+set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_s_app_enc_sign.hex"
+set s_app_init_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_s_app_init_sign.hex"
 
 set s_app_enc_sign_digest_xml_field="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.digest"
 set s_app_init_sign_digest_xml_field="%bin_path_xml_field%\OEMuROT_Boot_init_sign.digest"
 
-set s_app_init_sign_digest_file="%bin_path_xml_field%\OEMuROT_Boot_init_sign.digest"
-set s_app_enc_sign_digest_file="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.digest"
+set s_app_init_sign_digest_file="%bin_path_xml_field%\rot_tz_s_app_init_sign.digest"
+set s_app_enc_sign_digest_file="%bin_path_xml_field%\rot_tz_s_app_enc_sign.digest"
 
-set s_app_init_sign_sig_file="%bin_path_xml_field%\OEMuROT_Boot_init_sign.sig"
-set s_app_init_sign_sig_b64_file="%bin_path_xml_field%\OEMuROT_Boot_init_sign.sig.b64"
+set s_app_init_sign_sig_file="%bin_path_xml_field%\rot_tz_s_app_init_sign.sig"
+set s_app_init_sign_sig_b64_file="%bin_path_xml_field%\rot_tz_s_app_init_sign.sig.b64"
 
-set s_app_enc_sign_sig_file="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.sig"
-set s_app_enc_sign_sig_b64_file="%bin_path_xml_field%\OEMuROT_Boot_enc_sign.sig.b64"
+set s_app_enc_sign_sig_file="%bin_path_xml_field%\rot_tz_s_app_enc_sign.sig"
+set s_app_enc_sign_sig_b64_file="%bin_path_xml_field%\rot_tz_s_app_enc_sign.sig.b64"
+
+set s_data_enc_sign_bin_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_enc_sign.bin"
+set s_data_enc_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_enc_sign.hex"
+set s_data_init_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_init_sign.hex"
 
 ::Make sure we have a Binary sub-folder in UserApp folder
 if not exist "%bin_path_xml_field%" (
