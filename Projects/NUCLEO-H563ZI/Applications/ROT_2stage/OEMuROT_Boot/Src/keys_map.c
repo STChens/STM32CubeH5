@@ -93,7 +93,11 @@ const struct bootutil_key bootutil_keys[] = {
 };
 #endif /* MCUBOOT_SIGN_RSA_LEN == 2048 */
 #elif defined(MCUBOOT_SIGN_EC256)
-const unsigned int ecdsa_pub_key_len = 91;
+#if  defined(OEMUROT_ENABLE)
+#include "csk_pubkey.h"
+#else
+ const unsigned int ecdsa_pub_key_len = 91;
+#endif
 #if (MCUBOOT_APP_IMAGE_NUMBER == 2) || (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
 const unsigned int ecdsa_pub_key_len_1 = 91;
 #endif
