@@ -104,7 +104,8 @@ const unsigned int ecdsa_pub_key_len_1 = 91;
 const struct bootutil_key bootutil_keys[] = {
     {
 #if  defined(OEMUROT_ENABLE)
-        .key = OBK_Hdpl2_Cfg.Hdpl3SecureAuthenticationPubKey,
+        //.key = OBK_Hdpl2_Cfg.Hdpl3SecureAuthenticationPubKey,
+        .key = &ecdsa_pub_key[0],
 #else
         .key = OBK_Hdpl1_Cfg.Hdpl3SecureAuthenticationPubKey,
 #endif

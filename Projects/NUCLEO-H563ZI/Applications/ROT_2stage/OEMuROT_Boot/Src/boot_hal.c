@@ -642,20 +642,6 @@ int32_t boot_platform_init(void)
     /* Configure keys */
 #if  defined(OEMUROT_ENABLE)
     OBK_ReadHdpl2Config(&OBK_Hdpl2_Cfg);
-    {
-    	extern unsigned int ecdsa_pub_key_len;
-    	extern unsigned char ecdsa_pub_key[];
-
-		if(memcmp(&ecdsa_pub_key[0], &OBK_Hdpl2_Cfg.Hdpl3SecureAuthenticationPubKey[0], ecdsa_pub_key_len)!=0)
-		{
-			BOOT_LOG_ERR(BRIGHT_RED"OBK read: Wrong public key in OBK HDPL2 cfg"RESET_COLOR);
-			Error_Handler();
-		}
-		else
-		{
-			BOOT_LOG_INF("OBK read: public key in OBK HDPL2 cfg is OK");
-		}
-    }
 #else
     OBK_ReadHdpl1Config(&OBK_Hdpl1_Cfg);
 #endif
