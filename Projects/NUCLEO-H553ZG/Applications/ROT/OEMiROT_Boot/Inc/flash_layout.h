@@ -28,6 +28,10 @@
 /* OEMiROT/STiROT_OEMuROT configuration */
 /*#define OEMUROT_ENABLE*/         /* Defined: the project is used for STiROT_OEMuROT boot path */
                                    /* Undefined: the project is used for OEMiROT boot path */
+
+#define MCUBOOT_PRIMARY_ONLY	   /* Defined: no download slot
+                                      Undefined: active slot + download slot */
+
 #define MCUBOOT_OVERWRITE_ONLY     /* Defined: the FW installation uses overwrite method.
                                       UnDefined: The FW installation uses swap mode. */
 
@@ -35,7 +39,7 @@
                                                To enter it, press user button at reset.
                                       Undefined: Do not use system bootloader. */
 
-#define MCUBOOT_APP_IMAGE_NUMBER 2      /* 1: S application only if FLASH_NS_PARTITION_SIZE = 0 ,
+#define MCUBOOT_APP_IMAGE_NUMBER 1      /* 1: S application only if FLASH_NS_PARTITION_SIZE = 0 ,
                                               else S and NS application binaries assembled in one single image.
                                            2: Two separated images for S and NS application binaries. */
 
@@ -75,20 +79,24 @@
 #if (MCUBOOT_APP_IMAGE_NUMBER == 2)
 #define FLASH_AREA_1_ID                 (2)
 #endif /* MCUBOOT_APP_IMAGE_NUMBER == 2 */
+
+#if !defined MCUBOOT_PRIMARY_ONLY
 #define FLASH_AREA_2_ID                 (3)
+#endif /*#if !defined MCUBOOT_PRIMARY_ONLY*/
+
 #if (MCUBOOT_APP_IMAGE_NUMBER == 2)
 #define FLASH_AREA_3_ID                 (4)
 #endif /* MCUBOOT_APP_IMAGE_NUMBER == 2 */
 #if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
 #define FLASH_AREA_4_ID                 (5)
 #endif /* MCUBOOT_S_DATA_IMAGE_NUMBER == 1 */
-#if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
+#if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1) && (!defined MCUBOOT_PRIMARY_ONLY)
 #define FLASH_AREA_5_ID                 (6)
 #endif /* MCUBOOT_NS_DATA_IMAGE_NUMBER == 1 */
 #if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)
 #define FLASH_AREA_6_ID                 (7)
 #endif /* MCUBOOT_S_DATA_IMAGE_NUMBER == 1 */
-#if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
+#if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1) && (!defined MCUBOOT_PRIMARY_ONLY)
 #define FLASH_AREA_7_ID                 (8)
 #endif /* MCUBOOT_NS_DATA_IMAGE_NUMBER == 1 */
 #define FLASH_AREA_SCRATCH_ID           (9)
@@ -100,13 +108,13 @@
 
 /* area for BL2 code protected by hdp */
 #define FLASH_AREA_BL2_OFFSET           (0x0000)
-#define FLASH_AREA_BL2_SIZE             (0x18000)
+#define FLASH_AREA_BL2_SIZE             (0x20000)
 
 /* scratch area */
 #if defined(FLASH_AREA_SCRATCH_ID)
 #define FLASH_AREA_SCRATCH_DEVICE_ID    (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
 #define FLASH_AREA_SCRATCH_OFFSET       (FLASH_AREA_BL2_SIZE)
-#if defined(MCUBOOT_OVERWRITE_ONLY)
+#if defined(MCUBOOT_OVERWRITE_ONLY) || defined (MCUBOOT_PRIMARY_ONLY)
 #define FLASH_AREA_SCRATCH_SIZE         (0x0000) /* Not used in MCUBOOT_OVERWRITE_ONLY mode */
 #else
 #define FLASH_AREA_SCRATCH_SIZE         (0x10000) /* 64 KB */
@@ -187,6 +195,27 @@
 /* BL2 flash areas */
 #define FLASH_AREA_BEGIN_OFFSET         (FLASH_AREA_SCRATCH_SIZE+FLASH_AREA_BL2_SIZE)
 #define FLASH_AREAS_DEVICE_ID           (FLASH_DEVICE_ID - FLASH_DEVICE_ID)
+
+/* FLASH_AREA_BEGIN_OFFSET :
+   Before FLASH_AREA_BEGIN_OFFSET is BL2 and Scratch area
+   Starting from FLASH_AREA_BEGIN_OFFSET is S data area, S code active slot and so on
+   Basically, all content that does not belong to Secure boot or managed by secure boot is starting from FLASH_AREA_BEGIN_OFFSET
+*/
+
+/* For SECURE ONLY APP use case, the possible slots following FLASH_AREA_BEGIN_OFFSET are
+   +----------+--------------------------------+-------------------------------+
+   | Area ID  |  Purpose                       |   Size                        |                 
+   +----------+--------------------------------+-------------------------------+
+   | 4        |  S data active slot            |   FLASH_S_DATA_PARTITION_SIZE |                 
+   +----------+--------------------------------+-------------------------------+
+   | 0        |  S App data active slot        |   FLASH_S_ACTIVESLOT_SIZE     |                 
+   +----------+--------------------------------+-------------------------------+
+   | 2        |  S App data download slot      |   FLASH_S_ACTIVESLOT_SIZE     |                 
+   +----------+--------------------------------+-------------------------------+
+   | 6        |  S data download slot          |   FLASH_S_DATA_PARTITION_SIZE |                 
+   +----------+--------------------------------+-------------------------------+
+   
+*/
 
 /* Secure data image primary slot */
 #if defined (FLASH_AREA_4_ID)
@@ -334,12 +363,14 @@
 /*
  * The maximum number of status entries supported by the bootloader.
  */
+#if !defined MCUBOOT_PRIMARY_ONLY
 #if defined(MCUBOOT_OVERWRITE_ONLY)
 #define MCUBOOT_STATUS_MAX_ENTRIES        (0)
 #else /* not MCUBOOT_OVERWRITE_ONLY */
 #define MCUBOOT_STATUS_MAX_ENTRIES        (((FLASH_MAX_PARTITION_SIZE - 1) / \
                                             FLASH_AREA_SCRATCH_SIZE) + 1)
 #endif /* MCUBOOT_OVERWRITE_ONLY */
+#endif /* #if !defined MCUBOOT_PRIMARY_ONLY */
 
 /* Maximum number of image sectors supported by the bootloader. */
 #define MCUBOOT_MAX_IMG_SECTORS           ((FLASH_MAX_PARTITION_SIZE) / \

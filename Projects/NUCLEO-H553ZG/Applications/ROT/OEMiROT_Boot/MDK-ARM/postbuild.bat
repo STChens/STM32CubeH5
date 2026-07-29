@@ -276,6 +276,10 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c --primary-only -h 1 -d "" %s_code_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %s_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -287,6 +291,10 @@ IF !errorlevel! NEQ 0 goto :error
 :: ============================================================ Update %ns_code_init_xml% =============================================================
 IF "%app_full_secure%" == "1" (goto :bypass_ns_code_xml_update)
 set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %ns_code_init_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlname --layout %preprocess_bl2_file% -m RE_APP_IMAGE_NUMBER -n %auth_ns% -sn %auth_s% -v 1 -c k %ns_code_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -324,6 +332,10 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_E
 IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_OVER_WRITE -n "Write Option" -t Data -c --overwrite-only -h 1 -d "" %ns_code_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c  --primary-only -h 1 -d "" %ns_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -374,6 +386,10 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c  --primary-only -h 1 -d "" %s_data_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %s_data_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -421,6 +437,10 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c  --primary-only -h 1 -d "" %ns_data_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %ns_data_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -457,6 +477,10 @@ IF !errorlevel! NEQ 0 goto :error
 if not exist %appli_flash_layout% (goto :end)
 
 set "command=%python%%applicfg% setdefine --layout %preprocess_bl2_file% -m RE_OVER_WRITE -n MCUBOOT_OVERWRITE_ONLY -v 1 %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% setdefine --layout %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n MCUBOOT_PRIMARY_ONLY -v 1 %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
