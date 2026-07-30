@@ -38,7 +38,7 @@
 #define MCUBOOT_EXT_LOADER         /* Defined: Use system bootloader (in system flash).
                                                To enter it, press user button at reset.
                                       Undefined: Do not use system bootloader. */
-
+																			
 #define MCUBOOT_APP_IMAGE_NUMBER 1      /* 1: S application only if FLASH_NS_PARTITION_SIZE = 0 ,
                                               else S and NS application binaries assembled in one single image.
                                            2: Two separated images for S and NS application binaries. */
@@ -48,6 +48,11 @@
 
 #define MCUBOOT_NS_DATA_IMAGE_NUMBER 0  /* 1: NS data image for NS application.
                                            0: No NS data image. */
+
+#define USE_USER_LOADER            /* Defined: BL2 will jump to the user loader instead of system booloader 
+																		  (valid only if MCUBOOT_EXT_LOADER is also defined)
+                                      UART Ymodem loader as example for user loader */
+																			
 
 /* Flash layout configuration : end ******************************************/
 
@@ -106,9 +111,34 @@
  * is used as a temporary storage during image swapping.
  */
 
+/* Memory layout with BL2 + Loader
+   +----------+--------------------------------+-------------------------------+
+   | Area ID  |  Purpose                       |   Size                        |                 
+   +----------+--------------------------------+-------------------------------+
+   | BL2      |  S data active slot            |   FLASH_S_DATA_PARTITION_SIZE |                 
+   +----------+--------------------------------+-------------------------------+
+   | 0        |  S App data active slot        |   FLASH_S_ACTIVESLOT_SIZE     |                 
+   +----------+--------------------------------+-------------------------------+
+   | 2        |  S App data download slot      |   FLASH_S_ACTIVESLOT_SIZE     |                 
+   +----------+--------------------------------+-------------------------------+
+   | 6        |  S data download slot          |   FLASH_S_DATA_PARTITION_SIZE |                 
+   +----------+--------------------------------+-------------------------------+
+   
+*/
+
 /* area for BL2 code protected by hdp */
 #define FLASH_AREA_BL2_OFFSET           (0x0000)
 #define FLASH_AREA_BL2_SIZE             (0x20000)
+
+/* User loader area */
+#if (defined MCUBOOT_EXT_LOADER && defined USE_USER_LOADER)
+#define LOADER_FLASH_DEV_NAME             Driver_FLASH0
+#define FLASH_AREA_LOADER_SIZE   (0x10000) /* 64 KB reserved for loader */
+#define FLASH_AREA_LOADER_OFFSET (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - FLASH_AREA_LOADER_SIZE) /* put at the end of BL2 area */
+#else /*  (defined MCUBOOT_EXT_LOADER && !defined USE_SYTEM_BOOTLOADER) */
+#define FLASH_AREA_LOADER_SIZE   (0) 
+#define FLASH_AREA_LOADER_OFFSET (FLASH_AREA_BL2_OFFSET + FLASH_AREA_BL2_SIZE - FLASH_AREA_LOADER_SIZE) /* put at the end of BL2 area */
+#endif /*  (defined MCUBOOT_EXT_LOADER && defined USE_USER_LOADER) */
 
 /* scratch area */
 #if defined(FLASH_AREA_SCRATCH_ID)
@@ -202,7 +232,7 @@
    Basically, all content that does not belong to Secure boot or managed by secure boot is starting from FLASH_AREA_BEGIN_OFFSET
 */
 
-/* For SECURE ONLY APP use case, the possible slots following FLASH_AREA_BEGIN_OFFSET are
+/* For Single Image APP use case, the possible slots following FLASH_AREA_BEGIN_OFFSET are
    +----------+--------------------------------+-------------------------------+
    | Area ID  |  Purpose                       |   Size                        |                 
    +----------+--------------------------------+-------------------------------+

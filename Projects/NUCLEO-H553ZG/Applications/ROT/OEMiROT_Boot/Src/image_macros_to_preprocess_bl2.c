@@ -167,6 +167,11 @@ enum image_attributes
   RE_OVER_WRITE = (0x0),
   RE_CMSE_VENEER_REGION_SIZE = (0x2000),
 #endif
+#if defined(MCUBOOT_PRIMARY_ONLY)
+  RE_PRIMARY_ONLY = (0x1),  
+#else
+  RE_PRIMARY_ONLY = (0x0),  
+#endif
 #if (MCUBOOT_APP_IMAGE_NUMBER == 1) && (FLASH_NS_PARTITION_SIZE == 0)
   RE_OEMIROT_APPLI_FULL_SECURE = (0x1),
 #else

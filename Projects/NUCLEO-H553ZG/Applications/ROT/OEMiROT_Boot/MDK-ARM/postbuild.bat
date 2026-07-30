@@ -62,6 +62,8 @@ set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 :postbuild
 set "auto_rot_update=%projectdir%\..\auto_rot_update.bat"
 set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
+set "oemirot_bin_file=%projectdir%\..\Binary\OEMiROT_Boot.bin"
+set "loader_bin_file=%projectdir%\..\..\Loader\Binary\Loader.bin"
 set "appli_dir=../../../../%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
@@ -110,6 +112,15 @@ set "command=%python%%applicfg% definevalue -xml %stirot_config_xml% -nxml %oemu
 IF !errorlevel! NEQ 0 goto :error
 
 :common_rot_regions
+
+:: ======================================================== Merge OEMiROT and Loader binary ===========================================================
+echo %oemirot_bin_file% >> %current_log_file% 2>>&1
+echo %loader_bin_file% >> %current_log_file% 2>>&1
+IF exist %loader_bin_file% (
+copy %oemirot_bin_file% %oemirot_bin_file%.tmp >> %current_log_file% 2>>&1
+%python%%applicfg% oneimage -fb %oemirot_bin_file%.tmp -o 0x10000 -sb %loader_bin_file% -i 0x0 -ob %oemirot_bin_file% --vb >> %current_log_file% 2>>&1
+del %oemirot_bin_file%.tmp >> %current_log_file% 2>>&1
+)
 
 :: =============================================================== Update %img_config% ================================================================
 set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b app_image_number -m RE_APP_IMAGE_NUMBER --decimal %img_config% --vb >> %current_log_file% 2>&1"
