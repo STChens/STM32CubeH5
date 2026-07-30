@@ -1060,6 +1060,8 @@ static void hdpext_loader_cfg(void)
   else
   {
     hdp2_ext = 0U;
+#if !defined (USE_USER_LOADER)
+		/* user loader locates after OEMiROT and will run in HDPL3, so we don't hide it */
     if (first_allowed > hdp1_end)
     {
       hdp1_ext = first_allowed - ((hdp1_end == 0U) ? 1U : hdp1_end);
@@ -1073,6 +1075,7 @@ static void hdpext_loader_cfg(void)
       /* Dwl area under native HDP */
       Error_Handler();
     }
+#endif /*!defined (USE_USER_LOADER)*/
   }
 
   /* configuration stage */

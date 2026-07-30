@@ -112,18 +112,15 @@
  */
 
 /* Memory layout with BL2 + Loader
-   +----------+--------------------------------+-------------------------------+
-   | Area ID  |  Purpose                       |   Size                        |                 
-   +----------+--------------------------------+-------------------------------+
-   | BL2      |  S data active slot            |   FLASH_S_DATA_PARTITION_SIZE |                 
-   +----------+--------------------------------+-------------------------------+
-   | 0        |  S App data active slot        |   FLASH_S_ACTIVESLOT_SIZE     |                 
-   +----------+--------------------------------+-------------------------------+
-   | 2        |  S App data download slot      |   FLASH_S_ACTIVESLOT_SIZE     |                 
-   +----------+--------------------------------+-------------------------------+
-   | 6        |  S data download slot          |   FLASH_S_DATA_PARTITION_SIZE |                 
-   +----------+--------------------------------+-------------------------------+
-   
+   +----------+--------------------------------+-------------------------------------------------+
+   | Area ID  |  sub area  |   Purpose         |   Size                                          |                 
+   +----------+--------------------------------+-------------------------------------------------+
+   |          | BL2        | OEMiROT code      |   FLASH_AREA_BL2_SIZE -  FLASH_AREA_LOADER_SIZE |                 
+   +   BL2    +--------------------------------+-------------------------------------------------+
+   |          | LOADER     | User Loader code  |   FLASH_AREA_LOADER_SIZE                        |                 
+   +----------+--------------------------------+-------------------------------------------------+
+   |  Others  |  ...                           |   ...                                           |                 
+   +----------+--------------------------------+-------------------------------------------------+   
 */
 
 /* area for BL2 code protected by hdp */
@@ -159,7 +156,11 @@
 
 /* HDP area end at this address */
 #if !defined(OEMUROT_ENABLE)
+#if (defined MCUBOOT_EXT_LOADER && defined USE_USER_LOADER)
+#define FLASH_BL2_HDP_END               (FLASH_AREA_LOADER_OFFSET-1)
+#else
 #define FLASH_BL2_HDP_END               (FLASH_AREA_SCRATCH_OFFSET+FLASH_AREA_SCRATCH_SIZE-1)
+#endif
 #endif /* not OEMUROT_ENABLE */
 
 /* control area for BL2 code */

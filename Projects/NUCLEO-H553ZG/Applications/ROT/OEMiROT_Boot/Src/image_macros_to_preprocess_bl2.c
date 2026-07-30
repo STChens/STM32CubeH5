@@ -131,7 +131,11 @@ enum image_attributes
   RE_BL2_HDP_END = 0x0,
 #else
   RE_BL2_HDP_START = 0x0,
+  #if (defined MCUBOOT_EXT_LOADER && defined USE_USER_LOADER)
+  RE_BL2_HDP_END = (FLASH_AREA_LOADER_OFFSET-0x1),
+  #else
   RE_BL2_HDP_END = (FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE+FLASH_AREA_SCRATCH_SIZE-0x1),
+  #endif
 #endif
   RE_BL2_WRP_END = (FLASH_AREA_BL2_OFFSET+FLASH_AREA_BL2_SIZE-0x1),
   /* area for updates slot address */

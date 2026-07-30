@@ -562,6 +562,7 @@ int32_t boot_platform_init(void)
 #ifdef MCUBOOT_HAVE_LOGGING
     /* Init for log */
     stdio_init();
+	  BOOT_LOG_INF("BOOT HAL built on: %s %s", __DATE__, __TIME__);
 #endif /*  MCUBOOT_HAVE_LOGGING */
 
 #ifdef OEMIROT_ICACHE_ENABLE

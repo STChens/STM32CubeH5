@@ -114,8 +114,7 @@ int main(int argc, char **argv)
   - Set NVIC Group Priority to 3
   - Low Level Initialization
   */
-  HAL_Init();
-  HAL_MPU_Disable();
+  HAL_Init();  
 
   /* Configure Communication module */
   COM_Init();
