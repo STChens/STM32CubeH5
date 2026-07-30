@@ -43,7 +43,8 @@ extern "C" {
 /** @defgroup COM_UART  UART Configuration
   * @{
   */
-#if 1
+
+
 #define COM_UART                                USART3
 #define COM_UART_CLK_ENABLE()                   __HAL_RCC_USART3_CLK_ENABLE()
 #define COM_UART_CLK_DISABLE()                  __HAL_RCC_USART3_CLK_DISABLE()
@@ -59,24 +60,7 @@ extern "C" {
 #define COM_UART_RX_PIN                         GPIO_PIN_9
 #define COM_UART_RX_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOD_CLK_ENABLE()
 #define COM_UART_RX_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOD_CLK_DISABLE()
-#else
-#define COM_UART                                USART1
-#define COM_UART_CLK_ENABLE()                   __HAL_RCC_USART1_CLK_ENABLE()
-#define COM_UART_CLK_DISABLE()                  __HAL_RCC_USART1_CLK_DISABLE()
-#define COM_UART_TX_GPIO_PORT                   GPIOA
-#define COM_UART_TX_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE()
-#define COM_UART_TX_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOA_CLK_DISABLE()
-  
-#define COM_UART_TX_PIN                         GPIO_PIN_9
-#define COM_UART_TX_AF                          GPIO_AF7_USART1
 
-#define COM_UART_RX_GPIO_PORT                   GPIOA
-#define COM_UART_RX_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE()
-#define COM_UART_RX_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOA_CLK_DISABLE()
-#define COM_UART_RX_PIN                         GPIO_PIN_10
-#define COM_UART_RX_AF                          GPIO_AF7_USART1
-
-#endif
 /* Maximum Timeout values for flags waiting loops.
    You may modify these timeout values depending on CPU frequency and application
    conditions (interrupts routines ...). */

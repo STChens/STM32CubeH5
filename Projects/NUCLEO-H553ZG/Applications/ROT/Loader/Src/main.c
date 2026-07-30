@@ -121,7 +121,7 @@ int main(int argc, char **argv)
   COM_Init();
 
   printf("\r\n======================================================================");
-  printf("\r\n=              (C) COPYRIGHT 2025 STMicroelectronics                 =");
+  printf("\r\n=              (C) COPYRIGHT 2026 STMicroelectronics                 =");
   printf("\r\n=                 Build time: %s %s                   =", __DATE__, __TIME__);
   printf("\r\n=                          LOCAL LOADER                              =");
   printf("\r\n======================================================================");

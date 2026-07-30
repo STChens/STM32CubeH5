@@ -31,6 +31,7 @@
 #define FLASH0_PAGE_SIZE 0x2000
 #define FLASH0_PROG_UNIT 0x10
 #define FLASH0_ERASED_VAL 0xff
+
 /*
 #define DEBUG_FLASH_ACCESS
 #define CHECK_ERASE
@@ -94,6 +95,30 @@ struct arm_flash_dev_t
 #if !defined(LOCAL_LOADER_CONFIG)
 static __IO uint32_t DoubleECC_Error_Counter = 0U;
 #endif
+
+/**
+  * \brief      Set/unset FLASH SECBB to full secure
+  * \param[in]  set 1: set, 0, unset  
+  */
+
+static void config_flash_secbb_fullsecure(int8_t set)
+{
+	if ( set == 1 ) 
+	{
+		FLASH->SECBB1R1 = 0xFFFFFFFF;
+		FLASH->SECBB1R2 = 0xFFFFFFFF;
+		FLASH->SECBB2R1 = 0xFFFFFFFF;
+		FLASH->SECBB2R2 = 0xFFFFFFFF;
+	}
+	else
+	{
+		FLASH->SECBB1R1 = 0;
+		FLASH->SECBB1R2 = 0;
+		FLASH->SECBB2R1 = 0;
+		FLASH->SECBB2R2 = 0;
+	}
+}
+
 /**
   * \brief      Check if the Flash memory boundaries are not violated.
   * \param[in]  flash_dev  Flash device structure \ref arm_flash_dev_t
@@ -431,6 +456,7 @@ static int32_t Flash_ProgramData(uint32_t addr,
     return ARM_DRIVER_ERROR_PARAMETER;
   }
 
+	config_flash_secbb_fullsecure(1);
   HAL_FLASH_Unlock();
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_BUSY;
   do
@@ -448,6 +474,7 @@ static int32_t Flash_ProgramData(uint32_t addr,
 
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_IDLE;
   HAL_FLASH_Lock();
+	config_flash_secbb_fullsecure(0);
   /* compare data written */
 #ifdef CHECK_WRITE
   if ((err == HAL_OK) && memcmp(dest, data, cnt))
@@ -511,15 +538,17 @@ static int32_t Flash_EraseSector(uint32_t addr)
   EraseInit.Sector = page_number(&ARM_FLASH0_DEV, addr);
 
   ARM_FLASH0_STATUS.error = DRIVER_STATUS_NO_ERROR;
+	config_flash_secbb_fullsecure(1);
   HAL_FLASH_Unlock();
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_BUSY;
   err = HAL_FLASHEx_Erase(&EraseInit, &pageError);
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_IDLE;
   HAL_FLASH_Lock();
+	config_flash_secbb_fullsecure(0);
 #ifdef DEBUG_FLASH_ACCESS
   if (err != HAL_OK)
   {
-    printf("erase failed \r\n");
+    printf("erase failed @%x \r\n", addr);
   }
 #endif /* DEBUG_FLASH_ACCESS */
 #ifdef CHECK_ERASE
