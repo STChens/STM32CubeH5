@@ -20,7 +20,7 @@ echo. > %current_log_file%
 ::=============================================================================================
 ::Variables updated by OEMiROT_Boot postbuild
 ::=============================================================================================
-set app_image_number=2
+set app_image_number=1
 set image_s_size=0x6000
 :: flag to switch between OEMiROT and OEMuROT
 set oemurot_enable=0
@@ -62,7 +62,9 @@ set fw_out_bin_xml_field="Image output file"
 set s_app_bin_xml_field="%bin_path_xml_field%\rot_tz_s_app.bin"
 set ns_app_bin_xml_field="%bin_path_xml_field%\rot_tz_ns_app.bin"
 set s_app_enc_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_s_app_enc_sign.hex"
+set s_app_enc_sign_bin_xml_field="%bin_path_xml_field%\rot_tz_s_app_enc_sign.bin"
 set ns_app_enc_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_ns_app_enc_sign.hex"
+set ns_app_enc_sign_bin_xml_field="%bin_path_xml_field%\rot_tz_ns_app_enc_sign.bin"
 set s_app_init_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_s_app_init_sign.hex"
 set ns_app_init_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_ns_app_init_sign.hex"
 set s_data_enc_sign_hex_xml_field="%provisioningdir%\%bootpath%\Binary\s_data_enc_sign.hex"
@@ -125,6 +127,7 @@ echo Creating only one image >> %current_log_file% 2>>&1
 %python%%applicfg% oneimage -fb %s_code_bin% -o %image_s_size% -sb %ns_code_bin% -i 0x0 -ob %one_code_bin% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 set ns_app_enc_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_app_enc_sign.hex"
+set ns_app_enc_sign_bin_xml_field="%bin_path_xml_field%\rot_tz_app_enc_sign.bin"
 set ns_app_init_sign_hex_xml_field="%bin_path_xml_field%\rot_tz_app_init_sign.hex"
 set ns_app_bin_xml_field="%bin_path_xml_field%\rot_tz_app.bin"
 )
@@ -138,8 +141,15 @@ echo Creating secure image  >> %current_log_file% 2>>&1
 %python%%applicfg% xmlval -v %s_app_bin_xml_field% --string -n %fw_in_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-::update xml file : output file
+::update xml file : output file (hex)
 %python%%applicfg% xmlval -v %s_app_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+%stm32tpccli% -pb %s_code_xml% >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+::update xml file : output file (bin)
+%python%%applicfg% xmlval -v %s_app_enc_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %s_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 %stm32tpccli% -pb %s_code_xml% >> %current_log_file% 2>>&1
@@ -171,8 +181,15 @@ echo Creating nonsecure image  >> %current_log_file% 2>>&1
 %python%%applicfg% xmlval -v %ns_app_bin_xml_field% --string -n %fw_in_bin_xml_field% %ns_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
-::update xml file : output file
+::update xml file : output file (hex)
 %python%%applicfg% xmlval -v %ns_app_enc_sign_hex_xml_field% --string -n %fw_out_bin_xml_field% %ns_code_xml% --vb >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+%stm32tpccli% -pb %ns_code_xml% >> %current_log_file% 2>>&1
+if !errorlevel! neq 0 goto :error
+
+::update xml file : output file (bin)
+%python%%applicfg% xmlval -v %ns_app_enc_sign_bin_xml_field% --string -n %fw_out_bin_xml_field% %ns_code_xml% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 
 %stm32tpccli% -pb %ns_code_xml% >> %current_log_file% 2>>&1
