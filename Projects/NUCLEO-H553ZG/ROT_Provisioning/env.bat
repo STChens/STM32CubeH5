@@ -21,9 +21,9 @@ set stirot_boot_path_project=Applications/ROT/STiROT_Appli
 ::                            OEMiROT Appli boot path
 :: Select application project below
 ::set oemirot_appli_path_project=Templates/ROT/OEMiROT_Appli
-::set oemirot_appli_path_project=Applications/ROT/OEMiROT_Appli
+set oemirot_appli_path_project=Applications/ROT/OEMiROT_Appli
 ::set oemirot_appli_path_project=Templates/ROT/OEMiROT_Appli_TrustZone
-set oemirot_appli_path_project=Applications/ROT/OEMiROT_Appli_TrustZone
+::set oemirot_appli_path_project=Applications/ROT/OEMiROT_Appli_TrustZone
 
 :: ==============================================================================
 ::                            OEMiROT boot path
