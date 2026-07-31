@@ -23,7 +23,6 @@
 #include "stm32h5xx_hal.h"
 #include "com.h"
 #include "common.h"
-/*#include "low_level_flash.h"*/
 #include "ymodem.h"
 #include "fw_update_app.h"
 #include "region_defs.h"
@@ -77,6 +76,29 @@ static HAL_StatusTypeDef FW_UPDATE_SECURE_DATA_IMAGE(void);
 #if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
 static HAL_StatusTypeDef FW_UPDATE_NONSECURE_DATA_IMAGE(void);
 #endif /* (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1) */
+
+/**
+  * @brief  Non-secure call function
+  *         This function is responsible for Non-secure initialization and switch
+  *         to non-secure state
+  * @retval None
+  */
+static void jump_to_system_bootloader(void)
+{
+  funcptr_NS sysbl_resethandler;
+
+  SCB_NS->VTOR = BOOTLOADER_BASE_NS;
+
+  /* Set non-secure main stack (MSP_NS) */
+  __TZ_set_MSP_NS((*(uint32_t *)BOOTLOADER_BASE_NS));
+
+  /* Get non-secure reset handler */
+  sysbl_resethandler = (funcptr_NS)(*((uint32_t *)((BOOTLOADER_BASE_NS) + 4U)));
+
+  /* Start non-secure state software application */
+  sysbl_resethandler();
+}
+
 /**
   * @}
   */
@@ -107,6 +129,11 @@ void FW_UPDATE_Run(void)
     {
       switch (key)
       {
+			case 'b' :
+          printf("Jumping to bootloader\r\n");
+					printf("Disconnect COM port if used by bootloader\r\n");
+          jump_to_system_bootloader();
+          break;				
       case '1' :
           printf("  -- Install image : reboot\r\n\n");
           NVIC_SystemReset();
@@ -326,6 +353,7 @@ static void FW_UPDATE_PrintWelcome(void)
 #if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
   printf("  Download NonSecure Data Image ------------------------- 5\r\n\n");
 #endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+	printf("  Start system bootloader for image download ------------ b\r\n\n");
 }
 /**
   * @brief Download a new Firmware from the host.
