@@ -37,7 +37,8 @@ typedef enum
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void SECURE_RegisterCallback(SECURE_CallbackIDTypeDef CallbackId, void *func);
-void SECURE_loader_run(void);
+void SECURE_sysloader_run(void);
+void SECURE_userloader_run(void);
 void SECURE_ConfirmSecureAppImage(void);
 void SECURE_ConfirmSecureDataImage(void);
 #endif /* SECURE_NSC_H */

@@ -23,7 +23,7 @@
 #define MCUBOOT_OVERWRITE_ONLY                 /* Defined: the FW installation uses overwrite method.
                                                   UnDefined: The FW installation uses swap mode. */
 
-#define MCUBOOT_APP_IMAGE_NUMBER       0x2      /* 1: S and NS application binaries are assembled in one single image.
+#define MCUBOOT_APP_IMAGE_NUMBER       0x1      /* 1: S and NS application binaries are assembled in one single image.
                                                    2: Two separated images for S and NS application binaries. */
 
 #define MCUBOOT_S_DATA_IMAGE_NUMBER    0x0      /* 1: S data image for S application.
@@ -32,21 +32,21 @@
 #define MCUBOOT_NS_DATA_IMAGE_NUMBER   0x0      /* 1: NS data image for NS application.
                                                    0: No NS data image. */
 
-#define FLASH_AREA_0_OFFSET            0x18000 /* Secure app image primary slot offset */
+#define FLASH_AREA_0_OFFSET            0x20000 /* Secure app image primary slot offset */
 
-#define FLASH_AREA_0_SIZE              0x6000   /* Secure app image primary slot size */
+#define FLASH_AREA_0_SIZE              0x56000   /* Secure app image primary slot size */
 
-#define FLASH_AREA_1_OFFSET            0x1E000  /* Non-secure app image primary slot offset */
+#define FLASH_AREA_1_OFFSET            0x0  /* Non-secure app image primary slot offset */
 
-#define FLASH_AREA_1_SIZE              0x50000   /* Non-secure app image primary slot size */
+#define FLASH_AREA_1_SIZE              0x0   /* Non-secure app image primary slot size */
 
-#define FLASH_AREA_2_OFFSET            0x6E000  /* Secure app image secondary slot */
+#define FLASH_AREA_2_OFFSET            0x0  /* Secure app image secondary slot */
 
-#define FLASH_AREA_2_SIZE              0x6000   /* Secure app image secondary slot size */
+#define FLASH_AREA_2_SIZE              0x0   /* Secure app image secondary slot size */
 
-#define FLASH_AREA_3_OFFSET            0x74000  /* Non-secure app image secondary slot offset */
+#define FLASH_AREA_3_OFFSET            0x0  /* Non-secure app image secondary slot offset */
 
-#define FLASH_AREA_3_SIZE              0x50000   /* Non-secure app image secondary slot size */
+#define FLASH_AREA_3_SIZE              0x0   /* Non-secure app image secondary slot size */
 
 #define FLASH_AREA_4_OFFSET            0x0 /* Secure data image primary slot offset */
 

@@ -100,7 +100,7 @@ static void SystemClock_Config(void);
 #endif
 void FW_APP_PrintMainMenu(void);
 void FW_APP_Run(void);
-void LOADER_Run(void);
+void LOADER_Run(int8_t is_sysbl);
 
 /* Callbacks prototypes */
 void SecureFault_Callback(void);
@@ -328,7 +328,8 @@ static void SystemClock_Config(void)
 void FW_APP_PrintMainMenu(void)
 {
   printf("\r\n=================== Main Menu ============================\r\n\n");
-  printf("  Start BootLoader -------------------------------------- 1\r\n\n");
+	printf("  Start User Loader -------------------------------------- 0\r\n\n");
+  printf("  Start System BootLoader -------------------------------- 1\r\n\n");
 #ifdef NS_DATA_IMAGE_EN
   printf("  Display Non secure Data  ------------------------------ 2\r\n\n");
 #endif
@@ -370,8 +371,11 @@ void FW_APP_Run(void)
     {
       switch (key)
       {
+				case '0' : 
+					LOADER_Run(0);
+					break;
         case '1' :
-          LOADER_Run();
+          LOADER_Run(1);
           break;
 #ifdef NS_DATA_IMAGE_EN
         case '2' :
@@ -415,27 +419,35 @@ void FW_APP_Run(void)
 
 /**
   * @brief  Perform Jump to the BootLoader
+	* @param  is_sysbl 1: jump to system bootloader, else jump to user loader.
   * @retval None.
   */
-void LOADER_Run(void)
+void LOADER_Run(int8_t is_sysbl)
 {
-  printf("\r\n  Start config before jumping to the bootloader");
+	if ( is_sysbl == 1 )
+	{
+		printf("\r\n  Start config before jumping to the bootloader");
 
-  for (int i = 0; i < 16; i++)
-  {
-    /*SRAM1 -> MPCBB1*/
-    GTZC_MPCBB1_NS->SECCFGR[i] = 0;
-  }
+		for (int i = 0; i < 16; i++)
+		{
+			/*SRAM1 -> MPCBB1*/
+			GTZC_MPCBB1_NS->SECCFGR[i] = 0;
+		}
 
-  /*  change stack limit  */
-  __set_MSPLIM(0);
+		/*  change stack limit  */
+		__set_MSPLIM(0);
 
-  printf("\r\n  Standard Bootloader started");
-  printf("\r\n  If you want to connect through USART interface, disconnect your TeraTerm");
-  printf("\r\n  Start download with STM32CubeProgrammer through supported interfaces (USART/SPI/I2C/USB)\r\n");
-  printf("\r\n");
+		printf("\r\n  Standard Bootloader started");
+		printf("\r\n  If you want to connect through USART interface, disconnect your TeraTerm");
+		printf("\r\n  Start download with STM32CubeProgrammer through supported interfaces (USART/SPI/I2C/USB)\r\n");
+		printf("\r\n");
 
-  SECURE_loader_run();
+		SECURE_sysloader_run();
+	}
+	else
+	{
+		SECURE_userloader_run();
+	}
 }
 
 #if  !defined(MCUBOOT_OVERWRITE_ONLY)

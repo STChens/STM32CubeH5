@@ -197,7 +197,7 @@ static void secure_internal_flash(uint32_t offset_start, uint32_t offset_end)
   * @brief  Sau idau configuration before jumping into loader
   * @retval None
   */
-CMSE_NS_ENTRY void SECURE_loader_run(void)
+CMSE_NS_ENTRY void SECURE_sysloader_run(void)
 {
   uint32_t i = 0U;
 
@@ -301,6 +301,35 @@ CMSE_NS_ENTRY void SECURE_loader_run(void)
                "MSR APSR_nzcvq,r1\n" /*clear APSR*/
                "bxns r0\n"::"r"(boot_address)); /*jump to non-secure address*/
   /*BXNS, no return here possible*/
+}
+
+/**
+  * @brief  Sau idau configuration before jumping into loader
+  * @retval None
+  */
+CMSE_NS_ENTRY void SECURE_userloader_run(void)
+{
+  uint32_t boot_address = (*(uint32_t *)(LOADER_S_CODE_START + 4U));
+
+  __set_MSP((*(uint32_t *)LOADER_S_CODE_START));
+  SCB->VTOR = LOADER_S_CODE_START;
+
+  __asm volatile("movs r0, %0\n"
+               "movs r1, #0\n" /*clear registers before jumping to user loader vector*/
+               "movs r2, #0\n"
+               "movs r3, #0\n"
+               "movs r4, #0\n"
+               "movs r5, #0\n"
+               "movs r6, #0\n"
+               "movs r7, #0\n"
+               "mov r8, r5\n"
+               "mov r9, r5\n"
+               "mov r10, r5\n"
+               "mov r11, r5\n"
+               "mov r12, r5\n"
+               "MSR APSR_nzcvq,r1\n" /*clear APSR*/
+               "bx r0\n"::"r"(boot_address)); /*jump to user loader address*/
+  /*BX, no return here possible*/	
 }
 
 /**
