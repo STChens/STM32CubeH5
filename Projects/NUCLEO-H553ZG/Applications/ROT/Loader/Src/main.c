@@ -8,7 +8,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2021 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -50,12 +50,30 @@ __asm("  .global __ARM_use_no_argv\n");
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
-static void uart_putc(unsigned char c)
+
+#if defined(__ICCARM__)
+#include <LowLevelIOInterface.h>
+#endif /* __ICCARM__ */
+
+#if defined(__ICCARM__)
+/* New definition from EWARM V9, compatible with EWARM8 */
+int iar_fputc(int ch);
+#define PUTCHAR_PROTOTYPE int iar_fputc(int ch)
+#elif defined ( __CC_ARM ) || defined(__ARMCC_VERSION)
+/* ARM Compiler 5/6*/
+int io_putchar(int ch);
+#define PUTCHAR_PROTOTYPE int io_putchar(int ch)
+#elif defined(__GNUC__)
+#define PUTCHAR_PROTOTYPE int32_t uart_putc(int32_t ch)
+#endif /* __ICCARM__ */
+
+PUTCHAR_PROTOTYPE
 {
-  COM_Transmit(&c, 1, 1000U);
+  COM_Transmit((uint8_t*)&ch, 1, TX_TIMEOUT);
+  return ch;
 }
 
-/* Redirects printf to TFM_DRIVER_STDIO in case of ARMCLANG*/
+/* Redirects printf to DRIVER_STDIO in case of ARMCLANG*/
 #if defined(__ARMCC_VERSION)
 FILE __stdout;
 
@@ -63,13 +81,13 @@ FILE __stdout;
 int fputc(int ch, FILE *f)
 {
   /* Send byte to USART */
-  uart_putc(ch);
+  io_putchar(ch);
 
   /* Return character written */
   return ch;
 }
 #elif defined(__GNUC__)
-/* Redirects printf to TFM_DRIVER_STDIO in case of GNUARM */
+/* Redirects printf to DRIVER_STDIO in case of GNUARM */
 int _write(int fd, char *str, int len)
 {
   int i;
@@ -84,13 +102,17 @@ int _write(int fd, char *str, int len)
   return len;
 }
 #elif defined(__ICCARM__)
-int putchar(int ch)
+size_t __write(int file, unsigned char const *ptr, size_t len)
 {
-  /* Send byte to USART */
-  uart_putc(ch);
+  size_t idx;
+  unsigned char const *pdata = ptr;
 
-  /* Return character written */
-  return ch;
+  for (idx = 0; idx < len; idx++)
+  {
+    iar_fputc((int)*pdata);
+    pdata++;
+  }
+  return len;
 }
 #endif /*  __GNUC__ */
 

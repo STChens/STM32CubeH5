@@ -1,8 +1,10 @@
 /**
   ******************************************************************************
-  * @file    system_stm32h5xx.c
+  * @file    system_stm32h5xx_s.c
   * @author  MCD Application Team
   * @brief   CMSIS Cortex-M33 Device Peripheral Access Layer System Source File
+  *          to be used in secure application when the system implements
+  *          the security.
   *
   ******************************************************************************
   * @attention
@@ -214,9 +216,11 @@ void SystemInit(void)
   TZ_SAU_Setup();
 
   /* FPU settings ------------------------------------------------------------*/
-  #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-   SCB->CPACR |= ((3UL << 20U)|(3UL << 22U));  /* set CP10 and CP11 Full Access */
-  #endif
+#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
+    SCB->CPACR |= ((3UL << 20U)|(3UL << 22U));     /* set CP10 and CP11 Full Access */
+
+    SCB_NS->CPACR |= ((3UL << 20U)|(3UL << 22U));  /* set CP10 and CP11 Full Access */
+#endif
 
   /* Reset the RCC clock configuration to the default reset state ------------*/
   /* Set HSION bit */
@@ -227,20 +231,13 @@ void SystemInit(void)
   RCC->CFGR2 = 0U;
 
   /* Reset HSEON, HSECSSON, HSEBYP, HSEEXT, HSIDIV, HSIKERON, CSION, CSIKERON, HSI48 and PLLxON bits */
-#if defined(RCC_CR_PLL3ON)
-  RCC->CR &= ~(RCC_CR_HSEON | RCC_CR_HSECSSON | RCC_CR_HSEBYP | RCC_CR_HSEEXT | RCC_CR_HSIDIV | RCC_CR_HSIKERON | \
-               RCC_CR_CSION | RCC_CR_CSIKERON |RCC_CR_HSI48ON | RCC_CR_PLL1ON | RCC_CR_PLL2ON | RCC_CR_PLL3ON);
-#else
   RCC->CR &= ~(RCC_CR_HSEON | RCC_CR_HSECSSON | RCC_CR_HSEBYP | RCC_CR_HSEEXT | RCC_CR_HSIDIV | RCC_CR_HSIKERON | \
                RCC_CR_CSION | RCC_CR_CSIKERON |RCC_CR_HSI48ON | RCC_CR_PLL1ON | RCC_CR_PLL2ON);
-#endif
 
   /* Reset PLLxCFGR register */
   RCC->PLL1CFGR = 0U;
   RCC->PLL2CFGR = 0U;
-#if defined(RCC_CR_PLL3ON)
-  RCC->PLL3CFGR = 0U;
-#endif /* RCC_CR_PLL3ON */
+  //RCC->PLL3CFGR = 0U;
 
   /* Reset PLL1DIVR register */
   RCC->PLL1DIVR = 0x01010280U;
@@ -250,12 +247,10 @@ void SystemInit(void)
   RCC->PLL2DIVR = 0x01010280U;
   /* Reset PLL2FRACR register */
   RCC->PLL2FRACR = 0x00000000U;
-#if defined(RCC_CR_PLL3ON)
   /* Reset PLL3DIVR register */
-  RCC->PLL3DIVR = 0x01010280U;
+  //RCC->PLL3DIVR = 0x01010280U;
   /* Reset PLL3FRACR register */
-  RCC->PLL3FRACR = 0x00000000U;
-#endif /* RCC_CR_PLL3ON */
+  //RCC->PLL3FRACR = 0x00000000U;
 
   /* Reset HSEBYP bit */
   RCC->CR &= ~(RCC_CR_HSEBYP);
@@ -274,10 +269,10 @@ void SystemInit(void)
   reg_opsr = FLASH->OPSR & FLASH_OPSR_CODE_OP;
   if ((reg_opsr == FLASH_OPSR_CODE_OP) || (reg_opsr == (FLASH_OPSR_CODE_OP_2 | FLASH_OPSR_CODE_OP_1)))
   {
-    /* Check FLASH Option Control Register access */
+    /* Check FLASH Option Control Registers access */
     if ((FLASH->OPTCR & FLASH_OPTCR_OPTLOCK) != 0U)
     {
-      /* Authorizes the Option Byte registers programming */
+      /* Authorizes the Option Byte register programming */
       FLASH->OPTKEYR = 0x08192A3BU;
       FLASH->OPTKEYR = 0x4C5D6E7FU;
     }
@@ -402,6 +397,7 @@ void SystemCoreClockUpdate(void)
   tmp = AHBPrescTable[((RCC->CFGR2 & RCC_CFGR2_HPRE) >> RCC_CFGR2_HPRE_Pos)];
   /* HCLK clock frequency */
   SystemCoreClock >>= tmp;
+
 }
 
 

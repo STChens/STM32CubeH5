@@ -266,7 +266,8 @@ static uint32_t page_number(struct arm_flash_dev_t *flash_dev,
                             uint32_t param)
 {
   uint32_t page = param / flash_dev->data->page_size ;
-  page = ((page >= (flash_dev->data->sector_count))) ? page - ((flash_dev->data->sector_count)) : page;
+  uint32_t sector_bank = (flash_dev->data->sector_count) / 2;
+  page = ((page >= sector_bank)) ? page - (sector_bank) : page;
 #ifdef DEBUG_FLASH_ACCESS
   printf("page = %x \r\n", page);
 #endif /* DEBUG_FLASH_ACCESS */
@@ -276,7 +277,7 @@ static uint32_t page_number(struct arm_flash_dev_t *flash_dev,
 static ARM_FLASH_INFO ARM_FLASH0_DEV_DATA =
 {
   .sector_info    = NULL,     /* Uniform sector layout */
-  .sector_count   = FLASH_TOTAL_SIZE / FLASH0_SECTOR_SIZE / 2, /*Thhis should be sector counter in a bank according to the code in page_number()*/ 
+  .sector_count   = FLASH_TOTAL_SIZE / FLASH0_SECTOR_SIZE,
   .sector_size    = FLASH0_SECTOR_SIZE,
   .page_size      = FLASH0_PAGE_SIZE,
   .program_unit   = FLASH0_PROG_UNIT,       /* Minimum write size in bytes */
@@ -569,7 +570,7 @@ static int32_t Flash_EraseSector(uint32_t addr)
 #else
   pt = (uint32_t *)((uint32_t)FLASH_BASE + addr);
 #endif
-  for (i = 0; i > 0x400; i++)
+  for (i = 0; i < (FLASH0_SECTOR_SIZE/4); i++)
   {
     if (pt[i] != 0xffffffff)
     {

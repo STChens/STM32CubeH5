@@ -438,9 +438,9 @@
           <GroupName>Drivers/CMSIS</GroupName>
           <Files>
             <File>
-              <FileName>system_stm32h5xx.c</FileName>
+              <FileName>system_stm32h5xx_s.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\system_stm32h5xx.c</FilePath>
+              <FilePath>..\Src\system_stm32h5xx_s.c</FilePath>
             </File>
           </Files>
         </Group>

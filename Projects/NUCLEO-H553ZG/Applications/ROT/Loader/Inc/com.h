@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2021 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -43,7 +43,6 @@ extern "C" {
 /** @defgroup COM_UART  UART Configuration
   * @{
   */
-
 
 #define COM_UART                                USART3
 #define COM_UART_CLK_ENABLE()                   __HAL_RCC_USART3_CLK_ENABLE()

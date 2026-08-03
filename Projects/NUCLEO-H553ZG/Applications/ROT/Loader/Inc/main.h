@@ -2,11 +2,11 @@
   ******************************************************************************
   * @file    main.h
   * @author  MCD Application Team
-  * @brief   This file contains definitions for main application file.
+  * @brief   Header for main.c module
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2021 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
