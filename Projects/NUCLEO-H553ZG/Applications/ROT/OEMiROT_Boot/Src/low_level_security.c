@@ -40,7 +40,7 @@
 /* DUAL BANK page size */
 #define PAGE_SIZE FLASH_AREA_IMAGE_SECTOR_SIZE
 
-#define PAGE_MAX_NUMBER_IN_BANK 0x7F
+#define PAGE_MAX_NUMBER_IN_BANK ((FLASH_B_SIZE)/(PAGE_SIZE)-1) //0x7F
 
 /* OEMIROT_Boot Vector Address  */
 #define OEMIROT_BOOT_VTOR_ADDR ((uint32_t)(BL2_CODE_START))
@@ -743,10 +743,14 @@ void LL_SECU_CheckStaticProtections(void)
   /* Check bank1 secure flash protection */
   start = 0;
   end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
+  //BOOT_LOG_INF("SECWM Check vs Bank1: start[%d] end[%d], PAGE_MAX_NUMBER_IN_BANK: [%d]", start, end, PAGE_MAX_NUMBER_IN_BANK);
+  
   if (end > PAGE_MAX_NUMBER_IN_BANK)
   {
     end = PAGE_MAX_NUMBER_IN_BANK;
   }
+  //BOOT_LOG_INF("SECWM Check vs Bank1: start[%d] end[%d]", start, end);
+	
   if ((start != flash_option_bytes_bank1.WMSecStartSector)
       || (end != flash_option_bytes_bank1.WMSecEndSector))
   {
