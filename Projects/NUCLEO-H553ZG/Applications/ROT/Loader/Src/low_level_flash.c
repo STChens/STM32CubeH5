@@ -266,7 +266,7 @@ static uint32_t page_number(struct arm_flash_dev_t *flash_dev,
                             uint32_t param)
 {
   uint32_t page = param / flash_dev->data->page_size ;
-  page = ((page > (flash_dev->data->sector_count))) ? page - ((flash_dev->data->sector_count)) : page;
+  page = ((page >= (flash_dev->data->sector_count))) ? page - ((flash_dev->data->sector_count)) : page;
 #ifdef DEBUG_FLASH_ACCESS
   printf("page = %x \r\n", page);
 #endif /* DEBUG_FLASH_ACCESS */
@@ -276,7 +276,7 @@ static uint32_t page_number(struct arm_flash_dev_t *flash_dev,
 static ARM_FLASH_INFO ARM_FLASH0_DEV_DATA =
 {
   .sector_info    = NULL,     /* Uniform sector layout */
-  .sector_count   = FLASH_TOTAL_SIZE / FLASH0_SECTOR_SIZE,
+  .sector_count   = FLASH_TOTAL_SIZE / FLASH0_SECTOR_SIZE / 2, /*Thhis should be sector counter in a bank according to the code in page_number()*/ 
   .sector_size    = FLASH0_SECTOR_SIZE,
   .page_size      = FLASH0_PAGE_SIZE,
   .program_unit   = FLASH0_PROG_UNIT,       /* Minimum write size in bytes */
@@ -494,6 +494,10 @@ static int32_t Flash_ProgramData(uint32_t addr,
   return (err == HAL_OK) ? ARM_DRIVER_OK : ARM_DRIVER_ERROR;
 }
 
+/*
+#define DEBUG_FLASH_ACCESS
+#define CHECK_ERASE
+*/
 static int32_t Flash_EraseSector(uint32_t addr)
 {
   FLASH_EraseInitTypeDef EraseInit;
@@ -546,7 +550,8 @@ static int32_t Flash_EraseSector(uint32_t addr)
   HAL_FLASH_Lock();
 	config_flash_secbb_fullsecure(0);
 #ifdef DEBUG_FLASH_ACCESS
-  if (err != HAL_OK)
+	printf("erase bank [%d], sector [%d] \r\n", EraseInit.Banks, EraseInit.Sector);
+	if (err != HAL_OK)
   {
     printf("erase failed @%x \r\n", addr);
   }
