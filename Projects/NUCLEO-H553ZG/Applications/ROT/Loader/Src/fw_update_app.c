@@ -399,6 +399,10 @@ void FW_UPDATE_Run(void)
           FW_UPDATE_NONSECURE_DATA_IMAGE();
           break;
 #endif /* (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1) */
+      case 'x':
+          printf("Exit from FW update menu\r\n");
+          exit =1;
+          break;
       default:
           printf("Invalid Number !\r");
           break;
@@ -596,7 +600,7 @@ static void FW_UPDATE_PrintWelcome(void)
 #if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
   printf("  Download NonSecure Data Image ------------------------- 5\r\n\n");
 #endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
-	printf("  Start system bootloader for image download ------------ b\r\n\n");
+  printf("  Exit from FW update menu ------------------------------ x\r\n\n");
 }
 /**
   * @brief Download a new Firmware from the host.

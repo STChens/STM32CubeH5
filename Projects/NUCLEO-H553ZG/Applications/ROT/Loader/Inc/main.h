@@ -33,6 +33,10 @@
 /* Exported macros -----------------------------------------------------------*/
 /* Exported functions --------------------------------------------------------*/
 void Error_Handler(void);
+
+#ifdef USB_CDC_SUPPORT
+void USB_ReceiveData_Handle(uint8_t *pBuf, uint32_t len);
+#endif
 /* Exported variables --------------------------------------------------------*/
 extern uint32_t TestNumber;
 #endif /* MAIN_H */

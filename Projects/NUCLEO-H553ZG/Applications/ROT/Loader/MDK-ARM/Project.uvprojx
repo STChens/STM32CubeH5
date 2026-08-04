@@ -338,9 +338,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32H553xx,USE_HAL_DRIVER,LOCAL_LOADER_CONFIG,BL2</Define>
+              <Define>STM32H553xx,USE_HAL_DRIVER,LOCAL_LOADER_CONFIG,BL2,USB_CDC_SUPPORT</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Inc;..\..\..\..\..\..\Drivers\CMSIS\Include;..\..\..\..\..\..\Drivers\CMSIS\Device\ST\STM32H5xx\Include;..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Inc;..\..\OEMiROT_Boot\Inc</IncludePath>
+              <IncludePath>..\Inc;..\..\..\..\..\..\Drivers\CMSIS\Include;..\..\..\..\..\..\Drivers\CMSIS\Device\ST\STM32H5xx\Include;..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Inc;..\..\OEMiROT_Boot\Inc;..\USB_Device\App;..\USB_Device\Target;..\Middlewares\ST\STM32_USB_Device_Library\Core\Inc;..\Middlewares\ST\STM32_USB_Device_Library\Class\CDC\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -418,19 +418,24 @@
               <FilePath>..\Src\main.c</FilePath>
             </File>
             <File>
-              <FileName>startup_stm32h5xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\startup_stm32h5xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>tick.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\tick.c</FilePath>
-            </File>
-            <File>
               <FileName>ymodem.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\ymodem.c</FilePath>
+            </File>
+            <File>
+              <FileName>startup_stm32h553xx.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\startup_stm32h553xx.s</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h5xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\stm32h5xx_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h5xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\stm32h5xx_hal_msp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -527,6 +532,81 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_uart_ex.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32h5xx_hal_pcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_pcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h5xx_hal_pcd_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_pcd_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h5xx_ll_usb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_ll_usb.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h5xx_hal_icache.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_icache.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h5xx_hal_gtzc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_hal_gtzc.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/User/USB_Device</GroupName>
+          <Files>
+            <File>
+              <FileName>usb_device.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_Device\App\usb_device.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_if.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_Device\App\usbd_cdc_if.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_desc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_Device\App\usbd_desc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_conf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USB_Device\Target\usbd_conf.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Middlewares/ST_USBD_Library</GroupName>
+          <Files>
+            <File>
+              <FileName>usbd_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\ST\STM32_USB_Device_Library\Core\Src\usbd_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ctlreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\ST\STM32_USB_Device_Library\Core\Src\usbd_ctlreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ioreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\ST\STM32_USB_Device_Library\Core\Src\usbd_ioreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\ST\STM32_USB_Device_Library\Class\CDC\Src\usbd_cdc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -548,5 +628,14 @@
     </components>
     <files/>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>Project</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>
