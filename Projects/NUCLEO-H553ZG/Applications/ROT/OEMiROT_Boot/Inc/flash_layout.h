@@ -53,6 +53,9 @@
 																		  (valid only if MCUBOOT_EXT_LOADER is also defined)
                                       UART Ymodem loader as example for user loader */
 																			
+#if defined MCUBOOT_PRIMARY_ONLY
+//#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
+#endif /* defined MCUBOOT_PRIMARY_ONLY */
 
 /* Flash layout configuration : end ******************************************/
 
@@ -182,7 +185,8 @@
 //#define FLASH_NS_PARTITION_SIZE         (0x50000) /* 320 KB for NS partition (except for FULL SECURE) */
 #define FLASH_NS_PARTITION_SIZE         (0) /* 0 for FULL SECURE */
 #if (FLASH_NS_PARTITION_SIZE == 0x0)
-#define FLASH_S_PARTITION_SIZE          (0x08000) /* 32 KB for S partition */
+#define FLASH_S_PARTITION_SIZE          (0x0DC000) /* 880 KB for S partition */
+//#define FLASH_S_PARTITION_SIZE          (0x060000) /* 384 KB for S partition */
 #elif !defined(MCUBOOT_OVERWRITE_ONLY)
 #define FLASH_S_PARTITION_SIZE          (0x08000) /* 32 KB for S partition */
 #else

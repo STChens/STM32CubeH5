@@ -362,7 +362,7 @@ static int32_t Flash_ReadData(uint32_t addr, void *data, uint32_t cnt)
   else
   {
     /* Return OK with data = 0, when double ECC error */
-    BOOT_LOG_ERR("Double ECC error detected");
+    BOOT_LOG_ERR("Double ECC error detected @[%x]", addr);
     memset(data, 0x00, cnt);
     ret = ARM_DRIVER_OK;
   }
