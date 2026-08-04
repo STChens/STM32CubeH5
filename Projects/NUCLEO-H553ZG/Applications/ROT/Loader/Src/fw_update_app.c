@@ -587,6 +587,9 @@ static HAL_StatusTypeDef FW_UPDATE_NONSECURE_DATA_IMAGE(void)
 static void FW_UPDATE_PrintWelcome(void)
 {
   printf("\r\n================ New Fw Image ============================\r\n\n");
+#if !defined MCUBOOT_PRIMARY_ONLY	
+	printf("  Jump to system bootloader ----------------------------- b\r\n\n");
+#endif
   printf("  Reset to trigger Installation ------------------------- 1\r\n\n");
 #if (MCUBOOT_APP_IMAGE_NUMBER == 2)
   printf("  Download Secure App Image ----------------------------- 2\r\n\n");

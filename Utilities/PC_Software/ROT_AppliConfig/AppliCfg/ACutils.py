@@ -159,6 +159,8 @@ class SCRIPT_APPLI(MANAGE_FILE):
     def is_header(self)->bool:
         if self._filename is not None and self._filename.endswith('.h'):
             return True
+        if self._filename is not None and self._filename.endswith('.h.txt'):
+            return True            
         else:
             return False
     def is_icf(self)->bool: 
