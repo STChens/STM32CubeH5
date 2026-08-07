@@ -54,7 +54,7 @@
                                       UART Ymodem loader as example for user loader */
 																			
 #if defined MCUBOOT_PRIMARY_ONLY
-//#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
+#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
 #endif /* defined MCUBOOT_PRIMARY_ONLY */
 
 /* Flash layout configuration : end ******************************************/
