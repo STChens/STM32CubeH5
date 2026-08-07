@@ -742,7 +742,11 @@ void LL_SECU_CheckStaticProtections(void)
 
   /* Check bank1 secure flash protection */
   start = 0;
+#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
+  end = (S_IMAGE_PRIMARY_PARTITION_OFFSET - 1) / PAGE_SIZE;	
+#else
   end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
+#endif	
   //BOOT_LOG_INF("SECWM Check vs Bank1: start[%d] end[%d], PAGE_MAX_NUMBER_IN_BANK: [%d]", start, end, PAGE_MAX_NUMBER_IN_BANK);
   
   if (end > PAGE_MAX_NUMBER_IN_BANK)
@@ -759,10 +763,29 @@ void LL_SECU_CheckStaticProtections(void)
     BOOT_LOG_ERR("Unexpected value for secure flash protection");
     Error_Handler();
   }
+#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
+	/* Set FLASH SECBB to cover the App S IMAGE area */
+	else
+	{
+		int i;
+		end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
+		for ( i = start; i< end; i++)
+		{
+			if ( i < 32 )
+				FLASH->SECBB1R1 |= (1<<i);
+			else
+				FLASH->SECBB1R2 |= (1<<(i-32));					
+		}
+	}
+#endif	
 
   /* Check bank2 secure flash protection */
   start = 0;
+#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
+  end = (S_IMAGE_PRIMARY_PARTITION_OFFSET - 1) / PAGE_SIZE;
+#else	
   end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
+#endif
   if (end > PAGE_MAX_NUMBER_IN_BANK)
   {
     end = end - (PAGE_MAX_NUMBER_IN_BANK + 1);
@@ -774,6 +797,21 @@ void LL_SECU_CheckStaticProtections(void)
       BOOT_LOG_ERR("Unexpected value for secure flash protection");
       Error_Handler();
     }
+#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
+		/* Set FLASH SECBB to cover the App S IMAGE area */
+		else 
+		{
+			int i;
+			end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
+			for ( i = start; i< end; i++)
+			{
+				if ( i < 32 )
+					FLASH->SECBB2R1 |= (1<<i);
+				else
+					FLASH->SECBB2R2 |= (1<<(i-32));					
+			}
+		}
+#endif		
   }
   /* the bank 2 must be fully unsecure */
   else if (flash_option_bytes_bank2.WMSecEndSector >= flash_option_bytes_bank2.WMSecStartSector)

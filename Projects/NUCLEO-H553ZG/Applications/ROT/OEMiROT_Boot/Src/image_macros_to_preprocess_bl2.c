@@ -124,6 +124,16 @@ enum image_attributes
   RE_BL2_SEC2_START = 0x0,
   RE_BL2_SEC2_END = (FLASH_AREA_0_OFFSET+SECURE_IMAGE_MAX_SIZE-FLASH_B_SIZE-0x1)
 #endif
+
+#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
+ /* This is to allow NS system bootloader to write to primary slot
+    So the SECWM will only cover OEMiROT (including local loader code) area
+   */
+  RE_BL2_SEC1_END = (FLASH_AREA_BEGIN_OFFSET-0x1),
+  RE_BL2_SEC2_START = (FLASH_B_SIZE-0x1),
+  RE_BL2_SEC2_END = (0x0),
+#endif
+
   RE_BL2_WRP_START = (FLASH_AREA_BL2_OFFSET),
 
 #if  defined(OEMUROT_ENABLE)

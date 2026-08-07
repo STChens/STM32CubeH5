@@ -210,6 +210,89 @@ static void secure_internal_flash(uint32_t offset_start, uint32_t offset_end)
 }
 
 /**
+  * @brief  GTZC configuration before jumping into loader
+  * @param  None
+  * @retval None
+  */
+static void gtzc_loader_cfg(void)
+{
+  uint32_t i = 0U;
+
+  /* configuration stage */
+	__HAL_RCC_GTZC1_CLK_ENABLE();
+
+  /* Allow secure to access to non secure */
+  GTZC_MPCBB1_S->CR |= GTZC_MPCBB_CR_SRWILADIS_Msk;
+	/* All bocks of SRAM1 configured non secure / privileged (default value)  */
+	for (i = 0; i < GTZC_MPCBB1_NB_VCTR; i++)
+	{
+		/*SRAM1 -> MPCBB1*/
+		GTZC_MPCBB1_S->SECCFGR[i] = GTZC_MPCBB_ALL_NSEC;
+		GTZC_MPCBB1_S->PRIVCFGR[i] = GTZC_MPCBB_ALL_NPRIV;
+	}
+
+	/* All bocks of SRAM3 configured non secure / privileged (default value)  */
+	for (i = 0; i < GTZC_MPCBB3_NB_VCTR; i++)
+	{
+		/*SRAM3 -> MPCBB3*/
+		GTZC_MPCBB3_S->SECCFGR[i] = GTZC_MPCBB_ALL_NSEC;
+		GTZC_MPCBB3_S->PRIVCFGR[i] = GTZC_MPCBB_ALL_NPRIV;
+	}
+
+	/* Required peripherals configured non secure / non privileged */
+	GTZC_TZSC1_S->PRIVCFGR1 = ~TZSC_MASK_R1;
+	GTZC_TZSC1_S->PRIVCFGR2 = ~TZSC_MASK_R2;
+	GTZC_TZSC1_S->PRIVCFGR3 = ~TZSC_MASK_R3;
+
+	GTZC_TZSC1_S->SECCFGR1 = ~TZSC_MASK_R1;
+	GTZC_TZSC1_S->SECCFGR2 = ~TZSC_MASK_R2;
+	GTZC_TZSC1_S->SECCFGR3 = ~TZSC_MASK_R3;
+  
+}
+
+/**
+  * @brief  configure NVIC before jumping into loader
+  * @param  None
+  * @retval None
+  */
+static void nvic_loader_cfg(void)
+{
+	/* Enable HardFault/busFault and NMI exception in ns.
+	 * It is up to BL to drive non-secure faults
+	 * Do not enter in secure on non-secure fault
+	 */
+	SCB->AIRCR  = (uint32_t)((0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
+													 (SCB->AIRCR & 0x0000FFFFU) |
+													 SCB_AIRCR_BFHFNMINS_Msk);
+
+
+	NVIC->ITNS[0U] = RSS_NVIC_INIT_ITNS0_VAL;
+	NVIC->ITNS[1U] = RSS_NVIC_INIT_ITNS1_VAL;
+	NVIC->ITNS[2U] = RSS_NVIC_INIT_ITNS2_VAL;
+	NVIC->ITNS[3U] = RSS_NVIC_INIT_ITNS3_VAL;
+
+}
+
+/**
+  * @brief  GPIO configuration before jumping into loader
+  * @param  None
+  * @retval None
+  */
+static void gpio_loader_cfg(void)
+{
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+
+	/* Required GPIO configured non secure */
+	GPIOA_S->SECCFGR = ~GPIOA_MASK_SECCFG;
+	GPIOB_S->SECCFGR = ~GPIOB_MASK_SECCFG;
+	GPIOC_S->SECCFGR = ~GPIOC_MASK_SECCFG;
+	GPIOD_S->SECCFGR = ~GPIOD_MASK_SECCFG;
+}
+
+/**
   * @brief  Sau idau configuration before jumping into loader
   * @retval None
   */
@@ -221,44 +304,14 @@ void SECURE_loader_run(void)
   __HAL_RCC_GTZC1_CLK_ENABLE();
 
   /* Allow secure to access to non secure */
-  GTZC_MPCBB1_S->CR |= GTZC_MPCBB_CR_SRWILADIS_Msk;
-  /* All bocks of SRAM1 configured non secure / privileged (default value) */
-  for (i = 0; i < GTZC_MPCBB1_NB_VCTR; i++)
-  {
-    /*SRAM1 -> MPCBB1*/
-    GTZC_MPCBB1_S->SECCFGR[i] = GTZC_MPCBB_ALL_NSEC;
-    GTZC_MPCBB1_S->PRIVCFGR[i] = GTZC_MPCBB_ALL_NPRIV;
-  }
-  /* All bocks of SRAM3 configured non secure / privileged (default value) */
-  for (i = 0; i < GTZC_MPCBB3_NB_VCTR; i++)
-  {
-    /*SRAM3 -> MPCBB3*/
-    GTZC_MPCBB3_S->SECCFGR[i] = GTZC_MPCBB_ALL_NSEC;
-    GTZC_MPCBB3_S->PRIVCFGR[i] = GTZC_MPCBB_ALL_NPRIV;
-  }
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
+	gtzc_loader_cfg();
 
   /* Required GPIO configured non secure */
-  GPIOA_S->SECCFGR = ~GPIOA_MASK_SECCFG;
-  GPIOB_S->SECCFGR = ~GPIOB_MASK_SECCFG;
-  GPIOC_S->SECCFGR = ~GPIOC_MASK_SECCFG;
-  GPIOD_S->SECCFGR = ~GPIOD_MASK_SECCFG;
+  gpio_loader_cfg();
 
   /* disable MPU */
    MPU->CTRL = 0;
    MPU_NS->CTRL = 0;
-
-  /* Required peripherals configured non secure (default value) / privileged */
-  GTZC_TZSC1_S->PRIVCFGR1 = ~TZSC_MASK_R1;
-  GTZC_TZSC1_S->PRIVCFGR2 = ~TZSC_MASK_R2;
-  GTZC_TZSC1_S->PRIVCFGR3 = ~TZSC_MASK_R3;
-
-  GTZC_TZSC1_S->SECCFGR1 = ~TZSC_MASK_R1;
-  GTZC_TZSC1_S->SECCFGR2 = ~TZSC_MASK_R2;
-  GTZC_TZSC1_S->SECCFGR3 = ~TZSC_MASK_R3;
 
   for (i = 0U; i < ARRAY_SIZE(sau_load_cfg); i++)
   {
@@ -268,8 +321,12 @@ void SECURE_loader_run(void)
                 SAU_RLAR_ENABLE_Msk;
   }
 
+#if (!defined MCUBOOT_PRIMARY_ONLY)
   secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
-
+#elif (defined USE_SYSTEM_LOADER)
+	/* we only secure the FLASH SECBB up to OEMiROT area */
+	secure_internal_flash(0x00, FLASH_AREA_BEGIN_OFFSET-1);
+#endif
   /* Force memory writes before continuing */
   __DSB();
   /* Flush and refill pipeline with updated permissions */
@@ -277,18 +334,7 @@ void SECURE_loader_run(void)
   /* Enable SAU */
   TZ_SAU_Enable();
 
-   /* Enable HardFault/busFault and NMI exception in ns.
-   * It is up to BL to drive non-secure faults
-   * Do not enter in secure on non-secure fault
-   */
-  SCB->AIRCR  = (uint32_t)((0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
-                           (SCB->AIRCR & 0x0000FFFFU) |
-                           SCB_AIRCR_BFHFNMINS_Msk);
-
-  NVIC->ITNS[0U] = RSS_NVIC_INIT_ITNS0_VAL;
-  NVIC->ITNS[1U] = RSS_NVIC_INIT_ITNS1_VAL;
-  NVIC->ITNS[2U] = RSS_NVIC_INIT_ITNS2_VAL;
-  NVIC->ITNS[3U] = RSS_NVIC_INIT_ITNS3_VAL;
+	nvic_loader_cfg();
 
   /* Stop systick before jumping */
   HAL_SuspendTick();
@@ -587,7 +633,7 @@ static HAL_StatusTypeDef FW_UPDATE_NONSECURE_DATA_IMAGE(void)
 static void FW_UPDATE_PrintWelcome(void)
 {
   printf("\r\n================ New Fw Image ============================\r\n\n");
-#if !defined MCUBOOT_PRIMARY_ONLY	
+#if (!defined MCUBOOT_PRIMARY_ONLY) || (defined USE_SYSTEM_LOADER)
 	printf("  Jump to system bootloader ----------------------------- b\r\n\n");
 #endif
   printf("  Reset to trigger Installation ------------------------- 1\r\n\n");
