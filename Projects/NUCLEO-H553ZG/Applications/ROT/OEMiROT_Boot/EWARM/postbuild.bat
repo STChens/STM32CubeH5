@@ -62,6 +62,9 @@ set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 :postbuild
 set "auto_rot_update=%projectdir%\..\auto_rot_update.bat"
 set "preprocess_bl2_file=%projectdir%\image_macros_preprocessed_bl2.c"
+set "oemirot_bin_file=%projectdir%\..\Binary\OEMiROT_Boot.bin"
+set "boot_bin_file=%projectdir%\..\Binary\Boot.bin"
+set "loader_bin_file=%projectdir%\..\..\Loader\Binary\Loader.bin"
 set "appli_dir=../../../../%oemirot_appli_path_project%"
 
 set "flash_layout=%projectdir%\..\Inc\flash_layout.h"
@@ -110,6 +113,14 @@ set "command=%python%%applicfg% definevalue -xml %stirot_config_xml% -nxml %oemu
 IF !errorlevel! NEQ 0 goto :error
 
 :common_rot_regions
+
+:: ======================================================== Merge OEMiROT and Loader binary ===========================================================
+echo %oemirot_bin_file% >> %current_log_file% 2>>&1
+echo %boot_bin_file% >> %current_log_file% 2>>&1
+echo %loader_bin_file% >> %current_log_file% 2>>&1
+IF exist %loader_bin_file% (
+%python%%applicfg% oneimage -fb %boot_bin_file% -o 0x10000 -sb %loader_bin_file% -i 0x0 -ob %oemirot_bin_file% --vb >> %current_log_file% 2>>&1
+)
 
 :: =============================================================== Update %img_config% ================================================================
 set "command=%python%%applicfg% flash --layout %preprocess_bl2_file% -b app_image_number -m RE_APP_IMAGE_NUMBER --decimal %img_config% --vb >> %current_log_file% 2>&1"
@@ -276,6 +287,10 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c --primary-only -h 1 -d "" %s_code_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %s_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -287,6 +302,10 @@ IF !errorlevel! NEQ 0 goto :error
 :: ============================================================ Update %ns_code_init_xml% =============================================================
 IF "%app_full_secure%" == "1" (goto :bypass_ns_code_xml_update)
 set "command=%python%%applicfg% xmlparam --option add -n "Clear" -t Data -c -c -h 1 -d "" %ns_code_init_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlname --layout %preprocess_bl2_file% -m RE_APP_IMAGE_NUMBER -n %auth_ns% -sn %auth_s% -v 1 -c k %ns_code_init_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -324,6 +343,10 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_E
 IF !errorlevel! NEQ 0 goto :error
 
 set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_OVER_WRITE -n "Write Option" -t Data -c --overwrite-only -h 1 -d "" %ns_code_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c  --primary-only -h 1 -d "" %ns_code_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -374,6 +397,10 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c  --primary-only -h 1 -d "" %s_data_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %s_data_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -421,6 +448,10 @@ set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_O
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% xmlparam --layout  %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n "Slot Option" -t Data -c  --primary-only -h 1 -d "" %ns_data_xml% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 set "command=%python%%applicfg% xmlval --layout %preprocess_bl2_file% -m RE_FLASH_AREA_SCRATCH_SIZE -n %scratch_sector_number% --decimal %ns_data_xml% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -431,6 +462,18 @@ IF !errorlevel! NEQ 0 goto :error
 :bypass_ns_data_xml_update
 
 :: ================================================================ Update %s_main% ===================================================================
+set "s_main_txt=%s_main%.txt"
+
+echo "s_main txt file: %s_main_txt%" >> %current_log_file% 2>&1"
+if not exist %s_main_txt% (goto :process_s_main)
+
+:: if appli flash layout header txt file exists, we process the txt file instead of the .h file
+set "dst_h_file=%s_main%"
+set "s_main=%s_main_txt%"
+echo "s_main file to process: %s_main%" >> %current_log_file% 2>&1"
+echo "s_main file to copy to: %dst_h_file%" >> %current_log_file% 2>&1"
+
+:process_s_main
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_AREA_0_OFFSET -n S_CODE_OFFSET %s_main% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
@@ -444,19 +487,58 @@ set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE
 %command%
 IF !errorlevel! NEQ 0 goto :error
 :bypass_s_main_update
+if exist %s_main_txt% (
+  echo copy %s_main_txt% %dst_h_file% >> %current_log_file% 2>&1
+  copy %s_main_txt% %dst_h_file% >> %current_log_file% 2>&1
+)
 
 :: =============================================================== Update %ns_main% ===================================================================
 IF "%app_full_secure%" == "1" (goto :bypass_ns_main_update)
+
+set "ns_main_txt=%ns_main%.txt"
+
+echo "ns_main txt file: %s_main_txt%" >> %current_log_file% 2>&1"
+if not exist %ns_main_txt% (goto :process_s_main)
+
+:: if appli flash layout header txt file exists, we process the txt file instead of the .h file
+set "dst_h_file=%ns_main%"
+set "ns_main=%ns_main_txt%"
+echo "ns_main file to process: %ns_main%" >> %current_log_file% 2>&1"
+echo "ns_main file to copy to: %dst_h_file%" >> %current_log_file% 2>&1"
+
+:process_ns_main
 set "command=%python%%applicfg% setdefine --layout %preprocess_bl2_file% -m RE_NS_DATA_IMAGE_NUMBER -n NS_DATA_IMAGE_EN -v 1 %ns_main% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
+
+if exist %ns_main_txt% (
+  echo copy %ns_main_txt% %dst_h_file% >> %current_log_file% 2>&1
+  copy %ns_main_txt% %dst_h_file% >> %current_log_file% 2>&1
+)
+
 :bypass_ns_main_update
 
 :: =========================================================== Update %appli_flash_layout% ============================================================
 :: Bypass configuration of appli_flash_layout file if not present
+echo "appli_flash_layout: %appli_flash_layout%" >> %current_log_file% 2>&1"
 if not exist %appli_flash_layout% (goto :end)
 
+set "appli_flash_layout_txt=%appli_flash_layout%.txt"
+echo "Appli flash layout txt file: %appli_flash_layout_txt%" >> %current_log_file% 2>&1"
+if not exist %appli_flash_layout_txt% (goto :process_appli_flash_layout)
+
+:: if appli flash layout header txt file exists, we process the txt file instead of the .h file
+set "dst_h_file=%appli_flash_layout%"
+set "appli_flash_layout=%appli_flash_layout_txt%"
+echo "Appli flash layout file to process: %appli_flash_layout%" >> %current_log_file% 2>&1"
+echo "Appli flash layout file to copy to: %dst_h_file%" >> %current_log_file% 2>&1"
+
+:process_appli_flash_layout
 set "command=%python%%applicfg% setdefine --layout %preprocess_bl2_file% -m RE_OVER_WRITE -n MCUBOOT_OVERWRITE_ONLY -v 1 %appli_flash_layout% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
+set "command=%python%%applicfg% setdefine --layout %preprocess_bl2_file% -m RE_PRIMARY_ONLY -n MCUBOOT_PRIMARY_ONLY -v 1 %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
@@ -559,6 +641,11 @@ IF !errorlevel! NEQ 0 goto :error
 set "command=%python%%applicfg% definevalue --layout %preprocess_bl2_file% -m RE_FLASH_B_SIZE -n FLASH_B_SIZE %appli_flash_layout% --vb >> %current_log_file% 2>&1"
 %command%
 IF !errorlevel! NEQ 0 goto :error
+
+if exist %appli_flash_layout_txt% (
+  echo copy %appli_flash_layout% %dst_h_file% >> %current_log_file% 2>&1
+  copy %appli_flash_layout% %dst_h_file% >> %current_log_file% 2>&1
+)
 
 :end
 if %oemurot_enable% == 1 (
