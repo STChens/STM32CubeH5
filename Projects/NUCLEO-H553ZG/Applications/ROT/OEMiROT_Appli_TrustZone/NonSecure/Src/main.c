@@ -329,7 +329,7 @@ void FW_APP_PrintMainMenu(void)
 {
   printf("\r\n=================== Main Menu ============================\r\n\n");
 	printf("  Start User Loader -------------------------------------- 0\r\n\n");
-#if !defined MCUBOOT_PRIMARY_ONLY	
+#if (!defined MCUBOOT_PRIMARY_ONLY) || (defined USE_SYSTEM_LOADER) 
   printf("  Start System BootLoader -------------------------------- 1\r\n\n");
 #endif
 #ifdef NS_DATA_IMAGE_EN

@@ -29,6 +29,11 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
+
+#if defined MCUBOOT_PRIMARY_ONLY
+#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
+#endif /* defined MCUBOOT_PRIMARY_ONLY */
+
 /* Exported functions --------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 extern uint32_t TestNumber;

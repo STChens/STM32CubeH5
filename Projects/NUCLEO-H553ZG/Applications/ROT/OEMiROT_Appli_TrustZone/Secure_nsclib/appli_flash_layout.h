@@ -19,7 +19,9 @@
 #ifndef __APPLI_FLASH_LAYOUT_H__
 #define __APPLI_FLASH_LAYOUT_H__
 
-
+#define MCUBOOT_PRIMARY_ONLY	   /* Defined: no download slot
+                                      Undefined: active slot + download slot */
+                                      
 #define MCUBOOT_OVERWRITE_ONLY                 /* Defined: the FW installation uses overwrite method.
                                                   UnDefined: The FW installation uses swap mode. */
 

@@ -23,6 +23,10 @@
 #include "appli_flash_layout.h"
 #include "low_level_flash.h"
 
+#if defined MCUBOOT_PRIMARY_ONLY
+#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
+#endif /* defined MCUBOOT_PRIMARY_ONLY */
+
 #define BOOTLOADER_BASE_NS                  (0x0BFA4000U)
 #define BOOTLOADER_SIZE                     (0xC000U)
 /* Engi bits */
@@ -252,7 +256,7 @@ CMSE_NS_ENTRY void SECURE_sysloader_run(void)
                 SAU_RLAR_ENABLE_Msk;
   }
 
-  secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
+  //secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
 
   /* Force memory writes before continuing */
   __DSB();
@@ -276,6 +280,13 @@ CMSE_NS_ENTRY void SECURE_sysloader_run(void)
 
   /* Stop systick before jumping */
   HAL_SuspendTick();
+
+#if (defined MCUBOOT_PRIMARY_ONLY) && (defined USE_SYSTEM_LOADER) 
+	/* we only secure the FLASH SECBB up to OEMiROT area */
+	secure_internal_flash(0x00, FLASH_AREA_0_OFFSET-1);
+#else
+  secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
+#endif
 
   uint32_t boot_address = cmse_nsfptr_create(*(uint32_t *)(BOOTLOADER_BASE_NS + 4U));
 
