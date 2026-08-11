@@ -692,8 +692,10 @@ void LL_SECU_CheckStaticProtections(void)
   static FLASH_OBProgramInitTypeDef flash_option_bytes_bank2 = {0};
   uint32_t start;
   uint32_t end;
+#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
+  uint32_t end_bl2;
+#endif /* (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY) */
   uint32_t i;
-
 
   /* Get bank1 OB  */
   flash_option_bytes_bank1.Banks = FLASH_BANK_1;
@@ -743,20 +745,26 @@ void LL_SECU_CheckStaticProtections(void)
   /* Check bank1 secure flash protection */
   start = 0;
 #if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
-  end = (S_IMAGE_PRIMARY_PARTITION_OFFSET - 1) / PAGE_SIZE;	
-#else
+  end_bl2 = (S_IMAGE_PRIMARY_PARTITION_OFFSET - 1) / PAGE_SIZE;	
+  BOOT_LOG_DBG("SECWM Check vs Bank1: start[%d] end_bl2[%d]", start, end_bl2);
+  
+#endif	/* (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY) */
   end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
-#endif	
-  //BOOT_LOG_INF("SECWM Check vs Bank1: start[%d] end[%d], PAGE_MAX_NUMBER_IN_BANK: [%d]", start, end, PAGE_MAX_NUMBER_IN_BANK);
+  BOOT_LOG_DBG("SECWM Check vs Bank1: start[%d] end[%d], PAGE_MAX_NUMBER_IN_BANK: [%d]", start, end, PAGE_MAX_NUMBER_IN_BANK);
   
   if (end > PAGE_MAX_NUMBER_IN_BANK)
   {
     end = PAGE_MAX_NUMBER_IN_BANK;
   }
-  //BOOT_LOG_INF("SECWM Check vs Bank1: start[%d] end[%d]", start, end);
+  BOOT_LOG_DBG("SECWM Check vs Bank1: start[%d] end[%d]", start, end);
 	
+#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
+  if ((start != flash_option_bytes_bank1.WMSecStartSector)
+      || (end_bl2 != flash_option_bytes_bank1.WMSecEndSector))
+#else	/* (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY) */
   if ((start != flash_option_bytes_bank1.WMSecStartSector)
       || (end != flash_option_bytes_bank1.WMSecEndSector))
+#endif
   {
     BOOT_LOG_INF("BANK 1 secure flash [%d, %d] : OB [%d, %d]",
                  (int)start, (int)end, (int)flash_option_bytes_bank1.WMSecStartSector, (int)flash_option_bytes_bank1.WMSecEndSector);
@@ -764,31 +772,57 @@ void LL_SECU_CheckStaticProtections(void)
     Error_Handler();
   }
 #if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
-	/* Set FLASH SECBB to cover the App S IMAGE area */
+	/* Set FLASH SECBB to cover the App S IMAGE area. 
+     FLASH SECBB will be set according to end value 
+  */
 	else
 	{
 		int i;
-		end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
-		for ( i = start; i< end; i++)
+    BOOT_LOG_DBG("BANK 1 secure flash BB ref [%d, %d]", start, end);
+		for ( i = start; i<= end; i++)
 		{
 			if ( i < 32 )
 				FLASH->SECBB1R1 |= (1<<i);
 			else
 				FLASH->SECBB1R2 |= (1<<(i-32));					
 		}
+    BOOT_LOG_DBG("BANK 1 secure flash BB [%x, %x]", FLASH->SECBB1R1, FLASH->SECBB1R2);
 	}
-#endif	
+#endif /* (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY) */	
 
   /* Check bank2 secure flash protection */
   start = 0;
-#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
-  end = (S_IMAGE_PRIMARY_PARTITION_OFFSET - 1) / PAGE_SIZE;
-#else	
   end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
-#endif
+  BOOT_LOG_DBG("SECWM Check vs Bank2: start[%d] end[%d]", start, end);
+  
   if (end > PAGE_MAX_NUMBER_IN_BANK)
   {
-    end = end - (PAGE_MAX_NUMBER_IN_BANK + 1);
+    end = end - (PAGE_MAX_NUMBER_IN_BANK + 1);    
+#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
+    /* Set FLASH SECBB for bank2 to cover the App S IMAGE area. 
+       FLASH SECBB will be set according to end value 
+    */		 
+		{
+			int i;
+			BOOT_LOG_DBG("BANK 2 secure flash BB ref [%d, %d]", start, end);
+		  for ( i = start; i<= end; i++)
+			{
+				if ( i < 32 )
+					FLASH->SECBB2R1 |= (1<<i);
+				else
+					FLASH->SECBB2R2 |= (1<<(i-32));					
+			}
+      BOOT_LOG_DBG("BANK 2 secure flash BB [%x, %x]", FLASH->SECBB2R1, FLASH->SECBB2R2);
+		}
+    /* Assumption here is that BL2 area is always within bank1 */
+    if (flash_option_bytes_bank2.WMSecEndSector >= flash_option_bytes_bank2.WMSecStartSector)
+    {
+      BOOT_LOG_INF("BANK 2 secure flash [%d, %d] : OB [%d, %d]", PAGE_MAX_NUMBER_IN_BANK, 0, (int)flash_option_bytes_bank2.WMSecStartSector,
+                   (int)flash_option_bytes_bank2.WMSecEndSector);
+      BOOT_LOG_ERR("Unexpected value for secure flash protection");
+      Error_Handler();
+    }
+#else	/* (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY) */ 
     if ((start != flash_option_bytes_bank2.WMSecStartSector)
         || (end != flash_option_bytes_bank2.WMSecEndSector))
     {
@@ -797,22 +831,9 @@ void LL_SECU_CheckStaticProtections(void)
       BOOT_LOG_ERR("Unexpected value for secure flash protection");
       Error_Handler();
     }
-#if (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY)
-		/* Set FLASH SECBB to cover the App S IMAGE area */
-		else 
-		{
-			int i;
-			end = (S_IMAGE_PRIMARY_PARTITION_OFFSET  + FLASH_S_PARTITION_SIZE - 1) / PAGE_SIZE;
-			for ( i = start; i< end; i++)
-			{
-				if ( i < 32 )
-					FLASH->SECBB2R1 |= (1<<i);
-				else
-					FLASH->SECBB2R2 |= (1<<(i-32));					
-			}
-		}
-#endif		
-  }
+
+#endif	/* (defined USE_SYSTEM_LOADER) && (defined MCUBOOT_PRIMARY_ONLY) */ 
+  }    
   /* the bank 2 must be fully unsecure */
   else if (flash_option_bytes_bank2.WMSecEndSector >= flash_option_bytes_bank2.WMSecStartSector)
   {

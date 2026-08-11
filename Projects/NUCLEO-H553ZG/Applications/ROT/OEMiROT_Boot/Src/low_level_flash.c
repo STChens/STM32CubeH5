@@ -38,8 +38,10 @@ extern void Error_Handler(void);
 #define FLASH0_PAGE_SIZE 0x2000
 #define FLASH0_PROG_UNIT 0x10
 #define FLASH0_ERASED_VAL 0xff
+
 /*
 #define DEBUG_FLASH_ACCESS
+#define DEBUG_FLASH_DATA
 #define CHECK_ERASE
 */
 #if !defined(LOCAL_LOADER_CONFIG)
@@ -337,21 +339,38 @@ static int32_t Flash_ReadData(uint32_t addr, void *data, uint32_t cnt)
   }
   /*  ECC to implement with NMI */
   /*  do a memcpy */
-#ifdef DEBUG_FLASH_ACCESS
-  BOOT_LOG_INF("read %lx n=%x \r\n", (addr + FLASH_BASE), cnt);
-#endif /*  DEBUG_FLASH_ACCESS */
+
   DoubleECC_Error_Counter = 0U;
 
 #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U) && !defined(LOCAL_LOADER_CONFIG)
   /* area secure and non secure are done with a non secure access */
   if (is_range_secure(&ARM_FLASH0_DEV, addr, cnt))
   {
+#ifdef DEBUG_FLASH_ACCESS
+    BOOT_LOG_INF("read %lx n=%x \r\n", (addr + FLASH_BASE), cnt);
+#endif /*  DEBUG_FLASH_ACCESS */    
     memcpy(data, (void *)((uint32_t)addr + FLASH_BASE), cnt);
   }
   else
   {
+#ifdef DEBUG_FLASH_ACCESS
+    BOOT_LOG_INF("read %lx n=%x \r\n", (addr + FLASH_BASE_NS), cnt);
+#endif /*  DEBUG_FLASH_ACCESS */    
     memcpy(data, (void *)((uint32_t)addr + FLASH_BASE_NS), cnt);
   }
+#if (defined DEBUG_FLASH_ACCESS) && (defined DEBUG_FLASH_DATA)
+  #include "stdio.h"
+  {
+    int i;
+    uint8_t *p = (uint8_t*)data;
+    for (i=0;i<cnt;i++)
+    {
+      printf("%02x ", p[i]);
+      if(((i+1)%16)==0) printf("\r\n");
+    }
+    printf("\r\n");
+  }
+#endif /* (defined DEBUG_FLASH_ACCESS) && (defined DEBUG_FLASH_DATA) */
 #else
   memcpy(data, (void *)((uint32_t)addr + FLASH_BASE_NS), cnt);
 #endif
