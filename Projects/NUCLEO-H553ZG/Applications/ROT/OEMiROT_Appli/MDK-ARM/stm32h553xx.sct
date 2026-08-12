@@ -17,15 +17,15 @@
  */
 
 #define S_CODE_OFFSET 0x20000                       /* This definition is updated automatically from OEMiROT_Boot postbuild*/
-#define S_CODE_SIZE 0x8000                          /* This definition is updated automatically from OEMiROT_Boot postbuild*/
+#define S_CODE_SIZE 0xdc000                          /* This definition is updated automatically from OEMiROT_Boot postbuild*/
 #define NS_CODE_OFFSET S_CODE_OFFSET + S_CODE_SIZE  /* Non secure code Offset */
 #define IMAGE_HEADER_SIZE 0x400                     /* mcuboot header size */
 
 #define S_CODE_START 0x0C000000 + S_CODE_OFFSET + IMAGE_HEADER_SIZE
 #define S_APP_CODE_SIZE S_CODE_SIZE - IMAGE_HEADER_SIZE
 
-#define S_DATA_START 0x30000000
-#define S_DATA_SIZE 0x1FFFF
+#define S_DATA_START 0x30020000
+#define S_DATA_SIZE 0xFFFF
 
 #define S_CODE_LIMIT (S_CODE_START + S_APP_CODE_SIZE - 1)
 
@@ -36,6 +36,7 @@ LR_CODE S_CODE_START {
     }
 
     ER_DATA S_DATA_START S_DATA_SIZE {
+		loader.o (+RO)
         .ANY (+ZI +RW)
     }
 }

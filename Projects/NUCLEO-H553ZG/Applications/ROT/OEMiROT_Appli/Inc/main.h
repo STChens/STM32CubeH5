@@ -28,7 +28,7 @@
 
 #define S_CODE_OFFSET      0x20000 /* This define is updated automatically from ROT_BOOT project */
 #define NS_CODE_SIZE       0x50000 /* This define is updated automatically from ROT_BOOT project */
-#define S_CODE_SIZE        0x8000 /* This define is updated automatically from ROT_BOOT project */
+#define S_CODE_SIZE        0xDC000 /* This define is updated automatically from ROT_BOOT project */
 #define NS_CODE_OFFSET     (S_CODE_OFFSET + S_CODE_SIZE) /* Non secure code Offset */
 #define IMAGE_HEADER_SIZE  (0x400)  /* mcuboot headre size */
 #define S_CODE_START       (FLASH_BASE_S + S_CODE_OFFSET + IMAGE_HEADER_SIZE)
@@ -41,6 +41,10 @@
 
 
 /* Exported macros -----------------------------------------------------------*/
+#if defined MCUBOOT_PRIMARY_ONLY
+#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
+#endif /* defined MCUBOOT_PRIMARY_ONLY */
+
 /* Exported functions --------------------------------------------------------*/
 void Error_Handler(void);
 /* Exported variables --------------------------------------------------------*/

@@ -227,7 +227,7 @@ void SECURE_sysloader_run(void)
                 SAU_RLAR_ENABLE_Msk;
   }
 
-  secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
+  //secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
 
   /* Force memory writes before continuing */
   __DSB();
@@ -251,6 +251,13 @@ void SECURE_sysloader_run(void)
 
   /* Stop systick before jumping */
   HAL_SuspendTick();
+	
+#if (defined MCUBOOT_PRIMARY_ONLY) && (defined USE_SYSTEM_LOADER) 
+	/* we only secure the FLASH SECBB up to OEMiROT area */
+	secure_internal_flash(0x00, FLASH_AREA_0_OFFSET-1);
+#else
+  secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
+#endif
 
   uint32_t boot_address = cmse_nsfptr_create(*(uint32_t *)(BOOTLOADER_BASE_NS + 4U));
 

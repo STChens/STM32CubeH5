@@ -19,7 +19,9 @@
 #ifndef __APPLI_FLASH_LAYOUT_H__
 #define __APPLI_FLASH_LAYOUT_H__
 
-
+#define MCUBOOT_PRIMARY_ONLY	   /* Defined: no download slot
+                                      Undefined: active slot + download slot */
+                                      
 #define MCUBOOT_OVERWRITE_ONLY                 /* Defined: the FW installation uses overwrite method.
                                                   UnDefined: The FW installation uses swap mode. */
 
@@ -34,7 +36,7 @@
 
 #define FLASH_AREA_0_OFFSET            0x20000 /* Secure app image primary slot offset */
 
-#define FLASH_AREA_0_SIZE              0x56000   /* Secure app image primary slot size */
+#define FLASH_AREA_0_SIZE              0xDC000   /* Secure app image primary slot size */
 
 #define FLASH_AREA_1_OFFSET            0x0  /* Non-secure app image primary slot offset */
 
@@ -64,11 +66,11 @@
 
 #define FLASH_AREA_7_SIZE              0x0   /* Non-secure data image secondary slot size */
 
-#define FLASH_PARTITION_SIZE           0x56000  /* Secure and Non Secure partition size */
+#define FLASH_PARTITION_SIZE           0xDC000  /* Secure and Non Secure partition size */
 
-#define FLASH_NS_PARTITION_SIZE        0x50000  /* Non Secure partition size */
+#define FLASH_NS_PARTITION_SIZE        0x0  /* Non Secure partition size */
 
-#define FLASH_S_PARTITION_SIZE         0x6000   /* secure partition size */
+#define FLASH_S_PARTITION_SIZE         0xDC000   /* secure partition size */
 
 #define FLASH_S_DATA_PARTITION_SIZE    0x0   /* secure data partition size */
 
