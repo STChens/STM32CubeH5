@@ -21,7 +21,11 @@
 
 #define MCUBOOT_PRIMARY_ONLY	   /* Defined: no download slot
                                       Undefined: active slot + download slot */
-                                      
+
+#if defined MCUBOOT_PRIMARY_ONLY
+#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
+#endif /* defined MCUBOOT_PRIMARY_ONLY */
+
 #define MCUBOOT_OVERWRITE_ONLY                 /* Defined: the FW installation uses overwrite method.
                                                   UnDefined: The FW installation uses swap mode. */
 

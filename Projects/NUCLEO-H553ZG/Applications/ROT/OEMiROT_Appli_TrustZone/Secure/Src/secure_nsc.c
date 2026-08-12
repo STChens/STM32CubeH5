@@ -23,10 +23,6 @@
 #include "appli_flash_layout.h"
 #include "low_level_flash.h"
 
-#if defined MCUBOOT_PRIMARY_ONLY
-#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
-#endif /* defined MCUBOOT_PRIMARY_ONLY */
-
 #define BOOTLOADER_BASE_NS                  (0x0BFA4000U)
 #define BOOTLOADER_SIZE                     (0xC000U)
 /* Engi bits */
