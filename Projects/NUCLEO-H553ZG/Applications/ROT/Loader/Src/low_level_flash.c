@@ -36,6 +36,7 @@
 #define DEBUG_FLASH_ACCESS
 #define CHECK_ERASE
 */
+
 #if !defined(LOCAL_LOADER_CONFIG)
 /* Driver version */
 #define ARM_FLASH_DRV_VERSION   ARM_DRIVER_VERSION_MAJOR_MINOR(1, 0)
@@ -95,29 +96,6 @@ struct arm_flash_dev_t
 #if !defined(LOCAL_LOADER_CONFIG)
 static __IO uint32_t DoubleECC_Error_Counter = 0U;
 #endif
-
-/**
-  * \brief      Set/unset FLASH SECBB to full secure
-  * \param[in]  set 1: set, 0, unset  
-  */
-
-static void config_flash_secbb_fullsecure(int8_t set)
-{
-	if ( set == 1 ) 
-	{
-		FLASH->SECBB1R1 = 0xFFFFFFFF;
-		FLASH->SECBB1R2 = 0xFFFFFFFF;
-		FLASH->SECBB2R1 = 0xFFFFFFFF;
-		FLASH->SECBB2R2 = 0xFFFFFFFF;
-	}
-	else
-	{
-		FLASH->SECBB1R1 = 0;
-		FLASH->SECBB1R2 = 0;
-		FLASH->SECBB2R1 = 0;
-		FLASH->SECBB2R2 = 0;
-	}
-}
 
 /**
   * \brief      Check if the Flash memory boundaries are not violated.
@@ -457,7 +435,6 @@ static int32_t Flash_ProgramData(uint32_t addr,
     return ARM_DRIVER_ERROR_PARAMETER;
   }
 
-	config_flash_secbb_fullsecure(1);
   HAL_FLASH_Unlock();
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_BUSY;
   do
@@ -475,7 +452,6 @@ static int32_t Flash_ProgramData(uint32_t addr,
 
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_IDLE;
   HAL_FLASH_Lock();
-	config_flash_secbb_fullsecure(0);
   /* compare data written */
 #ifdef CHECK_WRITE
   if ((err == HAL_OK) && memcmp(dest, data, cnt))
@@ -543,13 +519,12 @@ static int32_t Flash_EraseSector(uint32_t addr)
   EraseInit.Sector = page_number(&ARM_FLASH0_DEV, addr);
 
   ARM_FLASH0_STATUS.error = DRIVER_STATUS_NO_ERROR;
-	config_flash_secbb_fullsecure(1);
   HAL_FLASH_Unlock();
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_BUSY;
   err = HAL_FLASHEx_Erase(&EraseInit, &pageError);
   ARM_FLASH0_STATUS.busy = DRIVER_STATUS_IDLE;
   HAL_FLASH_Lock();
-	config_flash_secbb_fullsecure(0);
+	
 #ifdef DEBUG_FLASH_ACCESS
 	printf("erase bank [%d], sector [%d] \r\n", EraseInit.Banks, EraseInit.Sector);
 	if (err != HAL_OK)
@@ -575,7 +550,7 @@ static int32_t Flash_EraseSector(uint32_t addr)
     if (pt[i] != 0xffffffff)
     {
 #ifdef DEBUG_FLASH_ACCESS
-      printf("erase failed off %x %x %x\r\n", addr, &pt[i], pt[i]);
+      printf("erase failed off %x %p %x\r\n", addr, &pt[i], pt[i]);
 #endif /* DEBUG_FLASH_ACCESS */
       err = HAL_ERROR;
       break;

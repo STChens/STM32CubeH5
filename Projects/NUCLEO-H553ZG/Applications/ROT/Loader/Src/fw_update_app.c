@@ -161,6 +161,9 @@ const uint32_t MagicTrailerValue[] =
 static void FW_UPDATE_PrintWelcome(void);
 static HAL_StatusTypeDef FW_UPDATE_DownloadNewFirmware(SFU_FwImageFlashTypeDef *pFwImageDwlArea);
 static HAL_StatusTypeDef FW_UPDATE_SECURE_APP_IMAGE(void);
+#if defined (MCUBOOT_PRIMARY_ONLY)
+static HAL_StatusTypeDef FW_EraseArea(uint32_t offset_start, uint32_t size);
+#endif
 #if (MCUBOOT_APP_IMAGE_NUMBER == 2)
 static HAL_StatusTypeDef FW_UPDATE_NONSECURE_APP_IMAGE(void);
 #endif /* (MCUBOOT_APP_IMAGE_NUMBER == 2) */
@@ -321,12 +324,13 @@ void SECURE_loader_run(void)
                 SAU_RLAR_ENABLE_Msk;
   }
 
-#if (!defined MCUBOOT_PRIMARY_ONLY)
-  secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
-#elif (defined USE_SYSTEM_LOADER)
+#if (defined MCUBOOT_PRIMARY_ONLY) && (defined USE_SYSTEM_LOADER) 
 	/* we only secure the FLASH SECBB up to OEMiROT area */
 	secure_internal_flash(0x00, FLASH_AREA_BEGIN_OFFSET-1);
+#else
+  secure_internal_flash(0x00, S_IMAGE_SECONDARY_PARTITION_OFFSET-1);
 #endif
+  
   /* Force memory writes before continuing */
   __DSB();
   /* Flush and refill pipeline with updated permissions */
@@ -371,6 +375,18 @@ void SECURE_loader_run(void)
   */
 static void LOADER_Run(void)
 {
+#if defined (MCUBOOT_PRIMARY_ONLY)
+  HAL_StatusTypeDef status;
+  printf("\r\n  Erase download area before jumping to the bootloader");
+  secure_internal_flash(0, FLASH_AREA_0_OFFSET + FLASH_AREA_0_SIZE -1);
+  status = FW_EraseArea(FLASH_AREA_0_OFFSET, FLASH_AREA_0_SIZE);
+  if (status != HAL_OK)
+  {
+    printf("\r\n  Erase download area failed!\r\n");
+    return;
+  }
+#endif
+  
   printf("\r\n  Start config before jumping to the bootloader");
 
   for (int i = 0; i < 16; i++)
@@ -651,6 +667,38 @@ static void FW_UPDATE_PrintWelcome(void)
 #endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
   printf("  Exit from FW update menu ------------------------------ x\r\n\n");
 }
+
+#if  defined(MCUBOOT_PRIMARY_ONLY)
+
+/**
+  * @brief Download a new Firmware from the host.
+  * @retval HAL status
+  */
+static HAL_StatusTypeDef FW_EraseArea(uint32_t offset_start, uint32_t size)
+{
+  HAL_StatusTypeDef ret = HAL_ERROR;
+  int32_t ret_arm;
+  uint32_t sector_address;
+  ARM_FLASH_INFO *data = LOADER_FLASH_DEV_NAME.GetInfo();
+  
+  /* Clear download area (app primary slot) */
+  printf("  -- Erasing download area \r\n\n");
+
+  for (sector_address = offset_start;
+       sector_address < offset_start + size;
+       sector_address += data->sector_size)
+  {
+    ret_arm = LOADER_FLASH_DEV_NAME.EraseSector(sector_address);
+    if (ret_arm < 0)
+    {
+      return HAL_ERROR;
+    }
+  }
+  
+  return HAL_OK;
+}
+#endif
+
 /**
   * @brief Download a new Firmware from the host.
   * @retval HAL status
@@ -662,9 +710,11 @@ static HAL_StatusTypeDef FW_UPDATE_DownloadNewFirmware(SFU_FwImageFlashTypeDef *
   int32_t ret_arm;
   uint32_t u_fw_size = pFwImageDwlArea->MaxSizeInBytes ;
   uint32_t sector_address;
-
+    
   /* Clear download area */
   printf("  -- Erasing download area \r\n\n");
+  
+  secure_internal_flash(0, pFwImageDwlArea->DownloadAddr + pFwImageDwlArea->MaxSizeInBytes -1);
 
   for (sector_address = pFwImageDwlArea->DownloadAddr;
        sector_address < pFwImageDwlArea->DownloadAddr + pFwImageDwlArea->MaxSizeInBytes;
