@@ -42,9 +42,8 @@
 
 /* Exported macros -----------------------------------------------------------*/
 #if defined MCUBOOT_PRIMARY_ONLY
-#define USE_SYSTEM_LOADER					 /* Defined: BL2 will allow system bootloader to write to primary slot */
+#define USE_SYSTEM_LOADER               /* Defined: BL2 will allow system bootloader to write to primary slot */
 #endif /* defined MCUBOOT_PRIMARY_ONLY */
-
 /* Exported functions --------------------------------------------------------*/
 void Error_Handler(void);
 /* Exported variables --------------------------------------------------------*/
