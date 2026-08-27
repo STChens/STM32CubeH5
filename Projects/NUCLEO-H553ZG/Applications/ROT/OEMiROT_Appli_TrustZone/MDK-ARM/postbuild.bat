@@ -23,7 +23,7 @@ echo. > %current_log_file%
 set app_image_number=1
 set image_s_size=0x6000
 :: flag to switch between OEMiROT and OEMuROT
-set oemurot_enable=0
+set oemurot_enable=1
 
 if %oemurot_enable% == 1 (
 set project=OEMuROT
@@ -133,6 +133,9 @@ set ns_app_bin_xml_field="%bin_path_xml_field%\rot_tz_app.bin"
 )
 
 :continue
+if "%app_image_number%" == "1" (
+goto :skip_s_signing
+)
 IF %signing% == "secure" (
 
 echo Creating secure image  >> %current_log_file% 2>>&1
@@ -173,6 +176,8 @@ if !errorlevel! neq 0 goto :error
 %stm32tpccli% -pb %s_code_init_xml% >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
 )
+
+:skip_s_signing
 
 IF %signing% == "nonsecure" (
 echo Creating nonsecure image  >> %current_log_file% 2>>&1

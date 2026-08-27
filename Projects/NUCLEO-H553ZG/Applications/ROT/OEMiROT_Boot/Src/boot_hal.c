@@ -639,16 +639,23 @@ int32_t boot_platform_init(void)
 #endif
     BOOT_LOG_INF("Flash area 0 offset: %08x", FLASH_AREA_0_OFFSET);
     BOOT_LOG_INF("Flash area 0 size  : %08x", FLASH_AREA_0_SIZE);
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2)    
+    BOOT_LOG_INF("Flash area 1 offset: %08x", FLASH_AREA_1_OFFSET);
+    BOOT_LOG_INF("Flash area 1 size  : %08x", FLASH_AREA_1_SIZE);
+#endif
 #if !defined (MCUBOOT_PRIMARY_ONLY)    
     BOOT_LOG_INF("Flash area 2 offset: %08x", FLASH_AREA_2_OFFSET);
     BOOT_LOG_INF("Flash area 2 size  : %08x", FLASH_AREA_2_SIZE);    
-    
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2)    
+    BOOT_LOG_INF("Flash area 3 offset: %08x", FLASH_AREA_3_OFFSET);
+    BOOT_LOG_INF("Flash area 3 size  : %08x", FLASH_AREA_3_SIZE);
+#endif
     BOOT_LOG_INF("scratch area 2 offset: %08x", FLASH_AREA_SCRATCH_OFFSET);
     BOOT_LOG_INF("scratch area 2 size  : %08x", FLASH_AREA_SCRATCH_SIZE);        
 #endif
-    
+#if !defined OEMUROT_ENABLE
     BOOT_LOG_INF("HDP end: %08x", FLASH_BL2_HDP_END);        
-    
+#endif
 #if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)    
     BOOT_LOG_INF("Flash area 3 offset: %08x", FLASH_AREA_4_OFFSET);
     BOOT_LOG_INF("Flash area 3 size  : %08x", FLASH_AREA_4_SIZE);    

@@ -112,10 +112,6 @@ set "command=%python%%applicfg% definevalue -xml %stirot_config_xml% -nxml %oemu
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
-set "command=%python%%applicfg% modifyfilevalue -xml %stirot_config_xml% -nxml %oemurot_firmware_offset% --delimiter = -var DOWNLOAD_ROT_REGION_START %map_properties% --vb >> %current_log_file% 2>&1"
-%command%
-IF !errorlevel! NEQ 0 goto :error
-
 :common_rot_regions
 
 :: ======================================================== Merge OEMiROT and Loader binary ===========================================================
@@ -123,7 +119,11 @@ echo %oemirot_bin_file% >> %current_log_file% 2>>&1
 echo %boot_bin_file% >> %current_log_file% 2>>&1
 echo %loader_bin_file% >> %current_log_file% 2>>&1
 IF exist %loader_bin_file% (
-%python%%applicfg% oneimage -fb %boot_bin_file% -o 0x10000 -sb %loader_bin_file% -i 0x0 -ob %oemirot_bin_file% --vb >> %current_log_file% 2>>&1
+  if %oemurot_enable% == 1 (
+    %python%%applicfg% oneimage -fb %boot_bin_file% -o 0xFC00 -sb %loader_bin_file% -i 0x0 -ob %oemirot_bin_file% --vb >> %current_log_file% 2>>&1
+  ) else (
+    %python%%applicfg% oneimage -fb %boot_bin_file% -o 0x10000 -sb %loader_bin_file% -i 0x0 -ob %oemirot_bin_file% --vb >> %current_log_file% 2>>&1
+  )
 )
 
 :: =============================================================== Update %img_config% ================================================================
@@ -654,11 +654,22 @@ if exist %appli_flash_layout_txt% (
 
 :end
 if %oemurot_enable% == 1 (
-    %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Image.xml >> %current_log_file% 2>>&1
-    IF !errorlevel! NEQ 0 goto :error
+  ::update xml file : output file (hex)
+  %python%%applicfg% xmlval -v "./../../../Applications/ROT/OEMiROT_Boot/Binary/rot_enc_sign.hex" --string -n "Image output file" %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Image.xml --vb >> %current_log_file% 2>>&1
+  if !errorlevel! neq 0 goto :error
 
-    %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Init_Image.xml >> %current_log_file% 2>>&1
-    IF !errorlevel! NEQ 0 goto :error
+  %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Image.xml >> %current_log_file% 2>>&1
+  IF !errorlevel! NEQ 0 goto :error
+
+  ::update xml file : output file (bin)
+  %python%%applicfg% xmlval -v "./../../../Applications/ROT/OEMiROT_Boot/Binary/rot_enc_sign.bin" --string -n "Image output file" %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Image.xml --vb >> %current_log_file% 2>>&1
+  if !errorlevel! neq 0 goto :error
+
+  %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Image.xml >> %current_log_file% 2>>&1
+  IF !errorlevel! NEQ 0 goto :error
+
+  %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Init_Image.xml >> %current_log_file% 2>>&1
+  IF !errorlevel! NEQ 0 goto :error
 )
 
 :: ======================================================================= end ========================================================================

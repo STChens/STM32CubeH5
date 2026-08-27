@@ -26,7 +26,7 @@
 
 /* Flash layout configuration : begin ****************************************/
 /* OEMiROT/STiROT_OEMuROT configuration */
-/*#define OEMUROT_ENABLE*/         /* Defined: the project is used for STiROT_OEMuROT boot path */
+#define OEMUROT_ENABLE         /* Defined: the project is used for STiROT_OEMuROT boot path */
                                    /* Undefined: the project is used for OEMiROT boot path */
 
 #define MCUBOOT_PRIMARY_ONLY	   /* Defined: no download slot
@@ -81,6 +81,10 @@
 #define FLASH_B_SIZE                    (0x80000)   /* 512 KBytes*/
 #define FLASH_TOTAL_SIZE                (FLASH_B_SIZE+FLASH_B_SIZE) /* 1 MBytes */
 #define FLASH_BASE_ADDRESS              (0x08000000)
+
+#if defined(OEMUROT_ENABLE)
+#define FLASH_
+#endif
 
 /* Flash area IDs */
 #define FLASH_AREA_0_ID                 (1)
@@ -185,8 +189,8 @@
 #define FLASH_NS_PARTITION_SIZE         (0x50000) /* 320 KB for NS partition (except for FULL SECURE) */
 //#define FLASH_NS_PARTITION_SIZE         (0) /* 0 for FULL SECURE */
 #if (FLASH_NS_PARTITION_SIZE == 0x0)
-#define FLASH_S_PARTITION_SIZE          (0x0DC000) /* 880 KB for S partition */
-//#define FLASH_S_PARTITION_SIZE          (0x060000) /* 384 KB for S partition */
+#define FLASH_S_PARTITION_SIZE          (0x0DC000) /* test case 1: 880 KB for S partition */
+//#define FLASH_S_PARTITION_SIZE          (0x060000) /* test case 2: 384 KB for S partition */
 #elif !defined(MCUBOOT_OVERWRITE_ONLY)
 #define FLASH_S_PARTITION_SIZE          (0x08000) /* 32 KB for S partition */
 #else
@@ -387,12 +391,58 @@
 #define FLASH_AREA_7_SIZE               (0x0)
 #endif /* FLASH_AREA_7_ID */
 
+
+/* Flash Memory layout overview, in case of 
+   1) OEMUROT_ENABLE is defined  (STiROT + OEMuROT)
+   2) MCUBOOT_PRIMARY_ONLY is defined 
+   3) MCUBOOT_APP_IMAGE_NUMBER = 1
+   4) MCUBOOT_S_DATA_IMAGE_NUMBER = 0
+   5) MCUBOOT_S_DATA_IMAGE_NUMBER = 0
+    
+   +--------------+--------------------------------+-------------------------------+
+   | Area ID      |  sub area  |   Purpose         |   Size                        | 
+   +--------------+--------------------------------+-------------------------------+
+   |              | BL2        | OEMiROT code      |   FLASH_AREA_BL2_SIZE -       |
+   |   BL2        |            |                   |       FLASH_AREA_LOADER_SIZE  |                 
+   |  (uROT)      +--------------------------------+-------------------------------+
+   |              | LOADER     | User Loader code  |   FLASH_AREA_LOADER_SIZE      |                 
+   +--------------+--------------------------------+-------------------------------+
+   | 0            |  S App data active slot        |   FLASH_S_ACTIVESLOT_SIZE     |                 
+   +--------------+--------------------------------+-------------------------------+
+   | uROT Data Dwl|  OEMuROT Data download slot    |  FLASH_AREA_OEMuROT_DATA_SIZE |                 
+   +--------------+--------------------------------+-------------------------------+
+   | uROT FW Dwl  |  OEMuROT FW download slot      |   FLASH_AREA_OEMUROT_FW_SIZE  |                 
+   +--------------+--------------------------------+-------------------------------+
+   
+*/
+#if defined (OEMUROT_ENABLE)
+#define FLASH_AREA_OEMuROT_DATA_OFFSET (0x00DE000) // This shall be in line with the "Data download area offset" definition in STiROT config
+#define FLASH_AREA_OEMuROT_DATA_SIZE (0x2000) // This shall be in line with the "Data download slot size" definition in STiROT config -- fixed to 0x2000
+#define FLASH_AREA_OEMuROT_FW_OFFSET (0x00E0000) // This shall be in line with the "Firmware download area offset" definition in STiROT config
+#define FLASH_AREA_OEMuROT_FW_SIZE (0x00020000)  // This shall be in line with the "Firmware area size" definition in STiROT config
+
+#define FLASH_SLOT_AREA_END_OFFSET      (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
+                                         FLASH_AREA_0_SIZE + FLASH_AREA_1_SIZE + \
+                                         FLASH_AREA_5_SIZE + FLASH_AREA_2_SIZE + \
+                                         FLASH_AREA_3_SIZE + FLASH_AREA_6_SIZE + \
+                                         FLASH_AREA_7_SIZE)
+
+#if (FLASH_SLOT_AREA_END_OFFSET  > FLASH_AREA_OEMuROT_DATA_OFFSET )
+#error "Flash slot end offset cannot be overlap with OEMuROT FW download offset!"
+#endif /*(FLASH_SLOT_AREA_END_OFFSET  > FLASH_AREA_OEMuROT_DATA_OFFSET )*/
+
+/* flash areas end offset */
+#define FLASH_AREA_END_OFFSET           (FLASH_AREA_OEMuROT_FW_OFFSET + FLASH_AREA_OEMuROT_FW_SIZE)
+
+#else
 /* flash areas end offset */
 #define FLASH_AREA_END_OFFSET           (FLASH_AREA_BEGIN_OFFSET + FLASH_AREA_4_SIZE + \
                                          FLASH_AREA_0_SIZE + FLASH_AREA_1_SIZE + \
                                          FLASH_AREA_5_SIZE + FLASH_AREA_2_SIZE + \
                                          FLASH_AREA_3_SIZE + FLASH_AREA_6_SIZE + \
                                          FLASH_AREA_7_SIZE)
+#endif
+
 /* Control flash area end */
 #if (FLASH_AREA_END_OFFSET  % FLASH_AREA_IMAGE_SECTOR_SIZE) != 0
 #error "FLASH_AREA_END_OFFSET  not aligned on FLASH_AREA_IMAGE_SECTOR_SIZE"

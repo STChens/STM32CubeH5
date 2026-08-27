@@ -161,6 +161,10 @@ const uint32_t MagicTrailerValue[] =
 static void FW_UPDATE_PrintWelcome(void);
 static HAL_StatusTypeDef FW_UPDATE_DownloadNewFirmware(SFU_FwImageFlashTypeDef *pFwImageDwlArea);
 static HAL_StatusTypeDef FW_UPDATE_SECURE_APP_IMAGE(void);
+#if defined (OEMUROT_ENABLE)
+static HAL_StatusTypeDef OEMuROT_UPDATE_IMAGE(void);
+static HAL_StatusTypeDef OEMuROT_UPDATE_DATA(void);
+#endif
 #if defined (MCUBOOT_PRIMARY_ONLY)
 static HAL_StatusTypeDef FW_EraseArea(uint32_t offset_start, uint32_t size);
 #endif
@@ -461,6 +465,14 @@ void FW_UPDATE_Run(void)
           FW_UPDATE_NONSECURE_DATA_IMAGE();
           break;
 #endif /* (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1) */
+#if defined (OEMUROT_ENABLE)
+      case '6' :
+          OEMuROT_UPDATE_IMAGE();
+          break;
+      case '7' :
+          OEMuROT_UPDATE_DATA();
+          break;
+#endif      
       case 'x':
           printf("Exit from FW update menu\r\n");
           exit =1;
@@ -474,6 +486,73 @@ void FW_UPDATE_Run(void)
     }
   }
 }
+
+#if defined (OEMUROT_ENABLE)
+/**
+  * @brief  Run OEMuROT FW Update process.
+  * @param  None
+  * @retval HAL Status.
+  */
+static HAL_StatusTypeDef OEMuROT_UPDATE_IMAGE(void)
+{
+  HAL_StatusTypeDef ret = HAL_ERROR;
+  SFU_FwImageFlashTypeDef fw_image_dwl_area;
+  ARM_FLASH_INFO *data = LOADER_FLASH_DEV_NAME.GetInfo();
+  /* Print Firmware Update welcome message */
+  printf("Download OEMuROT update Image\r\n");
+
+  /* Get Info about the download area */
+  fw_image_dwl_area.DownloadAddr =  FLASH_AREA_OEMuROT_FW_OFFSET; 
+  fw_image_dwl_area.MaxSizeInBytes = FLASH_AREA_OEMuROT_FW_SIZE; 
+
+  fw_image_dwl_area.ImageOffsetInBytes = 0x0;
+  m_uFlashSectorSize = data->sector_size;
+  m_uFlashMinWriteSize = data->program_unit;
+  /* Download new firmware image*/
+  ret = FW_UPDATE_DownloadNewFirmware(&fw_image_dwl_area);
+
+  if (HAL_OK == ret)
+  {
+    printf("  -- OEMuROT update Image correctly downloaded \r\n\n");
+    HAL_Delay(1000U);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Run OEMuROT Data Update process.
+  * @param  None
+  * @retval HAL Status.
+  */
+static HAL_StatusTypeDef OEMuROT_UPDATE_DATA(void)
+{
+  HAL_StatusTypeDef ret = HAL_ERROR;
+  SFU_FwImageFlashTypeDef fw_image_dwl_area;
+  ARM_FLASH_INFO *data = LOADER_FLASH_DEV_NAME.GetInfo();
+  /* Print Firmware Update welcome message */
+  printf("Download OEMuROT update Image\r\n");
+
+  /* Get Info about the download area */
+  fw_image_dwl_area.DownloadAddr =  FLASH_AREA_OEMuROT_DATA_OFFSET; 
+  fw_image_dwl_area.MaxSizeInBytes = FLASH_AREA_OEMuROT_DATA_SIZE; 
+
+  fw_image_dwl_area.ImageOffsetInBytes = 0x0;
+  m_uFlashSectorSize = data->sector_size;
+  m_uFlashMinWriteSize = data->program_unit;
+  /* Download new firmware image*/
+  ret = FW_UPDATE_DownloadNewFirmware(&fw_image_dwl_area);
+
+  if (HAL_OK == ret)
+  {
+    printf("  -- OEMuROT update Image correctly downloaded \r\n\n");
+    HAL_Delay(1000U);
+  }
+
+  return ret;
+}
+
+#endif
 
 /**
   * @brief  Run FW Update process.
@@ -665,6 +744,10 @@ static void FW_UPDATE_PrintWelcome(void)
 #if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
   printf("  Download NonSecure Data Image ------------------------- 5\r\n\n");
 #endif /* (MCUBOOT_S_DATA_IMAGE_NUMBER == 1) */
+#if defined (OEMUROT_ENABLE)
+  printf("  Download OEMuROT FW Image ----------------------------- 6\r\n\n");
+  printf("  Download OEMuROT Data Image --------------------------- 7\r\n\n");
+#endif  
   printf("  Exit from FW update menu ------------------------------ x\r\n\n");
 }
 
@@ -682,7 +765,7 @@ static HAL_StatusTypeDef FW_EraseArea(uint32_t offset_start, uint32_t size)
   ARM_FLASH_INFO *data = LOADER_FLASH_DEV_NAME.GetInfo();
   
   /* Clear download area (app primary slot) */
-  printf("  -- Erasing download area \r\n\n");
+  printf("\r\n  -- Erasing download area \r\n\n");
 
   for (sector_address = offset_start;
        sector_address < offset_start + size;
