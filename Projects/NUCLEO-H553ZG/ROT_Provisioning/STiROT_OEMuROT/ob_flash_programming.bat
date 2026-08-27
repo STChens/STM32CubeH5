@@ -6,19 +6,19 @@ set rot_provisioning_path=%rot_provisioning_path:"=%
 setlocal EnableDelayedExpansion
 
 set sec1_start=0
-set sec1_end=0xE
-set sec2_start=0x7F
+set sec1_end=0xF
+set sec2_start=0x3F
 set sec2_end=0x0
-set wrpgrp1=0xFFFFFFF8
-set wrpgrp2=0xFFFFFFFF
+set wrpgrp1=0xfff0
+set wrpgrp2=0xffff
 set hdp1_start=0
 set hdp1_end=0x0
-set hdp2_start=0x7F
+set hdp2_start=0x3f
 set hdp2_end=0x0
 set boot_lck=0xB4
 set bootaddress=0xC000400
 set bootob=0xC0004
-set app_image_number=2
+set app_image_number=1
 set s_data_image_number=0
 set ns_data_image_number=0
 
@@ -33,7 +33,7 @@ set connect_no_reset=-c port=SWD speed=fast ap=1 mode=Hotplug
 set connect_reset=-c port=SWD speed=fast ap=1 mode=UR
 
 :: =============================================== Remove protections and initialize Option Bytes ==========================================
-set remove_protect=-ob SECWM1_STRT=1 SECWM1_END=0 WRPSGn1=0xffffffff WRPSGn2=0xffffffff SECWM2_STRT=1 SECWM2_END=0 HDP1_STRT=1 HDP1_END=0 HDP2_STRT=1 HDP2_END=0 SWAP_BANK=0 SRAM2_RST=0 SRAM2_ECC=0 BOOT_UBE=0xB4
+set remove_protect=ob SECWM1_STRT=1 SECWM1_END=0 WRPSGn1=0xffff WRPSGn2=0xffff SECWM2_STRT=1 SECWM2_END=0 HDP1_STRT=1 HDP1_END=0 HDP2_STRT=1 HDP2_END=0 SECBOOT_LOCK=0xC3 SWAP_BANK=0 SRAM2_RST=0 SRAM2_ECC=0 BOOT_UBE=0xB4
 set erase_all=-e all
 
 if "%isGeneratedByCubeMX%" == "true" (
@@ -42,6 +42,8 @@ set appli_dir=%oemirot_appli_path_project%
 set appli_dir=../../%oemirot_appli_path_project%
 )
 
+:: =============================================== Hardening ===============================================================================
+set sec_water_mark=SECWM1_STRT=%sec1_start% SECWM1_END=%sec1_end% SECWM2_STRT=%sec2_start% SECWM2_END=%sec2_end%
 :: =============================================== Configure Option Bytes ====================================================================
 
 set "action=Set TZEN = 1"
@@ -79,11 +81,8 @@ set "action=Define secure area through watermarks"
 echo %action%
 :: This configuration depends on user mapping but the watermarks should cover at least the secure area part of the firmware execution slot.
 :: The secure area can also be larger in order to include additional sectors. For example the secure firmware will have to manage user data.
-%stm32programmercli% %connect_no_reset% -ob SECWM1_STRT=0x0 SECWM1_END=%sec1_end%
+%stm32programmercli% %connect_no_reset% -ob %sec_water_mark%
 IF !errorlevel! NEQ 0 goto :error
-%stm32programmercli% %connect_no_reset% -ob SECWM2_STRT=0x7F SECWM2_END=0x0
-IF !errorlevel! NEQ 0 goto :error
-
 :: ==================================================== Download images ====================================================================
 
 echo "Application images programming in download slots"
