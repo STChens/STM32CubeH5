@@ -120,7 +120,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGTARM</Key>
-          <Name>(6010=-1,-1,-1,-1,0)(6018=-1,-1,-1,-1,0)(6019=-1,-1,-1,-1,0)(6008=-1,-1,-1,-1,0)(6009=-1,-1,-1,-1,0)(6014=-1,-1,-1,-1,0)(6015=-1,-1,-1,-1,0)(6003=1113,190,1695,726,0)(6000=75,104,528,436,0)</Name>
+          <Name>(6010=-1,-1,-1,-1,0)(6018=-1,-1,-1,-1,0)(6019=-1,-1,-1,-1,0)(6008=-1,-1,-1,-1,0)(6009=-1,-1,-1,-1,0)(6014=862,188,1120,919,0)(6015=-1,-1,-1,-1,0)(6003=412,445,994,981,0)(6000=75,104,528,436,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -130,7 +130,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U0033002A3335510735383531 -O206 -SF10000 -C0 -A1 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(6BA02477) -L00(0) -TO131090 -TC10000000 -TT10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO0 -FD20000000 -FC8000 -FN2 -FF0STM32H5xx_1M_0800.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32H553ZGTx$CMSIS\Flash\STM32H5xx_1M_0800.FLM) -FF1STM32H5xx_1M_0C00.FLM -FS1C000000 -FL1100000 -FP1($$Device:STM32H553ZGTx$CMSIS\Flash\STM32H5xx_1M_0C00.FLM) -WA0 -WE0 -WVCE4 -WS2710 -WM0 -WP2 -WK0-R0</Name>
+          <Name>-U0033002A3335510735383531 -O32966 -SF10000 -C0 -A1 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(6BA02477) -L00(0) -TO131090 -TC10000000 -TT10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO0 -FD20000000 -FC8000 -FN2 -FF0STM32H5xx_1M_0800.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32H553ZGTx$CMSIS\Flash\STM32H5xx_1M_0800.FLM) -FF1STM32H5xx_1M_0C00.FLM -FS1C000000 -FL1100000 -FP1($$Device:STM32H553ZGTx$CMSIS\Flash\STM32H5xx_1M_0C00.FLM) -WA0 -WE0 -WVCE4 -WS2710 -WM0 -WP2 -WK0-R0</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -143,7 +143,184 @@
           <Name>UL2V8M(-S0 -C0 -P0 )  -FN2 -FC8000 -FD20000000 -FF0STM32H5xx_1M_0800 -FF1STM32H5xx_1M_0C00 -FL0100000 -FL1100000 -FS08000000 -FS1C000000 -FP0($$Device:STM32H553ZGTx$CMSIS\Flash\STM32H5xx_1M_0800.FLM) -FP1($$Device:STM32H553ZGTx$CMSIS\Flash\STM32H5xx_1M_0C00.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>774</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>201395152</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Src\fw_update_app.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Loader\../Src/fw_update_app.c\774</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>406</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>201396486</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Src\low_level_flash.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Loader\../Src/low_level_flash.c\406</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>488</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>201396078</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Src\low_level_flash.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Loader\../Src/low_level_flash.c\488</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>242</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>201392812</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\startup_stm32h553xx.s</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Loader\startup_stm32h553xx.s\242</Expression>
+        </Bp>
+        <Bp>
+          <Number>4</Number>
+          <Type>0</Type>
+          <LineNumber>162</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>201421976</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Src\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Loader\../Src/main.c\162</Expression>
+        </Bp>
+        <Bp>
+          <Number>5</Number>
+          <Type>0</Type>
+          <LineNumber>386</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\Src\fw_update_app.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>6</Number>
+          <Type>0</Type>
+          <LineNumber>425</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\Src\fw_update_app.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>7</Number>
+          <Type>0</Type>
+          <LineNumber>512</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\Src\fw_update_app.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>8</Number>
+          <Type>0</Type>
+          <LineNumber>698</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\Src\fw_update_app.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>9</Number>
+          <Type>0</Type>
+          <LineNumber>743</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\Src\fw_update_app.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>10</Number>
+          <Type>0</Type>
+          <LineNumber>489</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\Src\low_level_flash.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -160,10 +337,18 @@
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>1</SubType>
-          <ItemText>0x0c010000</ItemText>
+          <ItemText>0x30023FD0</ItemText>
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
+      <MemoryWindow2>
+        <Mm>
+          <WinNumber>2</WinNumber>
+          <SubType>1</SubType>
+          <ItemText>0x0c010000</ItemText>
+          <AccSizeX>0</AccSizeX>
+        </Mm>
+      </MemoryWindow2>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
@@ -188,7 +373,7 @@
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
         <aSer4>0</aSer4>
-        <StkLoc>0</StkLoc>
+        <StkLoc>1</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
         <uProt>0</uProt>
@@ -366,7 +551,7 @@
 
   <Group>
     <GroupName>Drivers/STM32H5xx_HAL_Driver</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -626,7 +811,7 @@
 
   <Group>
     <GroupName>Application/User/USB_Device</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -682,7 +867,7 @@
 
   <Group>
     <GroupName>Middlewares/ST_USBD_Library</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

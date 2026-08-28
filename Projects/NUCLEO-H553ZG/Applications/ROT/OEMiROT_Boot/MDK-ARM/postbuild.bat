@@ -654,6 +654,7 @@ if exist %appli_flash_layout_txt% (
 
 :end
 if %oemurot_enable% == 1 (
+  ::Generate OEMuROT signed+encrypted FW image for update (bin & hex)
   ::update xml file : output file (hex)
   %python%%applicfg% xmlval -v "./../../../Applications/ROT/OEMiROT_Boot/Binary/rot_enc_sign.hex" --string -n "Image output file" %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Image.xml --vb >> %current_log_file% 2>>&1
   if !errorlevel! neq 0 goto :error
@@ -668,7 +669,23 @@ if %oemurot_enable% == 1 (
   %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Image.xml >> %current_log_file% 2>>&1
   IF !errorlevel! NEQ 0 goto :error
 
+  ::Generate OEMuROT signed FW image for initial programming (hex)
   %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiRoT_Code_Init_Image.xml >> %current_log_file% 2>>&1
+  IF !errorlevel! NEQ 0 goto :error
+
+  ::Generate OEMuROT signed data image for update of OEMuROT keys (bin & hex)
+  ::update xml file : output file (hex)
+  %python%%applicfg% xmlval -v "./../Binary/OEMuRoT_Config_signed.hex" --string -n "Image output file" %rot_provisioning_path%\STiROT_OEMuROT\Images\STiROT_Data_Image.xml --vb >> %current_log_file% 2>>&1
+  if !errorlevel! neq 0 goto :error
+
+  %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiROT_Data_Image.xml >> %current_log_file% 2>>&1
+  IF !errorlevel! NEQ 0 goto :error
+
+  ::update xml file : output file (bin)
+  %python%%applicfg% xmlval -v "./../Binary/OEMuRoT_Config_signed.bin" --string -n "Image output file" %rot_provisioning_path%\STiROT_OEMuROT\Images\STiROT_Data_Image.xml --vb >> %current_log_file% 2>>&1
+  if !errorlevel! neq 0 goto :error
+
+  %stm32tpccli% -pb %rot_provisioning_path%\STiROT_OEMuROT\Images\STiROT_Data_Image.xml >> %current_log_file% 2>>&1
   IF !errorlevel! NEQ 0 goto :error
 )
 

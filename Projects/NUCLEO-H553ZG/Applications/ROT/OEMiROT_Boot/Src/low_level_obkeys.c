@@ -443,7 +443,20 @@ void OBK_ReadHdpl2Config(OBK_Hdpl2Config *pOBK_Hdpl2Cfg)
   {
     Error_Handler();
   }
-
+#if defined (DEBUG_OBK)  
+  {
+    int i;
+    uint8_t *p = (uint8_t*)pOBK_Hdpl2Cfg;
+    BOOT_LOG_INF("OBK data at offset 0x%x\r\n", OBK_HDPL2_OFFSET);
+    
+    for (i=0;i<sizeof(OBK_Hdpl2Config);i++)
+    {
+      printf("%02x ", p[i]);
+      if ((i+1)%16 == 0)
+        printf("\r\n");
+    }
+  }
+#endif
   /* Verif SHA256 on the area being signed by mcuboot image  */
   if (Compute_SHA256((uint8_t *) (Address), (uint32_t) &((OBK_Hdpl2Config*)0)->Non_Protected_TLV[0], sha256) != HAL_OK)
   {
@@ -470,7 +483,19 @@ HAL_StatusTypeDef OBK_ReadHdpl2Data(OBK_Hdpl2Data *pOBK_Hdpl2Data)
   {
     return HAL_ERROR;
   }
-
+#if defined (DEBUG_OBK)   
+  {
+    int i;
+    uint8_t *p = (uint8_t*)pOBK_Hdpl2Data;
+    BOOT_LOG_INF("OBK data at offset 0x%x\r\n", OBK_HDPL2_DATA_OFFSET);
+    for (i=0;i<sizeof(OBK_Hdpl2Data);i++)
+    {
+      printf("%02x ", p[i]);
+      if ((i+1)%16 == 0)
+        printf("\r\n");
+    }
+  }
+#endif  
   /* Verif SHA256 on the whole Hdpl 2 data except first 32 bytes of SHA256 */
   if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl2Data) - SHA256_LENGTH, sha256) != HAL_OK)
   {
@@ -520,7 +545,7 @@ void OBK_VerifyHdpl2Config(OBK_Hdpl2Config *pOBK_Hdpl2Cfg)
 {
   uint8_t sha256[SHA256_LENGTH] = { 0U };
   uint32_t Address = (uint32_t) pOBK_Hdpl2Cfg;
-
+  
   /* Verif SHA256 on the area being signed by mcuboot image  */
   if (Compute_SHA256((uint8_t *) (Address), (uint32_t) &((OBK_Hdpl2Config*)0)->Non_Protected_TLV[0], sha256) != HAL_OK)
   {

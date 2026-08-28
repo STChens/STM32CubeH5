@@ -655,6 +655,11 @@ int32_t boot_platform_init(void)
 #endif
 #if !defined OEMUROT_ENABLE
     BOOT_LOG_INF("HDP end: %08x", FLASH_BL2_HDP_END);        
+#else 
+    BOOT_LOG_INF("OEMuROT Data download slot offset: %08x", FLASH_AREA_OEMuROT_DATA_OFFSET);
+    BOOT_LOG_INF("OEMuROT Data download slot size: %08x", FLASH_AREA_OEMuROT_DATA_SIZE);
+    BOOT_LOG_INF("OEMuROT FW download slot offset: %08x", FLASH_AREA_OEMuROT_FW_OFFSET);
+    BOOT_LOG_INF("OEMuROT FW download slot size: %08x", FLASH_AREA_OEMuROT_FW_SIZE);
 #endif
 #if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)    
     BOOT_LOG_INF("Flash area 3 offset: %08x", FLASH_AREA_4_OFFSET);

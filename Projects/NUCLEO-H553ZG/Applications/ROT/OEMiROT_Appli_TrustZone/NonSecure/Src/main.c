@@ -447,7 +447,8 @@ void LOADER_Run(int8_t is_sysbl)
 		SECURE_sysloader_run();
 	}
 	else
-	{
+	{ 
+    HAL_SuspendTick();    
 		SECURE_userloader_run();
 	}
 }

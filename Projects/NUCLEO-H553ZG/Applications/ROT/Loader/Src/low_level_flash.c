@@ -473,8 +473,9 @@ static int32_t Flash_ProgramData(uint32_t addr,
 
 /*
 #define DEBUG_FLASH_ACCESS
-#define CHECK_ERASE
 */
+#define CHECK_ERASE
+
 static int32_t Flash_EraseSector(uint32_t addr)
 {
   FLASH_EraseInitTypeDef EraseInit;

@@ -212,6 +212,7 @@
 void SystemInit(void)
 {
   uint32_t reg_opsr;
+  SysTick_NS->CTRL &= ~SysTick_CTRL_TICKINT_Msk;
   /* SAU/IDAU, FPU and Interrupts secure/non-secure allocation settings */
   TZ_SAU_Setup();
 
