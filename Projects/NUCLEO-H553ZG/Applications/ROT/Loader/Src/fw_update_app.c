@@ -185,6 +185,7 @@ static void LOADER_Run(void);
 extern ARM_DRIVER_FLASH FLASH_DEV_NAME;
 #define BANK_NUMBER  2
 
+#if 1
 static void secure_internal_flash(uint32_t offset_start, uint32_t offset_end)
 {
   volatile uint32_t *SecBB[4]= {&FLASH_S->SECBB1R1, &FLASH_S->SECBB1R2,
@@ -215,6 +216,96 @@ static void secure_internal_flash(uint32_t offset_start, uint32_t offset_end)
     }
   }
 }
+#else
+
+//#define FLASH_SECBB_DBG
+static void secure_internal_flash(uint32_t offset_start, uint32_t offset_end)
+{
+  uint32_t start = 0;
+  uint32_t end = 0;
+  uint32_t sector_bank;
+  
+  const ARM_FLASH_INFO *flash_info;
+  
+  FLASH->SECBB1R1 = 0;
+  FLASH->SECBB2R1 = 0;
+  FLASH->SECBB1R2 = 0;
+  FLASH->SECBB2R2 = 0;
+
+  flash_info = FLASH_DEV_NAME.GetInfo();
+
+  sector_bank = (flash_info->sector_count) / 2;
+  start = offset_start / flash_info->page_size;
+  end = (offset_end / flash_info->page_size);
+
+#if defined FLASH_SECBB_DBG  
+  printf("%s:%d start(%x/ %d), end(%x/ %d), sector_bank(%d)\r\n", \
+    __FUNCTION__, __LINE__, offset_start, start, offset_end, end, sector_bank);
+  printf("\r\nFLASH SECBB1R1 : %08x\r\n", FLASH_S->SECBB1R1);
+  printf("FLASH SECBB1R2 : %08x\r\n", FLASH_S->SECBB1R2);
+  printf("FLASH SECBB2R1 : %08x\r\n", FLASH_S->SECBB2R1);
+  printf("FLASH SECBB2R2 : %08x\r\n", FLASH_S->SECBB2R2);
+#endif  
+  
+  /* First deal with bank1 */
+  if ( end >= sector_bank )
+  {
+    end = sector_bank-1;
+  }
+  if ( start < sector_bank )
+  {
+		int i;
+#if defined FLASH_SECBB_DBG
+    printf("BANK 1 secure flash BB ref [%d, %d]\r\n", start, end);
+#endif
+		for ( i = start; i<= end; i++)
+		{
+			if ( i < 32 )
+				FLASH->SECBB1R1 |= (1<<i);
+			else
+				FLASH->SECBB1R2 |= (1<<(i-32));					
+		}
+#if defined FLASH_SECBB_DBG    
+    printf("BANK 1 secure flash BB [%08x, %08x]\r\n", FLASH->SECBB1R1, FLASH->SECBB1R2);
+#endif    
+	}
+
+  /* Then deal with bank2 */
+  if ( start >= sector_bank )
+  {
+    start = start - sector_bank;
+  }
+  else
+  {
+    start = 0;
+  }
+  end = (offset_end / flash_info->page_size);
+  if ( end >= sector_bank )
+  {
+    end = end - sector_bank;
+    int i;
+#if defined FLASH_SECBB_DBG
+    printf("BANK 2 secure flash BB ref [%d, %d]\r\n", start, end);
+#endif
+    for ( i = start; i<= end; i++)
+    {
+      if ( i < 32 )
+        FLASH->SECBB2R1 |= (1<<i);
+      else
+        FLASH->SECBB2R2 |= (1<<(i-32));					
+    }
+#if defined FLASH_SECBB_DBG
+    printf("BANK 2 secure flash BB [%08x, %08x]\r\n", FLASH->SECBB2R1, FLASH->SECBB2R2);    
+#endif    
+  }
+#if defined FLASH_SECBB_DBG
+  printf("\r\nFLASH SECBB1R1 : %08x\r\n", FLASH_S->SECBB1R1);
+  printf("FLASH SECBB1R2 : %08x\r\n", FLASH_S->SECBB1R2);
+  printf("FLASH SECBB2R1 : %08x\r\n", FLASH_S->SECBB2R1);
+  printf("FLASH SECBB2R2 : %08x\r\n", FLASH_S->SECBB2R2);
+#endif
+}
+#endif
 
 /**
   * @brief  GTZC configuration before jumping into loader
@@ -536,7 +627,7 @@ static HAL_StatusTypeDef OEMuROT_UPDATE_DATA(void)
   /* Get Info about the download area */
   fw_image_dwl_area.DownloadAddr =  FLASH_AREA_OEMuROT_DATA_OFFSET; 
   fw_image_dwl_area.MaxSizeInBytes = FLASH_AREA_OEMuROT_DATA_SIZE; 
-
+  
   fw_image_dwl_area.ImageOffsetInBytes = 0x0;
   m_uFlashSectorSize = data->sector_size;
   m_uFlashMinWriteSize = data->program_unit;
@@ -578,6 +669,7 @@ static HAL_StatusTypeDef FW_UPDATE_SECURE_APP_IMAGE(void)
   fw_image_dwl_area.DownloadAddr =  FLASH_AREA_2_OFFSET;
   fw_image_dwl_area.MaxSizeInBytes = FLASH_AREA_2_SIZE;
 #endif /* MCUBOOT_PRIMARY_ONLY */
+  
   fw_image_dwl_area.ImageOffsetInBytes = 0x0;
   m_uFlashSectorSize = data->sector_size;
   m_uFlashMinWriteSize = data->program_unit;

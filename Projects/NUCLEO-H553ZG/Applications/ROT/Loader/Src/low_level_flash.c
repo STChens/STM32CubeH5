@@ -473,9 +473,8 @@ static int32_t Flash_ProgramData(uint32_t addr,
 
 /*
 #define DEBUG_FLASH_ACCESS
-*/
 #define CHECK_ERASE
-
+*/
 static int32_t Flash_EraseSector(uint32_t addr)
 {
   FLASH_EraseInitTypeDef EraseInit;
@@ -512,6 +511,10 @@ static int32_t Flash_EraseSector(uint32_t addr)
 #else
   EraseInit.TypeErase = FLASH_TYPEERASE_SECTORS;
 #endif
+  
+#ifdef DEBUG_FLASH_ACCESS
+  printf("\r\n --> Before erase: FLASH NSSR: %08x SECSR: %08x\r\n", FLASH->NSSR, FLASH->SECSR);
+#endif
   /*  fix me assume dual bank, reading DBANK in OPTR in Flash init is better */
   /*  flash size in  DB256K in OPTR */
   EraseInit.Banks = bank_number(&ARM_FLASH0_DEV, addr);
@@ -527,10 +530,11 @@ static int32_t Flash_EraseSector(uint32_t addr)
   HAL_FLASH_Lock();
 	
 #ifdef DEBUG_FLASH_ACCESS
+  printf("\r\n --> After erase: FLASH NSSR: %08x SECSR: %08x\r\n", FLASH->NSSR, FLASH->SECSR);
 	printf("erase bank [%d], sector [%d] \r\n", EraseInit.Banks, EraseInit.Sector);
 	if (err != HAL_OK)
   {
-    printf("erase failed @%x \r\n", addr);
+    printf("erase failed @%x \r\n", addr);    
   }
 #endif /* DEBUG_FLASH_ACCESS */
 #ifdef CHECK_ERASE

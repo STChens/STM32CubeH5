@@ -303,7 +303,7 @@ static void MX_ICACHE_Init(void)
 
   /** Enable instruction cache (default 2-ways set associative cache)
   */
-  if (HAL_ICACHE_Enable() != HAL_OK)
+  if (HAL_ICACHE_Disable() != HAL_OK)
   {
     Error_Handler();
   }

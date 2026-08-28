@@ -23,7 +23,7 @@ echo. > %current_log_file%
 set app_image_number=1
 set image_s_size=0x6000
 :: flag to switch between OEMiROT and OEMuROT
-set oemurot_enable=0
+set oemurot_enable=1
 
 if %oemurot_enable% == 1 (
 set project=OEMuROT

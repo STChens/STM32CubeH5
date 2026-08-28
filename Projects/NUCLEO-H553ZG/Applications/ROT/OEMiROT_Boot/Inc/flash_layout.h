@@ -186,10 +186,10 @@
 #endif /* not OEMUROT_ENABLE */
 
 /* BL2 partitions size */
-#define FLASH_NS_PARTITION_SIZE         (0x50000) /* 320 KB for NS partition (except for FULL SECURE) */
-//#define FLASH_NS_PARTITION_SIZE         (0) /* 0 for FULL SECURE */
+//#define FLASH_NS_PARTITION_SIZE         (0x50000) /* 320 KB for NS partition (except for FULL SECURE) */
+#define FLASH_NS_PARTITION_SIZE         (0) /* 0 for FULL SECURE */
 #if (FLASH_NS_PARTITION_SIZE == 0x0)
-#define FLASH_S_PARTITION_SIZE          (0x0DC000) /* test case 1: 880 KB for S partition */
+#define FLASH_S_PARTITION_SIZE          (0x0BE000) /* test case 1: 760 KB for S partition */
 //#define FLASH_S_PARTITION_SIZE          (0x060000) /* test case 2: 384 KB for S partition */
 #elif !defined(MCUBOOT_OVERWRITE_ONLY)
 #define FLASH_S_PARTITION_SIZE          (0x08000) /* 32 KB for S partition */
