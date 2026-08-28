@@ -4,12 +4,21 @@
 	<GlobalParam>
 		<Command>sign</Command>
 		<Title>Data image generation</Title>
+		<LinkedXML>./../Config/STiRoT_Config.xml</LinkedXML>
 	</GlobalParam>
+	<Param>
+		<Name>Authentication key</Name>
+		<Link></Link>
+		<Type>File</Type>
+		<Command>-k</Command>
+		<Hidden>1</Hidden>
+		<Tooltip>Signature Key used</Tooltip>
+		<Default></Default>
+	</Param>
 	<Param>
 		<Name>Image magic</Name>
 		<Type>Data</Type>
 		<Command>-ma</Command>
-		<Enable>1</Enable>
 		<Hidden>1</Hidden>
 		<Default>0x55f7394e</Default>
 	</Param>
@@ -21,12 +30,19 @@
 		<Default>little</Default>
 	</Param>
 	<Param>
-		<Name>Image Size</Name>
-		<Value>0x2000</Value>
+		<Name>Padding</Name>
+		<Type>Data</Type>
+		<Command>--pad</Command>
+		<Hidden>1</Hidden>
+		<Default></Default>
+	</Param>
+	<Param>
+		<Name>Data download slot size</Name>
+		<Link></Link>
 		<Type>Data</Type>
 		<Command>-S</Command>
-		<Hidden>0</Hidden>
-		<Default>0x2000</Default>
+		<Hidden>1</Hidden>
+		<Default></Default>
 	</Param>
 	<Param>
 		<Name>Header Size</Name>
@@ -73,8 +89,8 @@
 		<Command>-s</Command>
 		<Hidden>1</Hidden>
 		<Tooltip>Value of Security counter on which antirollback feature is relying.
-		'auto' (default) : security counter value is automatically aligned to image version.
-		'32 bits value': security counter value manually selected (not aligned with image version).
+		"auto" (default) : security counter value is automatically aligned to image version.
+		"32 bits value": security counter value manually selected (not aligned with image version).
 		Antirollback feature is inactive if security counter value remains unchanged at each version of image.
 		</Tooltip>
 		<Default>auto</Default>
@@ -86,13 +102,13 @@
 		<Hidden>1</Hidden>
 		<Default>16</Default>
 	</Param>
-		<Param>
+	<Param>
 		<Name>Data download area offset</Name>
-		<Value>0x81E6000</Value>
+		<Link>+0x8000000</Link>
 		<Type>Data</Type>
 		<Command>-x</Command>
 		<Hidden>1</Hidden>
-		<Default>0x81E6000</Default>
+		<Default></Default>
 	</Param>
 	<Param>
 		<Name>Data binary input file</Name>
@@ -103,8 +119,8 @@
 	</Param>
 	<Output>
 		<Name>Image output file</Name>
-		<Value>./../Binary/OEMuRoT_Config.hex</Value>
-		<Default>OEMuRoT_Config.hex</Default>
+		<Value>./../Binary/OEMuRoT_Config_signed.bin</Value>
+		<Default>OEMuRoT_Config_enc_signed.hex</Default>
 	</Output>
   </McubootFormat>
 </Root>
