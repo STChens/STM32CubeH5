@@ -427,6 +427,8 @@ static HAL_StatusTypeDef Compute_SHA256(uint8_t *pBuffer, uint32_t Length, uint8
   return HAL_OK;
 }
 
+//#define DEBUG_OBK
+
 #if  defined(OEMUROT_ENABLE)
 /**
   * @brief  Read configuration in OBkeys Hdpl 2
