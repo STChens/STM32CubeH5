@@ -7,7 +7,7 @@
 		<LinkedXML>../Config/OEMuRoT_Config_Keys.xml</LinkedXML>
 	</GlobalParam>
 	<Param>
-		<Name>Authentication non secure key</Name>
+		<Name>Authentication secure key</Name>
 		<Link></Link>
 		<Type>File</Type>
 		<Command>-k</Command>
@@ -39,7 +39,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware area size</Name>
-		<Value>0xA0000</Value>
+		<Value>0x56000</Value>
 		<Type>Data</Type>
 		<Command>-S</Command>
 		<Hidden>1</Hidden>
@@ -81,8 +81,8 @@
 		<Command>-s</Command>
 		<Hidden>1</Hidden>
 		<Tooltip>Value of Security counter on which antirollback feature is relying.
-		'auto' (default) : security counter value is automatically aligned to image version.
-		'32 bits value': security counter value manually selected (not aligned with image version).
+		"auto" (default) : security counter value is automatically aligned to image version.
+		"32 bits value": security counter value manually selected (not aligned with image version).
 		Antirollback feature is inactive if security counter value remains unchanged at each version of image.
 		</Tooltip>
 		<Default>auto</Default>
@@ -96,7 +96,7 @@
 	</Param>
 	<Param>
 		<Name>Firmware execution area offset</Name>
-		<Value>0x801E000</Value>
+		<Value>0x8020000</Value>
 		<Type>Data</Type>
 		<Command>-x</Command>
 		<Hidden>1</Hidden>
@@ -113,14 +113,14 @@
 	</Param>
 	<Param>
 		<Name>Firmware binary input file</Name>
-		<Value>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_ns_app.bin</Value>
+		<Value>..\..\..\Applications\ROT\OEMiROT_Appli_TrustZone\Binary\rot_tz_app.bin</Value>
 		<Type>File</Type>
 		<Tooltip>Select the firmware binary file to be processed for the image generation</Tooltip>
 		<Default>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_ns_app.bin</Default>
 	</Param>
 	<Output>
 		<Name>Image output file</Name>
-		<Value>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_ns_app_init_sign.hex</Value>
+		<Value>..\..\..\Applications\ROT\OEMiROT_Appli_TrustZone\Binary\rot_tz_app_init_sign.hex</Value>
 		<Default>../../../Applications/ROT/OEMiROT_Appli_TrustZone/Binary/rot_tz_ns_app_init_sign.hex</Default>
 	</Output>
   </McubootFormat>

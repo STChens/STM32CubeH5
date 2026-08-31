@@ -32,6 +32,14 @@
 		<Default>./../Keys/OEMuRoT_Encryption.pem</Default>
 		<Tooltip>Select the key used to encrypt firmware and data images</Tooltip>
 	</File>
+	<Data>
+		<Name>padding data</Name> 
+		<Value>0x00000000</Value>
+		<Width>4</Width>
+		<Hidden>1</Hidden>
+		<Default>0x00000000</Default>		
+		<Tooltip>Padding data to make the output file aligned to 16 bytes</Tooltip>
+	</Data>
 	<Output>
 		<Name>Output File</Name>
 		<Value>./../Binary/OEMuRoT_Config_intermediate.bin</Value>
