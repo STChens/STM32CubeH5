@@ -16,6 +16,14 @@
 		<Default></Default>
 	</Param>
 	<Param>
+		<Name>Encryption key</Name>
+		<Link>GetPublic</Link>
+		<Type>File</Type>
+		<Command>-E</Command>
+		<Hidden>1</Hidden>
+		<Default></Default>
+	</Param>
+	<Param>
 		<Name>Image magic</Name>
 		<Type>Data</Type>
 		<Command>-ma</Command>
@@ -119,7 +127,7 @@
 	</Param>
 	<Output>
 		<Name>Image output file</Name>
-		<Value>./../Binary/OEMuRoT_Config_signed.bin</Value>
+		<Value>./../Binary/OEMuRoT_Config_enc_signed.bin</Value>
 		<Default>OEMuRoT_Config_enc_signed.hex</Default>
 	</Output>
   </McubootFormat>
