@@ -78,9 +78,11 @@ typedef struct __attribute__((__packed__))
   uint8_t  Hdpl3SecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
   uint8_t  Hdpl3NonSecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
   uint8_t  Hdpl3EncryptionPrivKey[ENC_PRIV_KEY_LENGTH];
+  uint8_t  Padding1[4];
   uint8_t  Protected_TLV[12];
   uint8_t  Non_Protected_TLV[8];
   uint8_t  SHA256[SHA256_LENGTH];
+  uint8_t  Padding2[12];
 } OBK_Hdpl2Config;
 
 /* Hdpl 2 data section : to be aligned on FLASH_PROG_UNIT (16 bytes)

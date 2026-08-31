@@ -112,6 +112,10 @@ set "command=%python%%applicfg% definevalue -xml %stirot_config_xml% -nxml %oemu
 %command%
 IF !errorlevel! NEQ 0 goto :error
 
+set "command=%python%%applicfg% modifyfilevalue -xml %stirot_config_xml% -nxml %oemurot_firmware_offset% --delimiter = -var DOWNLOAD_ROT_REGION_START %map_properties% --vb >> %current_log_file% 2>&1"
+%command%
+IF !errorlevel! NEQ 0 goto :error
+
 :common_rot_regions
 
 :: ======================================================== Merge OEMiROT and Loader binary ===========================================================
