@@ -79,7 +79,7 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
-  .app_id (0xc000000 + S_CODE_OFFSET + S_CODE_SIZE - IMAGE_HEADER_SIZE - 512) :
+  .app_id (0xc000000 + S_CODE_OFFSET + S_CODE_SIZE - IMAGE_HEADER_SIZE - 2048) :
   {
     KEEP(*(.app_id))
   } > FLASH
