@@ -33,6 +33,7 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 #define OBK_HDPL1_RES_SIZE        (0x60U) /* Size reserved at start of OBKey Hdpl 1 for RSS DA */
+#define OBK_HDPL1_TOTAL_SIZE        (0x800U) /* Total Size of OBKey Hdpl 1 */
 #define OBK_HDPL1_CFG_OFFSET      (OBK_HDPL1_OFFSET + OBK_HDPL1_RES_SIZE) /* First OBkey Hdpl 1 for immutable config */
 #define OBK_HDPL1_CFG_SIZE        (sizeof(OBK_Hdpl1Config)) /* Size for OBkey Hdpl 1 cfg section */
 #define OBK_HDPL1_DATA_OFFSET     (OBK_HDPL1_CFG_OFFSET + OBK_HDPL1_CFG_SIZE) /* First OBkey Hdpl 1 for data section */
@@ -43,14 +44,28 @@ extern "C" {
 
 #define EC256_PRIV_KEY_LENGTH     (70U)
 #define EC256_PUB_KEY_LENGTH      (91U)
+#define EC384_PUB_KEY_LENGTH      (120U)
+#define SHA384_LENGTH             (48U)
 #define SHA256_LENGTH             (32U)
 
 #if   (CRYPTO_SCHEME == CRYPTO_SCHEME_EC256)
 #define AUTH_PUB_KEY_LENGTH       EC256_PUB_KEY_LENGTH
 #define ENC_PRIV_KEY_LENGTH       EC256_PRIV_KEY_LENGTH
+#define OBK_SHA_LENGTH            SHA256_LENGTH
+#define IMG_SHA_LENGTH            SHA256_LENGTH
+#elif (CRYPTO_SCHEME == CRYPTO_SCHEME_EC384)
+#define AUTH_PUB_KEY_LENGTH       EC384_PUB_KEY_LENGTH
+#define ENC_PRIV_KEY_LENGTH       EC256_PRIV_KEY_LENGTH // FIXME for now we just use ECC 256 for encryption part
+#define OBK_SHA_LENGTH            SHA256_LENGTH // FIXME we use SHA256 for OBK SHA first
+#define IMG_SHA_LENGTH            SHA384_LENGTH
+  
+#define AUTH_PUB_KEY_TOTAL_NUM  8   // Number of pub keys to support revocation
+//#define AUTH_PUB_KEY_TOTAL_NUM  1
 #else
 #error "undefined crypto scheme"
 #endif
+  
+#if   (CRYPTO_SCHEME == CRYPTO_SCHEME_EC256)
 #define RESERVED1                 ((4U - (AUTH_PUB_KEY_LENGTH % 4U)) % 4U)
 #define RESERVED2                 ((4U - (AUTH_PUB_KEY_LENGTH % 4U)) % 4U)
 #define RESERVED3                 ((4U - (ENC_PRIV_KEY_LENGTH % 4U)) % 4U)
@@ -59,14 +74,25 @@ extern "C" {
                                      AUTH_PUB_KEY_LENGTH + RESERVED2 +\
                                      ENC_PRIV_KEY_LENGTH + RESERVED3) % OBK_FLASH_PROG_UNIT))\
                                      % OBK_FLASH_PROG_UNIT)
+#elif   (CRYPTO_SCHEME == CRYPTO_SCHEME_EC384)
+
+#define RESERVED1                 ((4U - (ENC_PRIV_KEY_LENGTH % 4U)) % 4U)
+#define RESERVED2                 ((OBK_FLASH_PROG_UNIT -\
+                                   ((AUTH_PUB_KEY_LENGTH + \
+                                     AUTH_PUB_KEY_LENGTH + \
+                                     ENC_PRIV_KEY_LENGTH + RESERVED1) % OBK_FLASH_PROG_UNIT))\
+                                     % OBK_FLASH_PROG_UNIT)
+#endif
 
 /* Exported types ------------------------------------------------------------*/
 
 /* Hdpl 1 immutable section : to be aligned on FLASH_PROG_UNIT (16 bytes)
    ====================================================================== */
+#if   (CRYPTO_SCHEME == CRYPTO_SCHEME_EC256)
+
 typedef struct
 {
-  uint8_t  SHA256[SHA256_LENGTH];           /* Mandatory to be first in the structure */
+  uint8_t  OBKSHA[OBK_SHA_LENGTH];           /* Mandatory to be first in the structure */
   __attribute__((__aligned__(4))) uint8_t Hdpl3SecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
   uint8_t  Reserved1[RESERVED1];            /* Alignment on 4 bytes */
   __attribute__((__aligned__(4))) uint8_t Hdpl3NonSecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
@@ -76,11 +102,24 @@ typedef struct
   uint8_t  Reserved4[RESERVED4];            /* Alignment on 16 bytes */
 } OBK_Hdpl1Config;
 
+#elif   (CRYPTO_SCHEME == CRYPTO_SCHEME_EC384)
+
+typedef struct
+{
+  uint8_t  OBKSHA[OBK_SHA_LENGTH];           /* Mandatory to be first in the structure */
+  __attribute__((__aligned__(4))) uint8_t Hdpl3SecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
+  __attribute__((__aligned__(4))) uint8_t Hdpl3NonSecureAuthenticationPubKey[AUTH_PUB_KEY_LENGTH];
+  __attribute__((__aligned__(4))) uint8_t Hdpl3EncryptionPrivKey[ENC_PRIV_KEY_LENGTH];
+  uint8_t  Reserved1[RESERVED1];            /* Alignment on 4 bytes */
+  uint8_t  Reserved2[RESERVED2];            /* Alignment on 16 bytes */
+} OBK_Hdpl1Config;
+#endif
+
 /* Hdpl 1 data section : to be aligned on FLASH_PROG_UNIT (16 bytes)
    ================================================================= */
 typedef struct
 {
-  uint8_t  SHA256[SHA256_LENGTH];           /* Mandatory to be first in the structure */
+  uint8_t  OBKSHA[OBK_SHA_LENGTH];           /* Mandatory to be first in the structure */
   uint32_t Image0CurVersion;
   uint32_t Image0PrevVersion;
   uint32_t Image1CurVersion;
@@ -89,10 +128,10 @@ typedef struct
   uint32_t Image2PrevVersion;
   uint32_t Image3CurVersion;
   uint32_t Image3PrevVersion;
-  uint8_t  Image0SHA256[SHA256_LENGTH];
-  uint8_t  Image1SHA256[SHA256_LENGTH];
-  uint8_t  Image2SHA256[SHA256_LENGTH];
-  uint8_t  Image3SHA256[SHA256_LENGTH];
+  uint8_t  Image0SHA[IMG_SHA_LENGTH];
+  uint8_t  Image1SHA[IMG_SHA_LENGTH];
+  uint8_t  Image2SHA[IMG_SHA_LENGTH];
+  uint8_t  Image3SHA[IMG_SHA_LENGTH];
   uint8_t  Reserved[0];                     /* Alignment on 16 bytes */
 } OBK_Hdpl1Data;
 /* Driver configuration
