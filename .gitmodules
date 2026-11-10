@@ -48,8 +48,8 @@
 	branch = main
 [submodule "Middlewares/Third_Party/mcuboot"]
 	path = Middlewares/Third_Party/mcuboot
-	url = https://github.com/STMicroelectronics/stm32-mw-mcuboot
-	branch = main
+	url = https://github.com/STChens/stm32-mw-mcuboot.git
+	branch = v1.7.2.40_ecc384
 [submodule "Middlewares/Third_Party/mbed-crypto"]
 	path = Middlewares/Third_Party/mbed-crypto
 	url = https://github.com/STMicroelectronics/stm32-mw-mbedtls
