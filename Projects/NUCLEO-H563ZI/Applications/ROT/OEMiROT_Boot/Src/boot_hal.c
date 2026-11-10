@@ -587,6 +587,56 @@ int32_t boot_platform_init(void)
     }
 #endif
 
+#define DEBUG_FLASH_LAYOUT // Comment out this line to avoid the layout print
+#ifdef DEBUG_FLASH_LAYOUT    
+    BOOT_LOG_INF("BL2 start: %08x", BL2_CODE_START);
+    BOOT_LOG_INF("BL2 size :  %08x", BL2_CODE_SIZE);
+
+    BOOT_LOG_INF("Flash area 0 start (S code active): %08x", S_ROM_ALIAS(FLASH_AREA_0_OFFSET));
+    BOOT_LOG_INF("Flash area 0 size  : %08x", FLASH_AREA_0_SIZE);
+    
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2)
+    BOOT_LOG_INF("Flash area 1 start (NS code active): %08x", NS_ROM_ALIAS(FLASH_AREA_1_OFFSET));
+    BOOT_LOG_INF("Flash area 1 size  : %08x", FLASH_AREA_1_SIZE);    
+#endif
+    
+#if !defined (MCUBOOT_PRIMARY_ONLY)    
+    BOOT_LOG_INF("Flash area 2 start  (S code download): %08x", NS_ROM_ALIAS(FLASH_AREA_2_OFFSET));
+    BOOT_LOG_INF("Flash area 2 size  : %08x", FLASH_AREA_2_SIZE);    
+    
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2)
+    BOOT_LOG_INF("Flash area 3 start (NS code download): %08x", NS_ROM_ALIAS(FLASH_AREA_3_OFFSET));
+    BOOT_LOG_INF("Flash area 3 size  : %08x", FLASH_AREA_3_SIZE);    
+#endif    
+#if !defined MCUBOOT_OVERWRITE_ONLY    
+    BOOT_LOG_INF("scratch area offset: %08x", FLASH_AREA_SCRATCH_OFFSET);
+    BOOT_LOG_INF("scratch area size  : %08x", FLASH_AREA_SCRATCH_SIZE); 
+#endif
+#endif
+    
+    BOOT_LOG_INF("HDP end: %08x", FLASH_BL2_HDP_END);        
+    
+#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)    
+    BOOT_LOG_INF("Flash area 4 start  (S data active): %08x", S_ROM_ALIAS(FLASH_AREA_4_OFFSET));
+    BOOT_LOG_INF("Flash area 4 size  : %08x", FLASH_AREA_4_SIZE);    
+#if !defined (MCUBOOT_PRIMARY_ONLY)    
+    BOOT_LOG_INF("Flash area 6 start (S data download): %08x", NS_ROM_ALIAS(FLASH_AREA_6_OFFSET));
+    BOOT_LOG_INF("Flash area 6 size  : %08x", FLASH_AREA_6_SIZE);    
+#endif    
+#endif   
+
+#if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)    
+    BOOT_LOG_INF("Flash area 5 start (NS data active): %08x", NS_ROM_ALIAS(FLASH_AREA_5_OFFSET));
+    BOOT_LOG_INF("Flash area 5 size  : %08x", FLASH_AREA_5_SIZE);    
+#if !defined (MCUBOOT_PRIMARY_ONLY)    
+    BOOT_LOG_INF("Flash area 7 start (NS data download): %08x", NS_ROM_ALIAS(FLASH_AREA_7_OFFSET));
+    BOOT_LOG_INF("Flash area 7 size  : %08x", FLASH_AREA_7_SIZE);    
+#endif    
+#endif   
+
+
+#endif /* #ifdef DEBUG_FLASH_LAYOUT*/    
+    
 #if defined(MCUBOOT_EXT_LOADER)
     /* configure Button pin */
     BUTTON_CLK_ENABLE;
