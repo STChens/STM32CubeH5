@@ -21,7 +21,7 @@
 		<Name>Authentication secure key</Name>
 		<Value>./../Keys/OEMiRoT_Authentication_S.pem</Value>
 		<Align>4</Align>
-		<KeyType>ecdsa-p256</KeyType>
+		<KeyType>ecdsa-p384</KeyType>
 		<Type>Public</Type>
 		<Default>./../Keys/OEMiRoT_Authentication_S.pem</Default>
 		<Tooltip>Select the key used to authenticate secure firmware and data. When this key is regenerated, both firmware and data images must be processed with Imgtool</Tooltip>
@@ -30,7 +30,7 @@
 		<Name>Authentication non secure key</Name>
 		<Value>./../Keys/OEMiRoT_Authentication_NS.pem</Value>
 		<Align>4</Align>
-		<KeyType>ecdsa-p256</KeyType>
+		<KeyType>ecdsa-p384</KeyType>
 		<Type>Public</Type>
 		<Default>./../Keys/OEMiRoT_Authentication_NS.pem</Default>
 		<Tooltip>Select the key used to authenticate non secure firmware and data. When this key is regenerated, both firmware and data images must be processed with Imgtool</Tooltip>

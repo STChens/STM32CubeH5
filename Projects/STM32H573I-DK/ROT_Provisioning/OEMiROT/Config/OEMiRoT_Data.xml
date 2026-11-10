@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SCHVerif.xsd">
+<Obdata>
+	<Info>
+		<Title>OEMiRoT configuration</Title>
+		<ObDestAddress>0x0FFD02C0</ObDestAddress>
+		<DoEncryption>0</DoEncryption>
+		<GlobalAlign>16</GlobalAlign>
+		<FlashStart>0x0C000000</FlashStart>
+		<FlashSize>0x200000</FlashSize>
+		<FlashSectorSize>0x2000</FlashSectorSize>
+		<OBKStart>0xFFD0900</OBKStart>
+		<OBKSize>0x2F0</OBKSize>
+		<OBKSectorSize>0x10</OBKSectorSize>
+		<AuthOBKStart>0xFFD0900</AuthOBKStart>
+		<AuthOBKSize>0x2F0</AuthOBKSize>
+	</Info>
+	<Hash>
+	</Hash>
+	<File>
+		<Name>OEMiROT default data binary file</Name>
+		<Value>./data.bin</Value>
+		<Align>16</Align>
+		<KeyType>raw binary</KeyType>
+		<Default>./data.bin</Default>
+		<Tooltip>OEMiROT default data binary file</Tooltip>
+		</File>
+	<Output>
+		<Name>Output File</Name>
+		<Value>./../Binary/OEMiRoT_Data.obk</Value>
+		<Default>./../Binary/OEMiRoT_Data.obk</Default>
+		<Tooltip>Select the output file .obk including OEMiROT default data</Tooltip>
+	</Output>
+</Obdata>
+</Root>
