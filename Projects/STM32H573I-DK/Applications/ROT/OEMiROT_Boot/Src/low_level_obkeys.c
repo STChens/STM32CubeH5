@@ -46,7 +46,7 @@ struct arm_obk_flash_dev_t
 #else
 #define MAX_SIZE_CFG                         OBK_HDPL1_CFG_SIZE
 #endif
-#define ST_SHA256_TIMEOUT                       (3U)
+#define ST_SHA_TIMEOUT                       (3U)
 
 /* config for OBK flash driver */
 #define OBK_FLASH0_TOTAL_SIZE                   (0x2000U)
@@ -401,7 +401,7 @@ static uint32_t MemoryCompare(uint8_t *pAdd1, uint8_t *pAdd2, uint32_t Size)
   * @param  pSHA256: pointer to the compuyed digest
   * @retval None
   */
-static HAL_StatusTypeDef Compute_SHA256(uint8_t *pBuffer, uint32_t Length, uint8_t *pSHA256)
+static HAL_StatusTypeDef Compute_OBKSHA(uint8_t *pBuffer, int shaLength, uint32_t Length, uint8_t *pSHA)
 {
   /* Enable HASH clock */
   __HAL_RCC_HASH_CLK_ENABLE();
@@ -413,14 +413,19 @@ static HAL_StatusTypeDef Compute_SHA256(uint8_t *pBuffer, uint32_t Length, uint8
     return HAL_ERROR;
   }
   hhash.Init.DataType = HASH_BYTE_SWAP;
-  hhash.Init.Algorithm = HASH_ALGOSELECTION_SHA256;
+  if ( shaLength == OBK_SHA_LENGTH)
+    hhash.Init.Algorithm = HASH_ALGOSELECTION_SHA256;
+  else if ( shaLength == SHA384_LENGTH)
+    hhash.Init.Algorithm = HASH_ALGOSELECTION_SHA384;
+  else
+    return HAL_ERROR;
   if (HAL_HASH_Init(&hhash) != HAL_OK)
   {
     return HAL_ERROR;
   }
 
   /* HASH computation */
-  if (HAL_HASH_Start(&hhash, pBuffer, Length, pSHA256, ST_SHA256_TIMEOUT) != HAL_OK)
+  if (HAL_HASH_Start(&hhash, pBuffer, Length, pSHA, ST_SHA_TIMEOUT) != HAL_OK)
   {
     return HAL_ERROR;
   }
@@ -540,7 +545,7 @@ void OBK_VerifyHdpl2Config(OBK_Hdpl2Config *pOBK_Hdpl2Cfg)
   */
 HAL_StatusTypeDef OBK_ReadHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
 {
-  uint8_t sha256[SHA256_LENGTH] = { 0U };
+  uint8_t obksha[OBK_SHA_LENGTH] = { 0U };
   uint32_t Address = (uint32_t) pOBK_Hdpl1Data;
 
   /* Read configuration in OBKeys */
@@ -549,12 +554,12 @@ HAL_StatusTypeDef OBK_ReadHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
     return HAL_ERROR;
   }
 
-  /* Verif SHA256 on the whole Hdpl 1 data except first 32 bytes of SHA256 */
-  if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl1Data) - SHA256_LENGTH, sha256) != HAL_OK)
+  /* Verif OBK SHA on the whole Hdpl 1 data except first 32 bytes of SHA256 or 48 bytes of SHA384 */
+  if (Compute_OBKSHA((uint8_t *) (Address + OBK_SHA_LENGTH), OBK_SHA_LENGTH, sizeof(OBK_Hdpl1Data) - OBK_SHA_LENGTH, obksha) != HAL_OK)
   {
     return HAL_ERROR;
   }
-  if (MemoryCompare(pOBK_Hdpl1Data->SHA256, sha256, SHA256_LENGTH) != 0U)
+  if (MemoryCompare(pOBK_Hdpl1Data->OBKSHA, obksha, OBK_SHA_LENGTH) != 0U)
   {
     BOOT_LOG_ERR("Wrong OBK HDPL1 data");
     return HAL_ERROR;
@@ -569,16 +574,16 @@ HAL_StatusTypeDef OBK_ReadHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
   */
 HAL_StatusTypeDef OBK_UpdateHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
 {
-  uint8_t sha256[SHA256_LENGTH] = { 0U };
+  uint8_t obksha[OBK_SHA_LENGTH] = { 0U };
   uint32_t Address = (uint32_t) pOBK_Hdpl1Data;
 
-  /* Verif SHA256 on the whole Hdpl 1 data except first 32 bytes of SHA256 */
-  if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl1Data) - SHA256_LENGTH, sha256) != HAL_OK)
+  /* Verif SHA256/SHA384 on the whole Hdpl 1 data except first 32 bytes of SHA256 or 48 bytes of SHA384 */
+  if (Compute_OBKSHA((uint8_t *) (Address + OBK_SHA_LENGTH),  OBK_SHA_LENGTH, sizeof(OBK_Hdpl1Data) - OBK_SHA_LENGTH, obksha) != HAL_OK)
   {
     BOOT_LOG_ERR("Wrong OBK HDPL1 data");
     return HAL_ERROR;
   }
-  (void) memcpy(&pOBK_Hdpl1Data->SHA256[0], &sha256[0], SHA256_LENGTH);
+  (void) memcpy(&pOBK_Hdpl1Data->OBKSHA[0], &obksha[0], OBK_SHA_LENGTH);
 
   /* Write configuration in OBKeys */
   if (OBK_Write(OBK_HDPL1_DATA_OFFSET, (void *) pOBK_Hdpl1Data, sizeof(OBK_Hdpl1Data)) != ARM_DRIVER_OK)
@@ -599,7 +604,7 @@ HAL_StatusTypeDef OBK_UpdateHdpl1Data(OBK_Hdpl1Data *pOBK_Hdpl1Data)
   */
 void OBK_ReadHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
 {
-  uint8_t sha256[SHA256_LENGTH] = { 0U };
+  uint8_t obksha[OBK_SHA_LENGTH] = { 0U };
   uint32_t Address = (uint32_t) pOBK_Hdpl1Cfg;
 
   /* Read configuration in OBKeys */
@@ -608,12 +613,12 @@ void OBK_ReadHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
     Error_Handler();
   }
 
-  /* Verif SHA256 on the whole Hdpl 1 config except first 32 bytes of SHA256 */
-  if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl1Config) - SHA256_LENGTH, sha256) != HAL_OK)
+  /* Verif SHA256/SHA384 on the whole Hdpl 1 config except first 32 bytes of SHA256 or 48 bytes of SHA384 */
+  if (Compute_OBKSHA((uint8_t *) (Address + OBK_SHA_LENGTH),  OBK_SHA_LENGTH, sizeof(OBK_Hdpl1Config) - OBK_SHA_LENGTH, obksha) != HAL_OK)
   {
     Error_Handler();
   }
-  if (MemoryCompare(&pOBK_Hdpl1Cfg->SHA256[0], &sha256[0], SHA256_LENGTH) != 0U)
+  if (MemoryCompare(&pOBK_Hdpl1Cfg->OBKSHA[0], &obksha[0], OBK_SHA_LENGTH) != 0U)
   {
     BOOT_LOG_ERR("read: Wrong OBK HDPL1 cfg");
     Error_Handler();
@@ -627,15 +632,15 @@ void OBK_ReadHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
   */
 void OBK_VerifyHdpl1Config(OBK_Hdpl1Config *pOBK_Hdpl1Cfg)
 {
-  uint8_t sha256[SHA256_LENGTH] = { 0U };
+  uint8_t obksha[OBK_SHA_LENGTH] = { 0U };
   uint32_t Address = (uint32_t) pOBK_Hdpl1Cfg;
 
-  /* Verif SHA256 on the whole Hdpl 1 config except first 32 bytes of SHA256 */
-  if (Compute_SHA256((uint8_t *) (Address + SHA256_LENGTH), sizeof(OBK_Hdpl1Config) - SHA256_LENGTH, sha256) != HAL_OK)
+  /* Verif SHA256/SHA384 on the whole Hdpl 1 config except first 32 bytes of SHA256 or 48 bytes of SHA384 */
+  if (Compute_OBKSHA((uint8_t *) (Address + OBK_SHA_LENGTH),  OBK_SHA_LENGTH, sizeof(OBK_Hdpl1Config) - OBK_SHA_LENGTH, obksha) != HAL_OK)
   {
     Error_Handler();
   }
-  if (MemoryCompare(&pOBK_Hdpl1Cfg->SHA256[0], &sha256[0], SHA256_LENGTH) != 0U)
+  if (MemoryCompare(&pOBK_Hdpl1Cfg->OBKSHA[0], &obksha[0], OBK_SHA_LENGTH) != 0U)
   {
     BOOT_LOG_ERR("verify: Wrong OBK HDPL1 cfg");
     Error_Handler();

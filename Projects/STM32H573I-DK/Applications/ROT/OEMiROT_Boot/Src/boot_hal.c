@@ -36,7 +36,7 @@
 #include "low_level_obkeys.h"
 #include "bootutil_priv.h"
 #ifdef MCUBOOT_EXT_LOADER
-#include "bootutil/crypto/sha256.h"
+#include "bootutil/crypto/sha.h"
 #define BUTTON_PORT                       GPIOC
 #define BUTTON_CLK_ENABLE                 __HAL_RCC_GPIOC_CLK_ENABLE()
 #define BUTTON_PIN                        GPIO_PIN_13
@@ -74,7 +74,11 @@ uint8_t ImageValidEnable = 0;
 #if defined(MCUBOOT_USE_HASH_REF)
 #define BL2_HASH_REF_ADDR     (FLASH_HASH_REF_AREA_OFFSET)
 uint8_t ImageValidHashUpdate = 0;
+#if ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC256 )
 uint8_t ImageValidHashRef[MCUBOOT_IMAGE_NUMBER * SHA256_LEN] = {0};
+#elif ( CRYPTO_SCHEME == CRYPTO_SCHEME_EC384 )
+uint8_t ImageValidHashRef[MCUBOOT_IMAGE_NUMBER * SHA384_LEN] = {0};
+#endif
 #endif /* MCUBOOT_USE_HASH_REF */
 
 #if defined(FLOW_CONTROL)
@@ -112,6 +116,7 @@ void getDescriptorAdd(void);
   */
 void boot_platform_noimage(void)
 {
+#if !defined(MCUBOOT_PRIMARY_ONLY)
   uint32_t rsslib_sec_jump_HDP_lvl3ns;
 
   BOOT_LOG_INF("Jumping to bootloader");
@@ -119,7 +124,7 @@ void boot_platform_noimage(void)
 
   /* Init RSS jump function descriptor */
   rsslib_sec_jump_HDP_lvl3ns = (uint32_t)(Rss_lib_p->S.JumpHDPLvl3NS);
-
+#endif /* !defined(MCUBOOT_PRIMARY_ONLY) */
   /* Check Flow control */
   FLOW_CONTROL_CHECK(uFlowProtectValue, FLOW_CTRL_STAGE_2);
   uFlowStage = FLOW_STAGE_CFG;
@@ -349,9 +354,9 @@ int boot_hash_ref_store(void)
 
   /* update hash references */
 #if  defined(OEMUROT_ENABLE)
-  memcpy(&OBK_hdpl2_data.Image0SHA256[0], ImageValidHashRef, (SHA256_LENGTH * MCUBOOT_IMAGE_NUMBER));
+  memcpy(&OBK_hdpl2_data.Image0SHA[0], ImageValidHashRef, (IMG_SHA_LENGTH * MCUBOOT_IMAGE_NUMBER));
 #else
-  memcpy(&OBK_hdpl1_data.Image0SHA256[0], ImageValidHashRef, (SHA256_LENGTH * MCUBOOT_IMAGE_NUMBER));
+  memcpy(&OBK_hdpl1_data.Image0SHA[0], ImageValidHashRef, (IMG_SHA_LENGTH * MCUBOOT_IMAGE_NUMBER));
 #endif
 
   /* Update all OBK hdpl1 data with associated hash references */
@@ -391,9 +396,9 @@ int boot_hash_ref_load(void)
 
   /* update hash references */
 #if  defined(OEMUROT_ENABLE)
-  memcpy(ImageValidHashRef, &OBK_hdpl2_data.Image0SHA256[0], (SHA256_LENGTH * MCUBOOT_IMAGE_NUMBER));
+  memcpy(ImageValidHashRef, &OBK_hdpl2_data.Image0SHA[0], (IMG_SHA_LENGTH * MCUBOOT_IMAGE_NUMBER));
 #else
-  memcpy(ImageValidHashRef, &OBK_hdpl1_data.Image0SHA256[0], (SHA256_LENGTH * MCUBOOT_IMAGE_NUMBER));
+  memcpy(ImageValidHashRef, &OBK_hdpl1_data.Image0SHA[0], (IMG_SHA_LENGTH * MCUBOOT_IMAGE_NUMBER));
 #endif
 
   return 0;
@@ -409,7 +414,7 @@ int boot_hash_ref_load(void)
 int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 {
   /* Check size */
-  if (size != SHA256_LEN)
+  if (size != IMG_SHA_LENGTH)
   {
     return BOOT_EFLASH;
   }
@@ -421,7 +426,7 @@ int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
   }
 
   /* Set hash reference */
-  memcpy(ImageValidHashRef + (image_index * SHA256_LEN), hash_ref, SHA256_LEN);
+  memcpy(ImageValidHashRef + (image_index * IMG_SHA_LENGTH), hash_ref, IMG_SHA_LENGTH);
 
   /* Memorize that hash references will have to be updated in flash (later) */
   ImageValidHashUpdate++;
@@ -439,7 +444,7 @@ int boot_hash_ref_set(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 int boot_hash_ref_get(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
 {
   /* Check size */
-  if (size != SHA256_LEN)
+  if (size != IMG_SHA_LENGTH)
   {
     return BOOT_EFLASH;
   }
@@ -451,7 +456,7 @@ int boot_hash_ref_get(uint8_t *hash_ref, uint8_t size, uint8_t image_index)
   }
 
   /* Get hash reference */
-  memcpy(hash_ref, ImageValidHashRef + (image_index * SHA256_LEN), SHA256_LEN);
+  memcpy(hash_ref, ImageValidHashRef + (image_index * IMG_SHA_LENGTH), IMG_SHA_LENGTH);
 
   return 0;
 }
@@ -608,6 +613,56 @@ int32_t boot_platform_init(void)
     }
 #endif
 
+#define DEBUG_FLASH_LAYOUT // Comment out this line to avoid the layout print
+#ifdef DEBUG_FLASH_LAYOUT    
+    BOOT_LOG_INF("BL2 start: %08x", BL2_CODE_START);
+    BOOT_LOG_INF("BL2 size :  %08x", BL2_CODE_SIZE);
+
+    BOOT_LOG_INF("Flash area 0 start (S code active): %08x", S_ROM_ALIAS(FLASH_AREA_0_OFFSET));
+    BOOT_LOG_INF("Flash area 0 size  : %08x", FLASH_AREA_0_SIZE);
+    
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2)
+    BOOT_LOG_INF("Flash area 1 start (NS code active): %08x", NS_ROM_ALIAS(FLASH_AREA_1_OFFSET));
+    BOOT_LOG_INF("Flash area 1 size  : %08x", FLASH_AREA_1_SIZE);    
+#endif
+    
+#if !defined (MCUBOOT_PRIMARY_ONLY)    
+    BOOT_LOG_INF("Flash area 2 start  (S code download): %08x", NS_ROM_ALIAS(FLASH_AREA_2_OFFSET));
+    BOOT_LOG_INF("Flash area 2 size  : %08x", FLASH_AREA_2_SIZE);    
+    
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2)
+    BOOT_LOG_INF("Flash area 3 start (NS code download): %08x", NS_ROM_ALIAS(FLASH_AREA_3_OFFSET));
+    BOOT_LOG_INF("Flash area 3 size  : %08x", FLASH_AREA_3_SIZE);    
+#endif    
+#if !defined MCUBOOT_OVERWRITE_ONLY    
+    BOOT_LOG_INF("scratch area offset: %08x", FLASH_AREA_SCRATCH_OFFSET);
+    BOOT_LOG_INF("scratch area size  : %08x", FLASH_AREA_SCRATCH_SIZE); 
+#endif
+#endif
+    
+    BOOT_LOG_INF("HDP end: %08x", FLASH_BL2_HDP_END);        
+    
+#if (MCUBOOT_S_DATA_IMAGE_NUMBER == 1)    
+    BOOT_LOG_INF("Flash area 4 start  (S data active): %08x", S_ROM_ALIAS(FLASH_AREA_4_OFFSET));
+    BOOT_LOG_INF("Flash area 4 size  : %08x", FLASH_AREA_4_SIZE);    
+#if !defined (MCUBOOT_PRIMARY_ONLY)    
+    BOOT_LOG_INF("Flash area 6 start (S data download): %08x", NS_ROM_ALIAS(FLASH_AREA_6_OFFSET));
+    BOOT_LOG_INF("Flash area 6 size  : %08x", FLASH_AREA_6_SIZE);    
+#endif    
+#endif   
+
+#if (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)    
+    BOOT_LOG_INF("Flash area 5 start (NS data active): %08x", NS_ROM_ALIAS(FLASH_AREA_5_OFFSET));
+    BOOT_LOG_INF("Flash area 5 size  : %08x", FLASH_AREA_5_SIZE);    
+#if !defined (MCUBOOT_PRIMARY_ONLY)    
+    BOOT_LOG_INF("Flash area 7 start (NS data download): %08x", NS_ROM_ALIAS(FLASH_AREA_7_OFFSET));
+    BOOT_LOG_INF("Flash area 7 size  : %08x", FLASH_AREA_7_SIZE);    
+#endif    
+#endif   
+
+
+#endif /* #ifdef DEBUG_FLASH_LAYOUT*/    
+    
 #if defined(MCUBOOT_EXT_LOADER)
     /* configure Button pin */
     BUTTON_CLK_ENABLE;

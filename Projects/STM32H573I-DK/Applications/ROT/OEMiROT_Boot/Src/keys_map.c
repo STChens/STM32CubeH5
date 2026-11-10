@@ -92,10 +92,17 @@ const struct bootutil_key bootutil_keys[] = {
 #endif
 };
 #endif /* MCUBOOT_SIGN_RSA_LEN == 2048 */
-#elif defined(MCUBOOT_SIGN_EC256)
+#elif defined(MCUBOOT_SIGN_EC256) || defined(MCUBOOT_SIGN_EC384)
+#if defined(MCUBOOT_SIGN_EC256)  
 const unsigned int ecdsa_pub_key_len = 91;
 #if (MCUBOOT_APP_IMAGE_NUMBER == 2) || (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
 const unsigned int ecdsa_pub_key_len_1 = 91;
+#endif
+#elif defined(MCUBOOT_SIGN_EC384)
+const unsigned int ecdsa_pub_key_len = 120;
+#if (MCUBOOT_APP_IMAGE_NUMBER == 2) || (MCUBOOT_NS_DATA_IMAGE_NUMBER == 1)
+const unsigned int ecdsa_pub_key_len_1 = 120;
+#endif
 #endif
 const struct bootutil_key bootutil_keys[] = {
     {
