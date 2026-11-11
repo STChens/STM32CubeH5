@@ -10,13 +10,13 @@
       <TargetName>STM32H573I-DK_OEMiROT_Boot</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H573IIKx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H5xx_DFP.1.3.0</PackID>
+          <PackID>Keil.STM32H5xx_DFP.2.3.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>CLOCK(8000000) FPU3(SFPU) CPUTYPE("Cortex-M33") ELITTLE TZ</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -630,6 +630,11 @@
               <FileType>1</FileType>
               <FilePath>../../../../../../Middlewares/Third_Party/mcuboot/platform/ext/common/uart_stdout.c</FilePath>
             </File>
+            <File>
+              <FileName>image_ecdsa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mcuboot\boot\bootutil\src\image_ecdsa.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -735,6 +740,61 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\constant_time.c</FilePath>
             </File>
+            <File>
+              <FileName>psa_crypto.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_client.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_client.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_ecp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_ecp.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_hash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_hash.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_random.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_random.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_slot_management.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_slot_management.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_util.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_util.c</FilePath>
+            </File>
+            <File>
+              <FileName>sha512.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\sha512.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_cipher.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_cipher.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_driver_wrappers_no_static.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_driver_wrappers_no_static.c</FilePath>
+            </File>
+            <File>
+              <FileName>psa_crypto_mac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\Middlewares\Third_Party\mbed-crypto\library\psa_crypto_mac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -814,6 +874,11 @@
               <FileName>startup_stm32h5xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\startup_stm32h5xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>sha512_alt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\sha512_alt.c</FilePath>
             </File>
           </Files>
         </Group>

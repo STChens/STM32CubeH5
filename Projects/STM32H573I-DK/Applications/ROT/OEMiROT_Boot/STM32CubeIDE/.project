@@ -97,6 +97,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/sha256_alt.c</locationURI>
 		</link>
 		<link>
+			<name>Application/User/sha512_alt.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/sha512_alt.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/startup_stm32h5xx.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/startup_stm32h5xx.c</locationURI>
@@ -267,11 +272,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/constant_time.c</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/mbed-crypto/hmac_drbg.c</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/hmac_drbg.c</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/mbed-crypto/ecdh.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/ecdh.c</locationURI>
@@ -302,6 +302,11 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/hkdf.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/mbed-crypto/hmac_drbg.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/hmac_drbg.c</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/mbed-crypto/md.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/md.c</locationURI>
@@ -322,9 +327,49 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/platform_util.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/mbed-crypto/psa_crypto.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/psa_crypto.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/mbed-crypto/psa_crypto_client.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/psa_crypto_client.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/mbed-crypto/psa_crypto_ecp.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/psa_crypto_ecp.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/mbed-crypto/psa_crypto_hash.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/psa_crypto_hash.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/mbed-crypto/psa_crypto_random.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/psa_crypto_random.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/mbed-crypto/psa_crypto_slot_management.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/psa_crypto_slot_management.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/mbed-crypto/psa_util.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/psa_util.c</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/mbed-crypto/sha256.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/sha256.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/mbed-crypto/sha512.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mbed-crypto/library/sha512.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/mcuboot/bl2_main.c</name>
@@ -380,6 +425,11 @@
 			<name>Middlewares/mcuboot/image_ec256.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mcuboot/boot/bootutil/src/image_ec256.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/mcuboot/image_ecdsa.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/mcuboot/boot/bootutil/src/image_ecdsa.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/mcuboot/image_validate.c</name>
