@@ -130,6 +130,9 @@ set ns_app_bin_xml_field="%bin_path_xml_field%\rot_tz_app.bin"
 )
 
 :continue
+if "%app_image_number%" == "1" (
+goto :continue_ns
+)
 IF %signing% == "secure" (
 
 echo Creating secure image  >> %current_log_file% 2>>&1
@@ -164,6 +167,7 @@ if !errorlevel! neq 0 goto :error
 if !errorlevel! neq 0 goto :error
 )
 
+:continue_ns
 IF %signing% == "nonsecure" (
 echo Creating nonsecure image  >> %current_log_file% 2>>&1
 
