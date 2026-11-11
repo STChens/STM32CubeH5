@@ -121,7 +121,6 @@ if not "%MAJOR_VER%" == "3" (
   set "python=python3 "
 )
 ::=================================================================================================
-
 :: Environment variable for AppliCfg
 set "applicfg=%cube_fw_path%\Utilities\PC_Software\ROT_AppliConfig\AppliCfg.py"
 
@@ -157,7 +156,8 @@ echo Postbuild %signing% image >> %current_log_file% 2>>&1
 if "%app_image_number%" == "2" (
 goto :continue
 )
-IF %signing% == "nonsecure" (
+
+IF "%signing%" == "nonsecure" (
 echo Creating only one image >> %current_log_file% 2>>&1
 %python%%applicfg% oneimage -fb %s_code_bin% -o %image_s_size% -sb %ns_code_bin% -i 0x0 -ob %one_code_bin% --vb >> %current_log_file% 2>>&1
 if !errorlevel! neq 0 goto :error
@@ -167,7 +167,10 @@ set ns_app_bin_xml_field="%bin_path_xml_field%\rot_tz_app.bin"
 )
 
 :continue
-IF %signing% == "secure" (
+if "%app_image_number%" == "1" (
+goto :continue_ns
+)
+IF "%signing%" == "secure" (
 
 echo Creating secure image  >> %current_log_file% 2>>&1
 
@@ -201,8 +204,8 @@ if !errorlevel! neq 0 goto :error
 if !errorlevel! neq 0 goto :error
 )
 
-IF %signing% == "nonsecure" (
-
+:continue_ns
+IF "%signing%" == "nonsecure" (
 echo Creating nonsecure image  >> %current_log_file% 2>>&1
 
 ::update xml file : input file

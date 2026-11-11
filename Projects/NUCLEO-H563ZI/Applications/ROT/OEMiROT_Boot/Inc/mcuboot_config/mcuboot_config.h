@@ -59,9 +59,7 @@ extern "C" {
   #define NUM_ECC_BYTES 32
   #define NUM_ENC_ECC_BYTES 32
   #define MCUBOOT_SIGN_EC256
-  #define MCUBOOT_ENCRYPT_EC256
-                                          
-  #define MCUBOOT_KEY_REVOCATION                                        
+  #define MCUBOOT_ENCRYPT_EC256                                          
 #else
 #error "CRYPTO_SCHEME must be CRYPTO_SCHEME_EC256 or CRYPTO_SCHEME_EC384!"
 #endif

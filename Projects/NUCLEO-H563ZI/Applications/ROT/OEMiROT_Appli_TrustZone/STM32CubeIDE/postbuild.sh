@@ -161,7 +161,7 @@ if  [ $app_image_number -eq 1 ] && [ $signing == "nonsecure" ]; then
     ns_app_bin_xml_field="$bin_path_xml_field/rot_tz_app.bin"
 fi
 
-if  [ $signing == "secure" ]; then
+if  [ $app_image_number -neq 1 ] && [ $signing == "secure" ]; then
 
     echo "Creating secure image"  >> $current_log_file 2>&1
 

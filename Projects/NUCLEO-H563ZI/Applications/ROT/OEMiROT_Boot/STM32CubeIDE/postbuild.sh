@@ -581,6 +581,10 @@ if [ $? != 0 ]; then error; fi
 #xml for init image generation
 
 #
+$python$applicfg xmlname --layout $preprocess_bl2_file -m RE_APP_IMAGE_NUMBER -n "$auth_ns" -sn "$auth_s" -v 1 -c k $s_code_init_xml --vb >> $current_log_file 2>&1
+if [ $? != 0 ]; then error; fi
+
+#
 $python$applicfg xmlval --layout $preprocess_bl2_file -m RE_IMAGE_FLASH_SECURE_IMAGE_SIZE -c S $s_code_init_xml --vb >> $current_log_file 2>&1
 if [ $? != 0 ]; then error; fi
 

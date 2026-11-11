@@ -33,7 +33,6 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 #define OBK_HDPL1_RES_SIZE        (0x60U) /* Size reserved at start of OBKey Hdpl 1 for RSS DA */
-#define OBK_HDPL1_TOTAL_SIZE        (0x800U) /* Total Size of OBKey Hdpl 1 */
 #define OBK_HDPL1_CFG_OFFSET      (OBK_HDPL1_OFFSET + OBK_HDPL1_RES_SIZE) /* First OBkey Hdpl 1 for immutable config */
 #define OBK_HDPL1_CFG_SIZE        (sizeof(OBK_Hdpl1Config)) /* Size for OBkey Hdpl 1 cfg section */
 #define OBK_HDPL1_DATA_OFFSET     (OBK_HDPL1_CFG_OFFSET + OBK_HDPL1_CFG_SIZE) /* First OBkey Hdpl 1 for data section */
@@ -59,8 +58,6 @@ extern "C" {
 #define OBK_SHA_LENGTH            SHA256_LENGTH // FIXME we use SHA256 for OBK SHA first
 #define IMG_SHA_LENGTH            SHA384_LENGTH
   
-#define AUTH_PUB_KEY_TOTAL_NUM  8   // Number of pub keys to support revocation
-//#define AUTH_PUB_KEY_TOTAL_NUM  1
 #else
 #error "undefined crypto scheme"
 #endif
